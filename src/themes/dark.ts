@@ -5,6 +5,7 @@ export const darkTheme: Theme = {
   colors: {
     background: '#1e1e1e',
     foreground: '#d4d4d4',
+    border: '#3e3e3e',
 
     calendarBorder: '#3e3e3e',
     calendarHeader: '#569cd6',
@@ -36,5 +37,8 @@ export const darkTheme: Theme = {
     keyboardHint: '#6e6e6e',
     helpDialogBorder: '#569cd6',
     focusIndicator: '#c586c0',
+
+    modalOverlay: '#121212',
+    modalBackground: '#1e1e1e',
   },
 };

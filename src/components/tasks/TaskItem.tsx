@@ -1,7 +1,7 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { useTheme } from '../../contexts/ThemeContext';
-import type { Task } from '../../types/task';
+import React from "react";
+import { Box, Text } from "ink";
+import { useTheme } from "../../contexts/ThemeContext";
+import type { Task } from "../../types/task";
 
 interface TaskItemProps {
   task: Task;
@@ -10,29 +10,44 @@ interface TaskItemProps {
   isExpanded: boolean;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, depth, isSelected, isExpanded }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({
+  task,
+  depth,
+  isSelected,
+  isExpanded,
+}) => {
   const { theme } = useTheme();
 
-  const stateColors: Record<string, string> = {
+  const stateColors: Record<string, string | undefined> = {
     todo: theme.colors.taskStateTodo,
     completed: theme.colors.taskStateCompleted,
     delegated: theme.colors.taskStateDelegated,
     delayed: theme.colors.taskStateDelayed,
   };
 
-  const checkbox = task.state === 'completed' ? '☑' :
-                   task.state === 'delegated' ? '↦' :
-                   task.state === 'delayed' ? '⏸' : '☐';
+  const checkbox =
+    task.state === "completed"
+      ? "☑"
+      : task.state === "delegated"
+      ? "↦"
+      : task.state === "delayed"
+      ? "⏸"
+      : "☐";
 
-  const expandIcon = task.children.length > 0 ? (isExpanded ? '▼ ' : '▶ ') : '  ';
-  const indent = '  '.repeat(depth);
-  const selector = isSelected ? '>' : ' ';
+  const expandIcon =
+    task.children.length > 0 ? (isExpanded ? "▼ " : "▶ ") : "  ";
+  const indent = "  ".repeat(depth);
+  const selector = isSelected ? ">" : " ";
   const textColor = stateColors[task.state] || theme.colors.foreground;
-  const strikethrough = task.state === 'completed';
+  const strikethrough = task.state === "completed";
 
   return (
     <Box>
-      <Text color={isSelected ? theme.colors.focusIndicator : theme.colors.foreground}>
+      <Text
+        color={
+          isSelected ? theme.colors.focusIndicator : theme.colors.foreground
+        }
+      >
         {selector}
       </Text>
       <Text> </Text>
@@ -43,7 +58,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, depth, isSelected, isE
       <Text
         color={textColor}
         strikethrough={strikethrough}
-        dimColor={task.state === 'delayed'}
+        dimColor={task.state === "delayed"}
       >
         {task.title}
       </Text>

@@ -1,21 +1,25 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useApp } from '../../contexts/AppContext';
-import { Pane } from '../layout/Pane';
-import { TimelineEntry } from './TimelineEntry';
-import { getDateString } from '../../utils/date';
+import React from "react";
+import { Box, Text } from "ink";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useApp } from "../../contexts/AppContext";
+import { Pane } from "../layout/Pane";
+import { TimelineEntry } from "./TimelineEntry";
+import { getDateString } from "../../utils/date";
 
 export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, timeline, activePane } = useApp();
-  const isFocused = activePane === 'timeline';
+  const { selectedDate, timeline, activePane, isModalOpen } = useApp();
+  const isFocused = activePane === "timeline" && !isModalOpen;
 
-  const dateStr = getDateString(new Date(selectedDate.year, selectedDate.month, selectedDate.day));
+  const dateStr = getDateString(
+    new Date(selectedDate.year, selectedDate.month, selectedDate.day)
+  );
   const dayEvents = timeline[dateStr] || [];
 
   // Sort events by timestamp
-  const sortedEvents = [...dayEvents].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  const sortedEvents = [...dayEvents].sort(
+    (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+  );
 
   return (
     <Pane title="Timeline" isFocused={isFocused} width={35}>
@@ -28,7 +32,7 @@ export const TimelinePane: React.FC = () => {
           </Box>
         ) : (
           <>
-            {sortedEvents.map(event => (
+            {sortedEvents.map((event) => (
               <TimelineEntry key={event.id} event={event} />
             ))}
           </>
@@ -36,7 +40,7 @@ export const TimelinePane: React.FC = () => {
 
         <Box marginTop={1}>
           <Text color={theme.colors.keyboardHint} dimColor>
-            j/k: scroll  t: theme
+            j/k: scroll
           </Text>
         </Box>
       </Box>

@@ -11,7 +11,7 @@ interface KeyCode {
 }
 
 export const useKeyboardNav = () => {
-  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation } = useApp();
+  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog } = useApp();
 
   // Auto-reset exit confirmation after 3 seconds
   useEffect(() => {
@@ -34,8 +34,8 @@ export const useKeyboardNav = () => {
       }
     }
 
-    // Skip all shortcuts when in input mode
-    if (isInputMode) {
+    // Skip all shortcuts when in input mode or modal dialogs
+    if (isInputMode || showThemeDialog) {
       return;
     }
 
@@ -47,6 +47,11 @@ export const useKeyboardNav = () => {
 
     if (input === '?') {
       setShowHelp(!showHelp);
+      return;
+    }
+
+    if (input === 't') {
+      setShowThemeDialog(true);
       return;
     }
 

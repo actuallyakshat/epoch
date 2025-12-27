@@ -1,31 +1,45 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Text, useInput } from 'ink';
-import TextInput from 'ink-text-input';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useApp } from '../../contexts/AppContext';
-import { Pane } from '../layout/Pane';
-import { TaskHeader } from './TaskHeader';
-import { TaskList } from './TaskList';
-import { getDateString } from '../../utils/date';
-import { taskService } from '../../services/taskService';
-import { flattenTasks } from '../../utils/tree';
-import type { Task } from '../../types/task';
+import React, { useState, useEffect, useMemo } from "react";
+import { Box, Text, useInput } from "ink";
+import TextInput from "ink-text-input";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useApp } from "../../contexts/AppContext";
+import { Pane } from "../layout/Pane";
+import { TaskHeader } from "./TaskHeader";
+import { TaskList } from "./TaskList";
+import { getDateString } from "../../utils/date";
+import { taskService } from "../../services/taskService";
+import { flattenTasks } from "../../utils/tree";
+import type { Task } from "../../types/task";
 
-type EditMode = 'none' | 'add' | 'edit' | 'addSubtask';
+type EditMode = "none" | "add" | "edit" | "addSubtask";
 
 export const TasksPane: React.FC = () => {
+  const {
+    tasks,
+    setTasks,
+    timeline,
+    setTimeline,
+    activePane,
+    selectedDate,
+    isInputMode,
+    setIsInputMode,
+    isModalOpen,
+  } = useApp();
   const { theme } = useTheme();
-  const { selectedDate, tasks, setTasks, activePane, setIsInputMode } = useApp();
+
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [editMode, setEditMode] = useState<EditMode>('none');
-  const [editValue, setEditValue] = useState('');
+  const [editMode, setEditMode] = useState<EditMode>("none");
+  const [editValue, setEditValue] = useState("");
   const [parentTaskId, setParentTaskId] = useState<string | null>(null);
 
-  const dateStr = getDateString(new Date(selectedDate.year, selectedDate.month, selectedDate.day));
+  const dateStr = getDateString(
+    new Date(selectedDate.year, selectedDate.month, selectedDate.day)
+  );
+
   const dayTasks = tasks[dateStr] || [];
   const stats = taskService.getTaskStats(tasks, dateStr);
-  const isFocused = activePane === 'tasks';
+  const isFocused = activePane === "tasks" && !isModalOpen;
 
   // Flatten tasks for navigation (only visible ones based on expanded state)
   const flatTasks = useMemo(() => {
@@ -50,7 +64,7 @@ export const TasksPane: React.FC = () => {
   // Reset selection when day changes
   useEffect(() => {
     setSelectedIndex(0);
-    setEditMode('none');
+    setEditMode("none");
   }, [dateStr]);
 
   // Clamp selection index when tasks change
@@ -61,14 +75,14 @@ export const TasksPane: React.FC = () => {
   }, [flatTasks.length, selectedIndex]);
 
   const handleAddTask = () => {
-    setEditMode('add');
-    setEditValue('');
+    setEditMode("add");
+    setEditValue("");
     setIsInputMode(true);
   };
 
   const handleEditTask = () => {
     if (selectedTask) {
-      setEditMode('edit');
+      setEditMode("edit");
       setEditValue(selectedTask.title);
       setIsInputMode(true);
     }
@@ -76,12 +90,12 @@ export const TasksPane: React.FC = () => {
 
   const handleAddSubtask = () => {
     if (selectedTask) {
-      setEditMode('addSubtask');
-      setEditValue('');
+      setEditMode("addSubtask");
+      setEditValue("");
       setParentTaskId(selectedTask.id);
       setIsInputMode(true);
       // Auto-expand the parent to show the new subtask when created
-      setExpandedIds(prev => new Set(prev).add(selectedTask.id));
+      setExpandedIds((prev) => new Set(prev).add(selectedTask.id));
     }
   };
 
@@ -91,25 +105,32 @@ export const TasksPane: React.FC = () => {
         const updated = taskService.deleteTask(tasks, selectedTaskId);
         setTasks(updated);
       } catch (err) {
-        console.error('Error deleting task:', err);
+        console.error("Error deleting task:", err);
       }
     }
   };
 
-  const handleChangeState = (newState: 'todo' | 'completed' | 'delegated' | 'delayed') => {
+  const handleChangeState = (
+    newState: "todo" | "completed" | "delegated" | "delayed"
+  ) => {
     if (selectedTaskId) {
       try {
-        const updated = taskService.changeTaskState(tasks, selectedTaskId, newState);
+        const updated = taskService.changeTaskState(
+          tasks,
+          selectedTaskId,
+          newState
+        );
         setTasks(updated);
       } catch (err) {
-        console.error('Error changing task state:', err);
+        console.error("Error changing task state:", err);
       }
     }
   };
 
   const handleToggleComplete = () => {
     if (selectedTask) {
-      const newState = selectedTask.state === 'completed' ? 'todo' : 'completed';
+      const newState =
+        selectedTask.state === "completed" ? "todo" : "completed";
       handleChangeState(newState);
     }
   };
@@ -117,15 +138,15 @@ export const TasksPane: React.FC = () => {
   const handleSubmitEdit = (value: string) => {
     const trimmed = value.trim();
     if (!trimmed) {
-      setEditMode('none');
-      setEditValue('');
+      setEditMode("none");
+      setEditValue("");
       setParentTaskId(null);
       setIsInputMode(false);
       return;
     }
 
     try {
-      if (editMode === 'add') {
+      if (editMode === "add") {
         const newTask = taskService.createTask(trimmed, dateStr);
         const newTasks = {
           ...tasks,
@@ -133,38 +154,42 @@ export const TasksPane: React.FC = () => {
         };
         setTasks(newTasks);
         setSelectedIndex(flatTasks.length); // Select newly added task
-      } else if (editMode === 'addSubtask' && parentTaskId) {
+      } else if (editMode === "addSubtask" && parentTaskId) {
         const updated = taskService.addSubtask(tasks, parentTaskId, trimmed);
         setTasks(updated);
         // Find and select the newly added subtask
-        const parentIndex = flatTasks.findIndex(ft => ft.task.id === parentTaskId);
+        const parentIndex = flatTasks.findIndex(
+          (ft) => ft.task.id === parentTaskId
+        );
         if (parentIndex !== -1) {
           setSelectedIndex(parentIndex + 1); // Select first child (newly added)
         }
-      } else if (editMode === 'edit' && selectedTaskId) {
-        const updated = taskService.updateTask(tasks, selectedTaskId, { title: trimmed });
+      } else if (editMode === "edit" && selectedTaskId) {
+        const updated = taskService.updateTask(tasks, selectedTaskId, {
+          title: trimmed,
+        });
         setTasks(updated);
       }
     } catch (err) {
-      console.error('Error saving task:', err);
+      console.error("Error saving task:", err);
     }
 
-    setEditMode('none');
-    setEditValue('');
+    setEditMode("none");
+    setEditValue("");
     setParentTaskId(null);
     setIsInputMode(false);
   };
 
   const handleCancelEdit = () => {
-    setEditMode('none');
-    setEditValue('');
+    setEditMode("none");
+    setEditValue("");
     setParentTaskId(null);
     setIsInputMode(false);
   };
 
   const handleToggleExpand = () => {
     if (selectedTaskId && selectedTask?.children.length > 0) {
-      setExpandedIds(prev => {
+      setExpandedIds((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(selectedTaskId)) {
           newSet.delete(selectedTaskId);
@@ -178,13 +203,13 @@ export const TasksPane: React.FC = () => {
 
   const handleExpand = () => {
     if (selectedTaskId && selectedTask?.children.length > 0) {
-      setExpandedIds(prev => new Set(prev).add(selectedTaskId));
+      setExpandedIds((prev) => new Set(prev).add(selectedTaskId));
     }
   };
 
   const handleCollapse = () => {
     if (selectedTaskId && selectedTask?.children.length > 0) {
-      setExpandedIds(prev => {
+      setExpandedIds((prev) => {
         const newSet = new Set(prev);
         newSet.delete(selectedTaskId);
         return newSet;
@@ -211,115 +236,126 @@ export const TasksPane: React.FC = () => {
     setExpandedIds(new Set());
   };
 
-  useInput((input: string, key) => {
-    if (!isFocused) return;
+  useInput(
+    (input: string, key) => {
+      if (!isFocused) return;
 
-    // When in edit mode, only handle escape
-    if (editMode !== 'none') {
-      if (key.escape) {
-        handleCancelEdit();
+      // When in edit mode, only handle escape
+      if (editMode !== "none") {
+        if (key.escape) {
+          handleCancelEdit();
+        }
+        return;
       }
-      return;
-    }
 
-    // Navigation
-    if (input === 'j' || key.downArrow) {
-      setSelectedIndex(prev => Math.min(prev + 1, flatTasks.length - 1));
-      return;
-    }
-
-    if (input === 'k' || key.upArrow) {
-      setSelectedIndex(prev => Math.max(prev - 1, 0));
-      return;
-    }
-
-    // Expand/Collapse with arrow keys
-    if (key.leftArrow) {
-      if (key.meta || key.ctrl) {
-        // Cmd/Ctrl + Left: Collapse all
+      // Expand/Collapse ALL with Cmd/Ctrl + arrow keys
+      // Note: On Mac terminals, Cmd+Left sends Ctrl+a and Cmd+Right sends Ctrl+e
+      if ((key.meta || key.ctrl) && (input === "a" || key.leftArrow)) {
         handleCollapseAll();
-      } else {
-        // Left: Collapse current
-        handleCollapse();
+        return;
       }
-      return;
-    }
 
-    if (key.rightArrow) {
-      if (key.meta || key.ctrl) {
-        // Cmd/Ctrl + Right: Expand all
+      if ((key.meta || key.ctrl) && (input === "e" || key.rightArrow)) {
         handleExpandAll();
-      } else {
-        // Right: Expand current
+        return;
+      }
+
+      // Navigation
+      if (input === "j" || key.downArrow) {
+        setSelectedIndex((prev) => Math.min(prev + 1, flatTasks.length - 1));
+        return;
+      }
+
+      if (input === "k" || key.upArrow) {
+        setSelectedIndex((prev) => Math.max(prev - 1, 0));
+        return;
+      }
+
+      // Expand/Collapse current with arrow keys (no modifiers)
+      if (key.leftArrow && !key.meta && !key.ctrl) {
+        handleCollapse();
+        return;
+      }
+
+      if (key.rightArrow && !key.meta && !key.ctrl) {
         handleExpand();
+        return;
       }
-      return;
-    }
 
-    // Task actions
-    if (input === 'a') {
-      handleAddTask();
-      return;
-    }
-
-    if (input === 'e' && selectedTask) {
-      handleEditTask();
-      return;
-    }
-
-    if (input === 'd' && selectedTask) {
-      handleDeleteTask();
-      return;
-    }
-
-    if (input === ' ' && selectedTask) {
-      handleToggleComplete();
-      return;
-    }
-
-    if (input === 'D' && selectedTask) {
-      handleChangeState('delegated');
-      return;
-    }
-
-    if (input === 'x' && selectedTask) {
-      handleChangeState('delayed');
-      return;
-    }
-
-    if (input === 's' && selectedTask) {
-      // Start task
-      try {
-        const updated = taskService.startTask(tasks, selectedTaskId!);
-        setTasks(updated);
-      } catch (err) {
-        console.error('Error starting task:', err);
+      // Task actions (only if no modifier keys are pressed)
+      if (input === "a" && !key.meta && !key.ctrl && !key.shift) {
+        handleAddTask();
+        return;
       }
-      return;
-    }
 
-    if (key.return && selectedTask) {
-      handleToggleExpand();
-      return;
-    }
+      if (
+        input === "e" &&
+        selectedTask &&
+        !key.meta &&
+        !key.ctrl &&
+        !key.shift
+      ) {
+        handleEditTask();
+        return;
+      }
 
-    if (key.tab && selectedTask) {
-      handleAddSubtask();
-      return;
-    }
-  }, { isActive: isFocused && editMode === 'none' });
+      if (input === "d" && selectedTask) {
+        handleDeleteTask();
+        return;
+      }
+
+      if (input === " " && selectedTask) {
+        handleToggleComplete();
+        return;
+      }
+
+      if (input === "D" && selectedTask) {
+        handleChangeState("delegated");
+        return;
+      }
+
+      if (input === "x" && selectedTask) {
+        handleChangeState("delayed");
+        return;
+      }
+
+      if (input === "s" && selectedTask) {
+        // Start task
+        try {
+          const updated = taskService.startTask(tasks, selectedTaskId!);
+          setTasks(updated);
+        } catch (err) {
+          console.error("Error starting task:", err);
+        }
+        return;
+      }
+
+      if (key.return && selectedTask) {
+        handleToggleExpand();
+        return;
+      }
+
+      if (key.tab && selectedTask) {
+        handleAddSubtask();
+        return;
+      }
+    },
+    { isActive: isFocused }
+  );
 
   return (
     <Pane title="Tasks" isFocused={isFocused}>
       <Box flexDirection="column" flexGrow={1}>
         <TaskHeader
-          selectedDate={new Date(selectedDate.year, selectedDate.month, selectedDate.day)}
+          selectedDate={
+            new Date(selectedDate.year, selectedDate.month, selectedDate.day)
+          }
           completionPercentage={stats.percentage}
         />
 
-        {editMode === 'add' && (
+        {editMode === "add" && (
           <Box marginY={1}>
-            <Text color={theme.colors.focusIndicator}>{'>  '}</Text>
+            <Text color={theme.colors.focusIndicator}>{">  "}</Text>
             <TextInput
               value={editValue}
               onChange={setEditValue}
@@ -329,10 +365,10 @@ export const TasksPane: React.FC = () => {
           </Box>
         )}
 
-        {editMode === 'addSubtask' && (
+        {editMode === "addSubtask" && (
           <Box marginY={1}>
-            <Text color={theme.colors.focusIndicator}>{'>  '}</Text>
-            <Text color={theme.colors.keyboardHint}>{'  '}</Text>
+            <Text color={theme.colors.focusIndicator}>{">  "}</Text>
+            <Text color={theme.colors.keyboardHint}>{"  "}</Text>
             <TextInput
               value={editValue}
               onChange={setEditValue}
@@ -342,7 +378,9 @@ export const TasksPane: React.FC = () => {
           </Box>
         )}
 
-        {dayTasks.length === 0 && editMode !== 'add' && editMode !== 'addSubtask' ? (
+        {dayTasks.length === 0 &&
+        editMode !== "add" &&
+        editMode !== "addSubtask" ? (
           <Box marginY={1}>
             <Text color={theme.colors.keyboardHint} dimColor>
               No tasks. Press &apos;a&apos; to add one.
@@ -353,12 +391,12 @@ export const TasksPane: React.FC = () => {
             {flatTasks.map(({ task, depth }, index) => {
               const isSelected = index === selectedIndex;
               const isExpanded = expandedIds.has(task.id);
-              const isEditing = editMode === 'edit' && isSelected;
+              const isEditing = editMode === "edit" && isSelected;
 
               if (isEditing) {
                 return (
                   <Box key={task.id}>
-                    <Text color={theme.colors.focusIndicator}>{'>  '}</Text>
+                    <Text color={theme.colors.focusIndicator}>{">  "}</Text>
                     <TextInput
                       value={editValue}
                       onChange={setEditValue}
@@ -370,8 +408,14 @@ export const TasksPane: React.FC = () => {
 
               return (
                 <Box key={task.id}>
-                  <Text color={isSelected ? theme.colors.focusIndicator : theme.colors.foreground}>
-                    {isSelected ? '>' : ' '}
+                  <Text
+                    color={
+                      isSelected
+                        ? theme.colors.focusIndicator
+                        : theme.colors.foreground
+                    }
+                  >
+                    {isSelected ? ">" : " "}
                   </Text>
                   <Text> </Text>
                   <Text color={getStateColor(task.state, theme)}>
@@ -379,13 +423,17 @@ export const TasksPane: React.FC = () => {
                   </Text>
                   <Text> </Text>
                   <Text>
-                    {task.children.length > 0 ? (isExpanded ? '▼ ' : '▶ ') : '  '}
+                    {task.children.length > 0
+                      ? isExpanded
+                        ? "▼ "
+                        : "▶ "
+                      : "  "}
                   </Text>
-                  <Text>{'  '.repeat(depth)}</Text>
+                  <Text>{"  ".repeat(depth)}</Text>
                   <Text
                     color={getStateColor(task.state, theme)}
-                    strikethrough={task.state === 'completed'}
-                    dimColor={task.state === 'delayed'}
+                    strikethrough={task.state === "completed"}
+                    dimColor={task.state === "delayed"}
                   >
                     {task.title}
                   </Text>
@@ -400,13 +448,13 @@ export const TasksPane: React.FC = () => {
 
         <Box marginTop={1} flexDirection="column">
           <Text color={theme.colors.keyboardHint} dimColor>
-            j/k: navigate  a: add  Tab: add subtask  e: edit  d: delete
+            j/k: navigate a: add Tab: add subtask e: edit d: delete
           </Text>
           <Text color={theme.colors.keyboardHint} dimColor>
-            Space: complete  D: delegate  x: delay  s: start
+            Space: complete D: delegate x: delay s: start
           </Text>
           <Text color={theme.colors.keyboardHint} dimColor>
-            ←/→: collapse/expand  Cmd+←/→: collapse/expand all
+            ←/→: collapse/expand Cmd+←/→: collapse/expand all
           </Text>
         </Box>
       </Box>
@@ -416,15 +464,19 @@ export const TasksPane: React.FC = () => {
 
 function getCheckbox(state: string): string {
   switch (state) {
-    case 'completed': return '☑';
-    case 'delegated': return '↦';
-    case 'delayed': return '⏸';
-    default: return '☐';
+    case "completed":
+      return "☑";
+    case "delegated":
+      return "↦";
+    case "delayed":
+      return "⏸";
+    default:
+      return "☐";
   }
 }
 
-function getStateColor(state: string, theme: any): string {
-  const colors: Record<string, string> = {
+function getStateColor(state: string, theme: any): string | undefined {
+  const colors: Record<string, string | undefined> = {
     todo: theme.colors.taskStateTodo,
     completed: theme.colors.taskStateCompleted,
     delegated: theme.colors.taskStateDelegated,

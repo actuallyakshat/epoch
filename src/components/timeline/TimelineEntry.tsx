@@ -1,8 +1,8 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { useTheme } from '../../contexts/ThemeContext';
-import { timelineService } from '../../services/timelineService';
-import type { TimelineEvent } from '../../types/timeline';
+import React from "react";
+import { Box, Text } from "ink";
+import { useTheme } from "../../contexts/ThemeContext";
+import { timelineService } from "../../services/timelineService";
+import type { TimelineEvent } from "../../types/timeline";
 
 interface TimelineEntryProps {
   event: TimelineEvent;
@@ -12,15 +12,15 @@ export const TimelineEntry: React.FC<TimelineEntryProps> = ({ event }) => {
   const { theme } = useTheme();
   const icon = timelineService.getEventIcon(event.type);
 
-  const timeStr = event.timestamp.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+  const timeStr = event.timestamp.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: true,
   });
 
   const typeStr = event.type.charAt(0).toUpperCase() + event.type.slice(1);
 
-  const eventTypeColors: Record<string, string> = {
+  const eventTypeColors: Record<string, string | undefined> = {
     created: theme.colors.timelineEventCreated,
     started: theme.colors.timelineEventStarted,
     completed: theme.colors.timelineEventCompleted,

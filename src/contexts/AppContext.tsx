@@ -30,6 +30,9 @@ interface AppContextType {
   setOverviewMonth: (date: { year: number; month: number }) => void;
   exitConfirmation: boolean;
   setExitConfirmation: (show: boolean) => void;
+  showThemeDialog: boolean;
+  setShowThemeDialog: (show: boolean) => void;
+  isModalOpen: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -61,6 +64,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     month: today.getMonth(),
   });
   const [exitConfirmation, setExitConfirmation] = useState(false);
+  const [showThemeDialog, setShowThemeDialog] = useState(false);
 
   // Track if initial data has been loaded to prevent save loop
   const initialLoadDone = useRef(false);
@@ -114,6 +118,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setOverviewMonth,
         exitConfirmation,
         setExitConfirmation,
+        showThemeDialog,
+        setShowThemeDialog,
+        isModalOpen: showHelp || showThemeDialog || showOverview,
       }}
     >
       {children}

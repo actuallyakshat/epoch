@@ -5,6 +5,7 @@ export const lightTheme: Theme = {
   colors: {
     background: '#ffffff',
     foreground: '#333333',
+    border: '#cccccc',
 
     calendarBorder: '#cccccc',
     calendarHeader: '#0066cc',
@@ -36,5 +37,8 @@ export const lightTheme: Theme = {
     keyboardHint: '#999999',
     helpDialogBorder: '#0066cc',
     focusIndicator: '#9933cc',
+
+    modalOverlay: '#f0f0f0',
+    modalBackground: '#ffffff',
   },
 };
