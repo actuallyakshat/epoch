@@ -31,6 +31,7 @@ export const Pane: React.FC<PaneProps> = ({
       width={width}
       height={paneHeight}
       paddingRight={1}
+      paddingX={2}
       alignItems={center ? "center" : "flex-start"}
     >
       {title && (

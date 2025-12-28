@@ -438,7 +438,8 @@ export const TasksPane: React.FC = () => {
             <TextInput
               value={editValue}
               onChange={(val) => {
-                if (val.length <= 100) setEditValue(val);
+                const sanitized = val.replace(/[\n\r]/g, "");
+                if (sanitized.length <= 100) setEditValue(sanitized);
               }}
               onSubmit={handleSubmitEdit}
               placeholder="Enter task name..."
@@ -453,7 +454,8 @@ export const TasksPane: React.FC = () => {
             <TextInput
               value={editValue}
               onChange={(val) => {
-                if (val.length <= 100) setEditValue(val);
+                const sanitized = val.replace(/[\n\r]/g, "");
+                if (sanitized.length <= 100) setEditValue(sanitized);
               }}
               onSubmit={handleSubmitEdit}
               placeholder="Enter subtask name..."
@@ -483,7 +485,8 @@ export const TasksPane: React.FC = () => {
                     <TextInput
                       value={editValue}
                       onChange={(val) => {
-                        if (val.length <= 100) setEditValue(val);
+                        const sanitized = val.replace(/[\n\r]/g, "");
+                        if (sanitized.length <= 100) setEditValue(sanitized);
                       }}
                       onSubmit={handleSubmitEdit}
                     />

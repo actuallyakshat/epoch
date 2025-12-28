@@ -29,7 +29,7 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({
   const [data, setData] = useState<StorageSchema | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   // Keep a ref to always have the latest data for sync saves
   const latestDataRef = useRef<StorageSchema | null>(null);
 

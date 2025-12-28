@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "ink";
+import { Box, Text } from "ink";
 import type { ReactNode } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -13,12 +13,31 @@ interface ThreeColumnLayoutProps {
   activePane?: "calendar" | "tasks" | "timeline";
 }
 
+// Vertical separator component that fills height with proper background
+const VerticalSeparator: React.FC<{
+  color: string;
+  backgroundColor?: string;
+  height?: number;
+}> = ({ color, backgroundColor, height }) => {
+  // Create a column of │ characters
+  const lines = height ? Array(height).fill("│") : ["│"];
+  return (
+    <Box flexDirection="column" backgroundColor={backgroundColor}>
+      {lines.map((char, i) => (
+        <Text key={i} color={color} backgroundColor={backgroundColor}>
+          {char}
+        </Text>
+      ))}
+    </Box>
+  );
+};
+
 export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
   leftPane,
   centerPane,
   rightPane,
   leftWidth = "15%",
-  rightWidth = "30%",
+  rightWidth = "25%",
   height,
   activePane,
 }) => {
@@ -32,36 +51,47 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
     theme.name !== "terminal" ? theme.colors.background : undefined;
 
   return (
-    <Box flexDirection="row" width="100%" height={height}>
-      {/* Left Pane */}
+    <Box flexDirection="row" width="100%" height={height} backgroundColor={bgColor}>
+      {/* Left Pane - Calendar */}
       <Box
         width={leftWidth}
+        flexShrink={0}
         flexDirection="column"
-        borderRight
-        borderStyle="single"
-        borderColor={activePane === "calendar" ? focusedColor : normalColor}
+        backgroundColor={bgColor}
       >
         {leftPane}
       </Box>
 
-      {/* Center Pane */}
+      {/* Separator between Calendar and Tasks */}
+      <VerticalSeparator
+        color={activePane === "calendar" ? focusedColor! : normalColor!}
+        backgroundColor={bgColor}
+        height={height}
+      />
+
+      {/* Center Pane - Tasks */}
       <Box
         flexGrow={1}
+        flexShrink={1}
         flexDirection="column"
-        borderRight
-        borderStyle="single"
-        borderColor={activePane === "tasks" ? focusedColor : normalColor}
+        backgroundColor={bgColor}
       >
         {centerPane}
       </Box>
 
-      {/* Right Pane */}
+      {/* Separator between Tasks and Timeline */}
+      <VerticalSeparator
+        color={activePane === "tasks" ? focusedColor! : normalColor!}
+        backgroundColor={bgColor}
+        height={height}
+      />
+
+      {/* Right Pane - Timeline */}
       <Box
         width={rightWidth}
+        flexShrink={0.3}
         flexDirection="column"
-        borderLeft
-        borderStyle="single"
-        borderColor={activePane === "timeline" ? focusedColor : normalColor}
+        backgroundColor={bgColor}
       >
         {rightPane}
       </Box>

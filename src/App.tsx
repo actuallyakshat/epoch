@@ -46,7 +46,7 @@ const AppContent: React.FC = () => {
 
   return (
     <FullscreenBackground backgroundColor={theme.colors.background || "black"}>
-      <Box flexDirection="column" width={width} height={height} padding={1}>
+      <Box flexDirection="column" width={width} height={height} padding={1} backgroundColor={theme.colors.background}>
         {showOverview ? (
           <OverviewScreen />
         ) : (
@@ -73,13 +73,13 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider initialTheme="terminal">
-      <StorageProvider>
+    <StorageProvider>
+      <ThemeProvider initialTheme="dark">
         <AppProvider>
           <AppContent />
         </AppProvider>
-      </StorageProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </StorageProvider>
   );
 };
 
