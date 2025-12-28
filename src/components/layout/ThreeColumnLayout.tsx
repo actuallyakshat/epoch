@@ -17,8 +17,8 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
   leftPane,
   centerPane,
   rightPane,
-  leftWidth = 32,
-  rightWidth = 30,
+  leftWidth = "15%",
+  rightWidth = "30%",
   height,
   activePane,
 }) => {

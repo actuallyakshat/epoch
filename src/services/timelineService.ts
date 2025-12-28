@@ -39,6 +39,60 @@ export class TimelineService {
     };
   }
 
+  // Remove all events for a specific task (used when deleting a task)
+  removeEventsByTaskId(
+    timeline: { [date: string]: TimelineEvent[] },
+    taskId: string
+  ): { [date: string]: TimelineEvent[] } {
+    const result: { [date: string]: TimelineEvent[] } = {};
+
+    for (const [date, events] of Object.entries(timeline)) {
+      const filtered = events.filter(e => e.taskId !== taskId);
+      if (filtered.length > 0) {
+        result[date] = filtered;
+      }
+    }
+
+    return result;
+  }
+
+  // Remove the last event of a specific type for a task (used for undo operations)
+  removeLastEventByType(
+    timeline: { [date: string]: TimelineEvent[] },
+    taskId: string,
+    eventType: TimelineEventType
+  ): { [date: string]: TimelineEvent[] } {
+    const result: { [date: string]: TimelineEvent[] } = {};
+    let removed = false;
+
+    // Process dates in reverse order to find the most recent event
+    const dates = Object.keys(timeline).sort().reverse();
+
+    for (const date of dates) {
+      const events = timeline[date];
+      if (!removed) {
+        // Find the last matching event in this date's events
+        const lastIndex = events.map((e, i) => ({ e, i }))
+          .filter(({ e }) => e.taskId === taskId && e.type === eventType)
+          .pop()?.i;
+
+        if (lastIndex !== undefined) {
+          const filtered = events.filter((_, i) => i !== lastIndex);
+          if (filtered.length > 0) {
+            result[date] = filtered;
+          }
+          removed = true;
+        } else {
+          result[date] = events;
+        }
+      } else {
+        result[date] = events;
+      }
+    }
+
+    return result;
+  }
+
   formatEventDescription(event: TimelineEvent): string {
     const timeStr = event.timestamp.toLocaleTimeString('en-US', {
       hour: '2-digit',
@@ -47,23 +101,10 @@ export class TimelineService {
     });
 
     const stateInfo = event.newState
-      ? ` (${event.previousState} → ${event.newState})`
+      ? ` (${event.previousState} -> ${event.newState})`
       : '';
 
     return `${timeStr} - ${event.type.charAt(0).toUpperCase() + event.type.slice(1)}: ${event.taskTitle}${stateInfo}`;
-  }
-
-  getEventIcon(eventType: TimelineEventType): string {
-    const icons: Record<TimelineEventType, string> = {
-      created: '✨',
-      started: '▶️',
-      completed: '✅',
-      delegated: '👤',
-      delayed: '⏸️',
-      updated: '✏️',
-    };
-
-    return icons[eventType] || '•';
   }
 }
 

@@ -33,6 +33,7 @@ interface AppContextType {
   showThemeDialog: boolean;
   setShowThemeDialog: (show: boolean) => void;
   isModalOpen: boolean;
+  saveNow: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -42,7 +43,7 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const { data, save } = useStorage();
+  const { data, save, saveNow } = useStorage();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<CalendarDate>({
     year: today.getFullYear(),
@@ -121,6 +122,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         showThemeDialog,
         setShowThemeDialog,
         isModalOpen: showHelp || showThemeDialog || showOverview,
+        saveNow,
       }}
     >
       {children}

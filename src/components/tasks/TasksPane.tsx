@@ -8,8 +8,10 @@ import { TaskHeader } from "./TaskHeader";
 import { TaskList } from "./TaskList";
 import { getDateString } from "../../utils/date";
 import { taskService } from "../../services/taskService";
+import { timelineService } from "../../services/timelineService";
 import { flattenTasks } from "../../utils/tree";
-import type { Task } from "../../types/task";
+import type { Task, TaskState } from "../../types/task";
+import { TimelineEventType } from "../../types/timeline";
 
 type EditMode = "none" | "add" | "edit" | "addSubtask";
 
@@ -104,6 +106,13 @@ export const TasksPane: React.FC = () => {
       try {
         const updated = taskService.deleteTask(tasks, selectedTaskId);
         setTasks(updated);
+
+        // Remove all timeline events for this task
+        const updatedTimeline = timelineService.removeEventsByTaskId(
+          timeline,
+          selectedTaskId
+        );
+        setTimeline(updatedTimeline);
       } catch (err) {
         console.error("Error deleting task:", err);
       }
@@ -113,14 +122,50 @@ export const TasksPane: React.FC = () => {
   const handleChangeState = (
     newState: "todo" | "completed" | "delegated" | "delayed"
   ) => {
-    if (selectedTaskId) {
+    if (selectedTaskId && selectedTask) {
       try {
+        const previousState = selectedTask.state;
         const updated = taskService.changeTaskState(
           tasks,
           selectedTaskId,
           newState
         );
         setTasks(updated);
+
+        // Handle timeline based on state change
+        if (newState === "todo") {
+          // If toggling back to todo, remove the previous state event
+          const eventTypeToRemove: Record<TaskState, TimelineEventType> = {
+            todo: TimelineEventType.STARTED, // shouldn't happen
+            completed: TimelineEventType.COMPLETED,
+            delegated: TimelineEventType.DELEGATED,
+            delayed: TimelineEventType.DELAYED,
+          };
+          const updatedTimeline = timelineService.removeLastEventByType(
+            timeline,
+            selectedTaskId,
+            eventTypeToRemove[previousState]
+          );
+          setTimeline(updatedTimeline);
+        } else {
+          // Create timeline event for state change
+          const eventTypeMap: Record<TaskState, TimelineEventType> = {
+            todo: TimelineEventType.STARTED, // shouldn't happen
+            completed: TimelineEventType.COMPLETED,
+            delegated: TimelineEventType.DELEGATED,
+            delayed: TimelineEventType.DELAYED,
+          };
+          const event = timelineService.createEvent(
+            selectedTaskId,
+            selectedTask.title,
+            eventTypeMap[newState],
+            new Date(),
+            previousState,
+            newState
+          );
+          const updatedTimeline = timelineService.addEvent(timeline, event);
+          setTimeline(updatedTimeline);
+        }
       } catch (err) {
         console.error("Error changing task state:", err);
       }
@@ -154,6 +199,7 @@ export const TasksPane: React.FC = () => {
         };
         setTasks(newTasks);
         setSelectedIndex(flatTasks.length); // Select newly added task
+        // No timeline event for task creation - only track started/completed/etc
       } else if (editMode === "addSubtask" && parentTaskId) {
         const updated = taskService.addSubtask(tasks, parentTaskId, trimmed);
         setTasks(updated);
@@ -164,6 +210,7 @@ export const TasksPane: React.FC = () => {
         if (parentIndex !== -1) {
           setSelectedIndex(parentIndex + 1); // Select first child (newly added)
         }
+        // No timeline event for subtask creation
       } else if (editMode === "edit" && selectedTaskId) {
         const updated = taskService.updateTask(tasks, selectedTaskId, {
           title: trimmed,
@@ -324,6 +371,16 @@ export const TasksPane: React.FC = () => {
         try {
           const updated = taskService.startTask(tasks, selectedTaskId!);
           setTasks(updated);
+
+          // Create timeline event for starting task
+          const event = timelineService.createEvent(
+            selectedTaskId!,
+            selectedTask.title,
+            TimelineEventType.STARTED,
+            new Date()
+          );
+          const updatedTimeline = timelineService.addEvent(timeline, event);
+          setTimeline(updatedTimeline);
         } catch (err) {
           console.error("Error starting task:", err);
         }

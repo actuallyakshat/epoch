@@ -123,10 +123,14 @@ export const CalendarPane: React.FC = () => {
   const monthName = calendarService.getMonthName(currentMonth.month);
 
   return (
-    <Pane title={`${monthName} ${currentMonth.year}`} isFocused={isFocused}>
-      <Box flexDirection="column">
+    <Pane
+      title={`${monthName} ${currentMonth.year}`}
+      isFocused={isFocused}
+      center
+    >
+      <Box flexDirection="column" alignItems="center">
         <MonthView calendarView={calendarView} />
-        <Box marginTop={1} flexDirection="column">
+        <Box marginTop={1} flexDirection="column" alignItems="center">
           <Text color={theme.colors.keyboardHint} dimColor>
             h/l: days j/k: weeks
           </Text>

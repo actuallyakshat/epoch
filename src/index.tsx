@@ -3,4 +3,7 @@ import { render } from "ink";
 import App from "./App";
 
 console.clear();
-render(<App />, { exitOnCtrlC: false });
+const app = render(<App />, { exitOnCtrlC: false });
+
+// Make the app instance globally accessible for clean exit
+(global as any).__inkApp = app;

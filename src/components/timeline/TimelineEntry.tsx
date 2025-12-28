@@ -1,46 +1,74 @@
 import React from "react";
 import { Box, Text } from "ink";
 import { useTheme } from "../../contexts/ThemeContext";
-import { timelineService } from "../../services/timelineService";
 import type { TimelineEvent } from "../../types/timeline";
 
 interface TimelineEntryProps {
   event: TimelineEvent;
+  isLast: boolean;
+  hasNextSameTask: boolean;
 }
 
-export const TimelineEntry: React.FC<TimelineEntryProps> = ({ event }) => {
+export const TimelineEntry: React.FC<TimelineEntryProps> = ({
+  event,
+  isLast,
+  hasNextSameTask,
+}) => {
   const { theme } = useTheme();
-  const icon = timelineService.getEventIcon(event.type);
 
-  const timeStr = event.timestamp.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  // Format time as "7:31 am"
+  const hours = event.timestamp.getHours();
+  const minutes = event.timestamp.getMinutes();
+  const ampm = hours >= 12 ? "pm" : "am";
+  const hour12 = hours % 12 || 12;
+  const timeStr = `${hour12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
 
   const typeStr = event.type.charAt(0).toUpperCase() + event.type.slice(1);
 
+  // Color mapping for event types
   const eventTypeColors: Record<string, string | undefined> = {
-    created: theme.colors.timelineEventCreated,
-    started: theme.colors.timelineEventStarted,
-    completed: theme.colors.timelineEventCompleted,
-    delegated: theme.colors.timelineEventDelegated,
-    delayed: theme.colors.timelineEventDelayed,
+    created: theme.colors.foreground,
+    started: theme.colors.foreground,
+    completed: theme.colors.taskStateCompleted,
+    delegated: theme.colors.taskStateDelegated,
+    delayed: theme.colors.taskStateDelayed,
     updated: theme.colors.foreground,
   };
 
+  const color = eventTypeColors[event.type] || theme.colors.foreground;
+
+  // Circle style: hollow for started, filled for completed/delegated/delayed
+  const isFilledCircle = ["completed", "delegated", "delayed"].includes(event.type);
+
   return (
-    <Box marginY={0}>
-      <Box width={2}>
-        <Text color={eventTypeColors[event.type]}>{icon}</Text>
+    <Box flexDirection="column">
+      {/* Main entry row */}
+      <Box>
+        {/* Circle indicator */}
+        <Box width={3} justifyContent="center">
+          <Text color={color}>{isFilledCircle ? "●" : "○"}</Text>
+        </Box>
+        {/* Event content */}
+        <Box flexDirection="column" flexGrow={1}>
+          <Text>
+            <Text color={color} bold>
+              {typeStr}:
+            </Text>
+            <Text color={theme.colors.foreground}> {event.taskTitle}</Text>
+          </Text>
+          <Text color={theme.colors.keyboardHint} dimColor>
+            {timeStr}
+          </Text>
+        </Box>
       </Box>
-      <Box width={8}>
-        <Text color={theme.colors.timelineTimestamp}>{timeStr}</Text>
-      </Box>
-      <Text color={eventTypeColors[event.type]}>{typeStr}:</Text>
-      <Box marginLeft={1} flexGrow={1}>
-        <Text color={theme.colors.foreground}>{event.taskTitle}</Text>
-      </Box>
+      {/* Vertical connector line */}
+      {!isLast && (
+        <Box>
+          <Box width={3} justifyContent="center">
+            <Text color={hasNextSameTask ? color : theme.colors.border}>│</Text>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };

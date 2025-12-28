@@ -11,7 +11,7 @@ interface KeyCode {
 }
 
 export const useKeyboardNav = () => {
-  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog } = useApp();
+  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog, saveNow } = useApp();
 
   // Auto-reset exit confirmation after 3 seconds
   useEffect(() => {
@@ -27,7 +27,35 @@ export const useKeyboardNav = () => {
     // Handle Ctrl+C with confirmation
     if (key.ctrl && input === 'c') {
       if (exitConfirmation) {
-        process.exit(0);
+        // Save data before exiting
+        saveNow().then(() => {
+          // Unmount the Ink app first
+          const inkApp = (global as any).__inkApp;
+          if (inkApp) {
+            inkApp.unmount();
+          }
+          
+          // Clear the terminal completely
+          setTimeout(() => {
+            console.clear();
+            process.stdout.write('\x1Bc'); // Reset terminal
+            process.exit(0);
+          }, 100); // Give Ink time to unmount
+        }).catch(() => {
+          // Unmount the Ink app first even on error
+          const inkApp = (global as any).__inkApp;
+          if (inkApp) {
+            inkApp.unmount();
+          }
+          
+          // Clear the terminal completely
+          setTimeout(() => {
+            console.clear();
+            process.stdout.write('\x1Bc'); // Reset terminal
+            process.exit(0);
+          }, 100); // Give Ink time to unmount
+        });
+        return;
       } else {
         setExitConfirmation(true);
         return;

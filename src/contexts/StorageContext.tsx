@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from 'react';
 import { storageService } from '../services/storage';
 import type { StorageSchema } from '../types/storage';
@@ -13,6 +14,7 @@ interface StorageContextType {
   isLoading: boolean;
   error: Error | null;
   save: (data: StorageSchema) => Promise<void>;
+  saveNow: () => Promise<void>;
 }
 
 const StorageContext = createContext<StorageContextType | undefined>(undefined);
@@ -28,6 +30,8 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  // Keep a ref to always have the latest data for sync saves
+  const latestDataRef = useRef<StorageSchema | null>(null);
 
   // Load data on mount
   useEffect(() => {
@@ -36,6 +40,7 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({
         setIsLoading(true);
         const loadedData = await storageService.load();
         setData(loadedData);
+        latestDataRef.current = loadedData;
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Unknown error'));
@@ -48,8 +53,9 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({
   }, []);
 
   // Debounced save
-  const save = async (newData: StorageSchema) => {
+  const save = useCallback(async (newData: StorageSchema) => {
     setData(newData);
+    latestDataRef.current = newData;
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -62,24 +68,39 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({
         setError(err instanceof Error ? err : new Error('Failed to save'));
       }
     }, 500);
-  };
+  }, []);
 
-  // Save on unmount
+  // Immediate save (for exit)
+  const saveNow = useCallback(async () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    if (latestDataRef.current) {
+      try {
+        await storageService.save(latestDataRef.current);
+      } catch (err) {
+        console.error('Failed to save:', err);
+      }
+    }
+  }, []);
+
+  // Save on unmount using the ref (always has latest data)
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
-      if (data) {
-        storageService.save(data).catch(err => {
+      if (latestDataRef.current) {
+        // Use sync write for unmount to ensure data is saved
+        storageService.save(latestDataRef.current).catch(err => {
           console.error('Failed to save on unmount:', err);
         });
       }
     };
-  }, [data]);
+  }, []);
 
   return (
-    <StorageContext.Provider value={{ data, isLoading, error, save }}>
+    <StorageContext.Provider value={{ data, isLoading, error, save, saveNow }}>
       {children}
     </StorageContext.Provider>
   );

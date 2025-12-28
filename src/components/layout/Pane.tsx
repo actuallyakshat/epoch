@@ -10,6 +10,7 @@ interface PaneProps {
   isFocused?: boolean;
   width?: number | string;
   height?: number | string;
+  center?: boolean;
 }
 
 export const Pane: React.FC<PaneProps> = ({
@@ -18,6 +19,7 @@ export const Pane: React.FC<PaneProps> = ({
   isFocused = false,
   width,
   height,
+  center = false,
 }) => {
   const { theme } = useTheme();
   // Allow height to be controlled by content or parent, don't force full screen
@@ -29,6 +31,7 @@ export const Pane: React.FC<PaneProps> = ({
       width={width}
       height={paneHeight}
       paddingRight={1}
+      alignItems={center ? "center" : "flex-start"}
     >
       {title && (
         <Box marginBottom={1}>
@@ -37,7 +40,12 @@ export const Pane: React.FC<PaneProps> = ({
           </Text>
         </Box>
       )}
-      <Box flexDirection="column" flexGrow={1} overflowY="hidden">
+      <Box
+        flexDirection="column"
+        flexGrow={1}
+        overflowY="hidden"
+        alignItems={center ? "center" : "flex-start"}
+      >
         {children}
       </Box>
     </Box>
