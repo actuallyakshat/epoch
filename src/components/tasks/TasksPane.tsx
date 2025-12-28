@@ -580,7 +580,7 @@ export const TasksPane: React.FC = () => {
                     <Text> </Text>
                     {task.children.length > 0 && (
                       <>
-                        <Text>{isExpanded ? "▼" : "▶"}</Text>
+                        <Text color={theme.colors.foreground}>{isExpanded ? "▼" : "▶"}</Text>
                         <Text> </Text>
                       </>
                     )}
