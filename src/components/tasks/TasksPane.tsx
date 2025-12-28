@@ -73,6 +73,21 @@ export const TasksPane: React.FC = () => {
   const selectedTask = flatTasks[selectedIndex]?.task;
   const selectedTaskId = selectedTask?.id;
 
+  // Expand all nested tasks by default when tasks change
+  useEffect(() => {
+    const allParentIds = new Set<string>();
+    const collectParents = (taskList: Task[]) => {
+      for (const task of taskList) {
+        if (task.children.length > 0) {
+          allParentIds.add(task.id);
+          collectParents(task.children);
+        }
+      }
+    };
+    collectParents(dayTasks);
+    setExpandedIds(allParentIds);
+  }, [dayTasks]);
+
   // Reset selection when day changes
   useEffect(() => {
     setSelectedIndex(0);
