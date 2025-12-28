@@ -52,11 +52,11 @@ export const TimelineEntry: React.FC<TimelineEntryProps> = ({
         </Box>
         {/* Event content */}
         <Box flexDirection="column" flexGrow={1} flexShrink={1} minWidth={0}>
-          <Text wrap="wrap">
+          <Text wrap="wrap" color={theme.colors.foreground}>
             <Text color={color} bold>
               {typeStr}:
             </Text>
-            <Text color={theme.colors.foreground}> {event.taskTitle}</Text>
+            {" "}{event.taskTitle}
           </Text>
           <Text color={theme.colors.keyboardHint} dimColor>
             {timeStr}
