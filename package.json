@@ -1,13 +1,20 @@
 {
-  "name": "epoch",
-  "version": "0.1.0",
+  "name": "epoch-tui",
+  "version": "0.1.2",
   "description": "A TUI app for daily task logging and time tracking",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "epoch": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx src/index.tsx",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "build": "tsup src/index.tsx --format esm --clean",
+    "start": "node dist/index.js",
+    "prepublishOnly": "pnpm run build"
   },
   "keywords": [
     "tui",
@@ -31,6 +38,7 @@
     "@types/node": "^20.10.6",
     "@types/react": "^19.2.7",
     "@types/uuid": "^11.0.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
