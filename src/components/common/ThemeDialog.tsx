@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Box, Text, useInput } from "ink";
-import TextInput from "ink-text-input";
+import { ControlledTextInput } from "./ControlledTextInput";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useApp } from "../../contexts/AppContext";
 import { Modal } from "./Modal";
@@ -77,15 +77,14 @@ export const ThemeDialog: React.FC = () => {
         return;
       }
 
+      // Block raw newlines (Shift+Enter sends \r or \n)
+      // Block raw newlines (Shift+Enter sends \r or \n) which don't trigger key.return
+      if ((input === "\r" || input === "\n") && !key.return) {
+        return;
+      }
+
       // Handle navigation based on focus mode
       if (focusMode === "search") {
-        // Enter selects the first result and closes
-        if (key.return && themeItems.length > 0) {
-          setTheme(themeItems[0].value);
-          setShowThemeDialog(false);
-          return;
-        }
-
         // In search mode, only down arrow moves to list (to avoid j/k interfering with typing)
         if (key.downArrow && themeItems.length > 0) {
           setFocusMode("list");
@@ -154,14 +153,20 @@ export const ThemeDialog: React.FC = () => {
           <Text color={theme.colors.foreground} dimColor>
             Search:{" "}
           </Text>
-          <Text color={theme.colors.foreground}>
-            <TextInput
-              value={searchQuery}
-              onChange={setSearchQuery}
-              focus={focusMode === "search"}
-              placeholder="Type to filter..."
-            />
-          </Text>
+          <ControlledTextInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSubmit={() => {
+              // Enter in search mode selects the first result
+              if (themeItems.length > 0) {
+                setTheme(themeItems[0].value);
+                setShowThemeDialog(false);
+              }
+            }}
+            focus={focusMode === "search"}
+            placeholder="Type to filter..."
+            placeholderColor={theme.colors.foreground}
+          />
         </Box>
         <Box flexDirection="column" marginTop={1}>
           {allThemes.map((item, idx) => {

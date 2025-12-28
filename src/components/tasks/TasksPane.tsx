@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Box, Text, useInput } from "ink";
-import { TextInput } from "@inkjs/ui";
+import { ControlledTextInput } from "../common/ControlledTextInput";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useApp } from "../../contexts/AppContext";
 import { Pane } from "../layout/Pane";
@@ -35,8 +35,6 @@ export const TasksPane: React.FC = () => {
   const [editMode, setEditMode] = useState<EditMode>("none");
   const [editValue, setEditValue] = useState("");
   const [parentTaskId, setParentTaskId] = useState<string | null>(null);
-  const inputValueRef = useRef(""); // Track current input value for uncontrolled TextInput
-  const [inputKey, setInputKey] = useState(0); // Key to force TextInput remount
   const [scrollOffset, setScrollOffset] = useState(0);
   const { height: terminalHeight } = useTerminalSize();
 
@@ -116,30 +114,24 @@ export const TasksPane: React.FC = () => {
   }, [dateStr]);
 
   const handleAddTask = () => {
-    inputValueRef.current = "";
     setEditMode("add");
     setEditValue("");
-    setInputKey((k) => k + 1);
     setIsInputMode(true);
   };
 
   const handleEditTask = () => {
     if (selectedTask) {
-      inputValueRef.current = selectedTask.title;
       setEditMode("edit");
       setEditValue(selectedTask.title);
-      setInputKey((k) => k + 1);
       setIsInputMode(true);
     }
   };
 
   const handleAddSubtask = () => {
     if (selectedTask) {
-      inputValueRef.current = "";
       setEditMode("addSubtask");
       setEditValue("");
       setParentTaskId(selectedTask.id);
-      setInputKey((k) => k + 1);
       setIsInputMode(true);
       setExpandedIds((prev) => new Set(prev).add(selectedTask.id));
     }
@@ -327,16 +319,6 @@ export const TasksPane: React.FC = () => {
     setExpandedIds(new Set());
   };
 
-  // Handle escape key to cancel editing
-  useInput(
-    (_input, key) => {
-      if (key.escape) {
-        handleCancelEdit();
-      }
-    },
-    { isActive: isFocused && editMode !== "none" }
-  );
-
   // Input handler for navigation/command mode
   useInput(
     (input, key) => {
@@ -480,14 +462,15 @@ export const TasksPane: React.FC = () => {
         {editMode === "add" && (
           <Box marginY={1}>
             <Text color={theme.colors.focusIndicator}>{">  "}</Text>
-            <TextInput
-              key={`add-${inputKey}`}
-              defaultValue=""
+            <ControlledTextInput
+              value={editValue}
               placeholder="Enter task name..."
-              onChange={(val) => {
-                inputValueRef.current = val;
-              }}
+              onChange={setEditValue}
               onSubmit={handleSubmitEdit}
+              onCancel={handleCancelEdit}
+              color={theme.colors.foreground}
+              placeholderColor={theme.colors.foreground}
+              maxLength={60}
             />
           </Box>
         )}
@@ -496,14 +479,15 @@ export const TasksPane: React.FC = () => {
           <Box marginY={1}>
             <Text color={theme.colors.focusIndicator}>{">  "}</Text>
             <Text color={theme.colors.keyboardHint}>{"  "}</Text>
-            <TextInput
-              key={`subtask-${inputKey}`}
-              defaultValue=""
+            <ControlledTextInput
+              value={editValue}
               placeholder="Enter subtask name..."
-              onChange={(val) => {
-                inputValueRef.current = val;
-              }}
+              onChange={setEditValue}
               onSubmit={handleSubmitEdit}
+              onCancel={handleCancelEdit}
+              color={theme.colors.foreground}
+              placeholderColor={theme.colors.foreground}
+              maxLength={60}
             />
           </Box>
         )}
@@ -538,13 +522,14 @@ export const TasksPane: React.FC = () => {
                   return (
                     <Box key={task.id}>
                       <Text color={theme.colors.focusIndicator}>{">  "}</Text>
-                      <TextInput
-                        key={`edit-${inputKey}`}
-                        defaultValue={editValue}
-                        onChange={(val) => {
-                          inputValueRef.current = val;
-                        }}
+                      <ControlledTextInput
+                        value={editValue}
+                        onChange={setEditValue}
                         onSubmit={handleSubmitEdit}
+                        onCancel={handleCancelEdit}
+                        color={theme.colors.foreground}
+                        placeholderColor={theme.colors.foreground}
+                        maxLength={60}
                       />
                     </Box>
                   );
