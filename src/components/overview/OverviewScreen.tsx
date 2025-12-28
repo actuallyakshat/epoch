@@ -150,7 +150,16 @@ export const OverviewScreen: React.FC = () => {
 
                 const dateStr = getDateString(date);
                 const dayTasks = tasksByDate[dateStr] || [];
-                const flatTasks = flattenTasks(dayTasks);
+
+                // Flatten tasks with depth info for indentation
+                const flatTasksWithDepth: { task: Task; depth: number }[] = [];
+                const traverse = (taskList: Task[], depth: number) => {
+                  for (const task of taskList) {
+                    flatTasksWithDepth.push({ task, depth });
+                    traverse(task.children, depth + 1);
+                  }
+                };
+                traverse(dayTasks, 0);
 
                 return (
                   <Box
@@ -167,20 +176,25 @@ export const OverviewScreen: React.FC = () => {
 
                     {/* Tasks */}
                     <Box flexDirection="column">
-                      {flatTasks.length === 0 ? (
+                      {flatTasksWithDepth.length === 0 ? (
                         <Text dimColor color={theme.colors.keyboardHint}>
                           No tasks
                         </Text>
                       ) : (
-                        flatTasks
+                        flatTasksWithDepth
                           .slice(0, 10)
-                          .map((task) => (
-                            <TaskItem key={task.id} task={task} theme={theme} />
+                          .map(({ task, depth }) => (
+                            <TaskItem
+                              key={task.id}
+                              task={task}
+                              theme={theme}
+                              depth={depth}
+                            />
                           ))
                       )}
-                      {flatTasks.length > 10 && (
+                      {flatTasksWithDepth.length > 10 && (
                         <Text dimColor color={theme.colors.keyboardHint}>
-                          +{flatTasks.length - 10} more...
+                          +{flatTasksWithDepth.length - 10} more...
                         </Text>
                       )}
                     </Box>
@@ -213,31 +227,26 @@ export const OverviewScreen: React.FC = () => {
 interface TaskItemProps {
   task: Task;
   theme: any;
-  depth?: number;
+  depth: number;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth = 0 }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth }) => {
   const checkbox = getCheckbox(task.state);
   const color = getStateColor(task.state, theme);
 
+  // Note: We don't recurse here anymore because the parent component (OverviewScreen)
+  // already uses flattenTasks() to get a flat list of all tasks including children.
   return (
-    <Box flexDirection="column">
-      <Box>
-        <Text color={color}>{checkbox} </Text>
-        {depth > 0 && <Text>{"  ".repeat(depth)}</Text>}
-        <Text
-          color={color}
-          strikethrough={task.state === "completed"}
-          dimColor={task.state === "delayed"}
-        >
-          {task.title.length > 40
-            ? task.title.slice(0, 37) + "..."
-            : task.title}
-        </Text>
-      </Box>
-      {task.children.map((child) => (
-        <TaskItem key={child.id} task={child} theme={theme} depth={depth + 1} />
-      ))}
+    <Box>
+      <Text color={color}>{checkbox} </Text>
+      {depth > 0 && <Text>{"  ".repeat(depth)}</Text>}
+      <Text
+        color={color}
+        strikethrough={task.state === "completed"}
+        dimColor={task.state === "delayed"}
+      >
+        {task.title.length > 35 ? task.title.slice(0, 32) + "..." : task.title}
+      </Text>
     </Box>
   );
 };
@@ -245,13 +254,13 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth = 0 }) => {
 function getCheckbox(state: string): string {
   switch (state) {
     case "completed":
-      return "☑";
+      return "[✓]";
     case "delegated":
-      return "↦";
+      return "[→]";
     case "delayed":
-      return "⏸";
+      return "[‖]";
     default:
-      return "☐";
+      return "[ ]";
   }
 }
 
