@@ -1,6 +1,6 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { useTheme } from '../../contexts/ThemeContext';
+import React from "react";
+import { Box, Text } from "ink";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface SeparatorProps {
   vertical?: boolean;

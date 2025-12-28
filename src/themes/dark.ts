@@ -3,6 +3,7 @@ import type { Theme } from '../types/theme';
 export const darkTheme: Theme = {
   name: 'dark',
   colors: {
+    // Hex colors work with Ink's Text backgroundColor (via chalk)
     background: '#1e1e1e',
     foreground: '#d4d4d4',
     border: '#3e3e3e',

@@ -11,6 +11,7 @@ import { TimelinePane } from "./components/timeline/TimelinePane";
 import { HelpDialog } from "./components/common/HelpDialog";
 import { ThemeDialog } from "./components/common/ThemeDialog";
 import { OverviewScreen } from "./components/overview/OverviewScreen";
+import { FullscreenBackground } from "./components/common/FullscreenBackground";
 
 const AppContent: React.FC = () => {
   const {
@@ -39,34 +40,29 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Box
-      flexDirection="column"
-      width={width}
-      height={height}
-      padding={1}
-      // @ts-ignore
-      backgroundColor={theme.colors.background}
-    >
-      {showOverview ? (
-        <OverviewScreen />
-      ) : (
-        <ThreeColumnLayout
-          leftPane={<CalendarPane />}
-          centerPane={<TasksPane />}
-          rightPane={<TimelinePane />}
-          activePane={activePane}
-          height={height - 2} // Account for padding
-        />
-      )}
-      {exitConfirmation && (
-        <Box width="100%" justifyContent="center" paddingY={1}>
-          <Text backgroundColor="red" color="white" bold>
-            {" "}
-            Press Ctrl+C again to exit Epoch{" "}
-          </Text>
-        </Box>
-      )}
-    </Box>
+    <FullscreenBackground backgroundColor={theme.colors.background || "black"}>
+      <Box flexDirection="column" width={width} height={height} padding={1}>
+        {showOverview ? (
+          <OverviewScreen />
+        ) : (
+          <ThreeColumnLayout
+            leftPane={<CalendarPane />}
+            centerPane={<TasksPane />}
+            rightPane={<TimelinePane />}
+            activePane={activePane}
+            height={height - 2} // Account for padding
+          />
+        )}
+        {exitConfirmation && (
+          <Box width="100%" justifyContent="center" paddingY={1}>
+            <Text backgroundColor="red" color="white" bold>
+              {" "}
+              Press Ctrl+C again to exit Epoch{" "}
+            </Text>
+          </Box>
+        )}
+      </Box>
+    </FullscreenBackground>
   );
 };
 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Box } from 'ink';
-import { TaskItem } from './TaskItem';
-import type { Task } from '../../types/task';
+import React, { useState } from "react";
+import { Box } from "ink";
+import { TaskItem } from "./TaskItem";
+import type { Task } from "../../types/task";
 
 interface TaskListProps {
   tasks: Task[];
@@ -20,7 +20,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 }) => {
   return (
     <Box flexDirection="column">
-      {tasks.map(task => {
+      {tasks.map((task) => {
         const isSelected = task.id === selectedId;
         const isExpanded = expandedIds.has(task.id);
         const hasChildren = task.children.length > 0;

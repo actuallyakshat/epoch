@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Text } from "ink";
+import { Box } from "ink";
+import { Text } from "../common/ThemedText";
 import type { ReactNode } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 

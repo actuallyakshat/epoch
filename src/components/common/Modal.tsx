@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, useStdout } from "ink";
 import { useTheme } from "../../contexts/ThemeContext";
+import { FullscreenBackground } from "./FullscreenBackground";
 
 interface ModalProps {
   children: React.ReactNode;
@@ -18,16 +19,18 @@ export const Modal: React.FC<ModalProps> = ({ children }) => {
   const height = stdout?.rows || 30;
 
   return (
-    <Box
-      flexDirection="column"
-      width={width}
-      height={height}
-      justifyContent="center"
-      alignItems="center"
-      // @ts-ignore - backgroundColor is a valid Ink prop
-      backgroundColor={theme.colors.modalOverlay || theme.colors.background}
+    <FullscreenBackground
+      backgroundColor={theme.colors.modalOverlay || "black"}
     >
-      {children}
-    </Box>
+      <Box
+        flexDirection="column"
+        width={width}
+        height={height}
+        justifyContent="center"
+        alignItems="center"
+      >
+        {children}
+      </Box>
+    </FullscreenBackground>
   );
 };

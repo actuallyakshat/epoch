@@ -27,6 +27,10 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
   const focusedColor = theme.colors.focusIndicator;
   const normalColor = theme.colors.border;
 
+  // Apply background color for non-terminal themes
+  const bgColor =
+    theme.name !== "terminal" ? theme.colors.background : undefined;
+
   return (
     <Box flexDirection="row" width="100%" height={height}>
       {/* Left Pane */}
