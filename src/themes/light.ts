@@ -13,11 +13,11 @@ export const lightTheme: Theme = {
     calendarToday: '#00aa77',
     calendarSelected: '#9933cc',
     calendarDayWithTasks: '#cc6600',
-    calendarDayOtherMonth: '#888888',
+    calendarDayOtherMonth: '#666666', // Darker
 
     taskBorder: '#888888',
     taskHeader: '#0066cc',
-    taskCheckboxEmpty: '#888888',
+    taskCheckboxEmpty: '#666666', // Darker
     taskCheckboxFilled: '#00aa77',
     taskStateTodo: '#1a1a1a',
     taskStateCompleted: '#00aa77',
@@ -27,7 +27,7 @@ export const lightTheme: Theme = {
 
     timelineBorder: '#888888',
     timelineHeader: '#0066cc',
-    timelineTimestamp: '#666666',
+    timelineTimestamp: '#444444', // Darker
     timelineEventCreated: '#0066cc',
     timelineEventStarted: '#cc6600',
     timelineEventCompleted: '#00aa77',
@@ -35,7 +35,7 @@ export const lightTheme: Theme = {
     timelineEventDelayed: '#cc3333',
 
     separator: '#888888',
-    keyboardHint: '#666666',
+    keyboardHint: '#444444', // Darker
     helpDialogBorder: '#0066cc',
     focusIndicator: '#9933cc',
 
