@@ -18,14 +18,16 @@ const VerticalSeparator: React.FC<{
   color: string;
   backgroundColor?: string;
   height?: number;
-}> = ({ color, backgroundColor, height }) => {
-  // Create a column of │ characters
-  const lines = height ? Array(height).fill("│") : ["│"];
+  isFocused?: boolean;
+}> = ({ color, backgroundColor, height, isFocused }) => {
+  // Create a column of characters - use heavy vertical line if focused
+  const char = isFocused ? "┃" : "│";
+  const lines = height ? Array(height).fill(char) : [char];
   return (
     <Box flexDirection="column" backgroundColor={backgroundColor}>
-      {lines.map((char, i) => (
+      {lines.map((c, i) => (
         <Text key={i} color={color} backgroundColor={backgroundColor}>
-          {char}
+          {c}
         </Text>
       ))}
     </Box>
@@ -51,7 +53,12 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
     theme.name !== "terminal" ? theme.colors.background : undefined;
 
   return (
-    <Box flexDirection="row" width="100%" height={height} backgroundColor={bgColor}>
+    <Box
+      flexDirection="row"
+      width="100%"
+      height={height}
+      backgroundColor={bgColor}
+    >
       {/* Left Pane - Calendar */}
       <Box
         width={leftWidth}
@@ -64,7 +71,12 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
 
       {/* Separator between Calendar and Tasks */}
       <VerticalSeparator
-        color={activePane === "calendar" ? focusedColor! : normalColor!}
+        isFocused={activePane === "calendar" || activePane === "tasks"}
+        color={
+          activePane === "calendar" || activePane === "tasks"
+            ? focusedColor!
+            : normalColor!
+        }
         backgroundColor={bgColor}
         height={height}
       />
@@ -81,7 +93,12 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
 
       {/* Separator between Tasks and Timeline */}
       <VerticalSeparator
-        color={activePane === "tasks" ? focusedColor! : normalColor!}
+        isFocused={activePane === "tasks" || activePane === "timeline"}
+        color={
+          activePane === "tasks" || activePane === "timeline"
+            ? focusedColor!
+            : normalColor!
+        }
         backgroundColor={bgColor}
         height={height}
       />

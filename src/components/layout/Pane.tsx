@@ -36,8 +36,16 @@ export const Pane: React.FC<PaneProps> = ({
     >
       {title && (
         <Box marginBottom={1}>
-          <Text color={theme.colors.taskHeader} bold>
-            {title}
+          <Text
+            backgroundColor={
+              isFocused ? theme.colors.focusIndicator : undefined
+            }
+            color={
+              isFocused ? theme.colors.background : theme.colors.taskHeader
+            }
+            bold
+          >
+            {isFocused ? ` ${title.toUpperCase()} ` : title}
           </Text>
         </Box>
       )}
