@@ -32,6 +32,9 @@ interface AppContextType {
   setExitConfirmation: (show: boolean) => void;
   showThemeDialog: boolean;
   setShowThemeDialog: (show: boolean) => void;
+  showClearTimelineDialog: boolean;
+  setShowClearTimelineDialog: (show: boolean) => void;
+  clearTimelineForDate: (dateStr: string) => void;
   isModalOpen: boolean;
   saveNow: () => Promise<void>;
 }
@@ -66,6 +69,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   });
   const [exitConfirmation, setExitConfirmation] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
+  const [showClearTimelineDialog, setShowClearTimelineDialog] = useState(false);
+
+  // Function to clear timeline for a specific date
+  const clearTimelineForDate = useCallback((dateStr: string) => {
+    setTimeline((prev) => {
+      const newTimeline = { ...prev };
+      delete newTimeline[dateStr];
+      return newTimeline;
+    });
+  }, []);
 
   // Track if initial data has been loaded to prevent save loop
   const initialLoadDone = useRef(false);
@@ -121,7 +134,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setExitConfirmation,
         showThemeDialog,
         setShowThemeDialog,
-        isModalOpen: showHelp || showThemeDialog || showOverview,
+        showClearTimelineDialog,
+        setShowClearTimelineDialog,
+        clearTimelineForDate,
+        isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog,
         saveNow,
       }}
     >

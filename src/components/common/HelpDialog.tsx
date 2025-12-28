@@ -15,13 +15,13 @@ export const HelpDialog: React.FC = () => {
     { key: "2 / Tab", action: "Focus tasks pane" },
     { key: "3 / Shift+Tab", action: "Focus timeline pane" },
     { key: "", action: "" },
-    { key: "📅 Calendar Pane", action: "" },
+    { key: "Calendar Pane", action: "" },
     { key: "h/l ←/→", action: "Navigate days" },
     { key: "j/k ↓/↑", action: "Navigate weeks" },
     { key: "n/p", action: "Next/prev month" },
     { key: "T", action: "Go to today" },
     { key: "", action: "" },
-    { key: "📝 Tasks Pane", action: "" },
+    { key: "Tasks Pane", action: "" },
     { key: "j/k ↓/↑", action: "Navigate tasks" },
     { key: "a", action: "Add new task" },
     { key: "e", action: "Edit task" },
@@ -32,8 +32,9 @@ export const HelpDialog: React.FC = () => {
     { key: "x", action: "Mark delayed/cancelled" },
     { key: "Enter", action: "Expand/collapse subtasks" },
     { key: "", action: "" },
-    { key: "⏱️  Timeline Pane", action: "" },
-    { key: "j/k ↓/↑", action: "Scroll timeline" },
+    { key: "Timeline Pane", action: "" },
+    { key: "j/k", action: "Scroll timeline" },
+    { key: "Shift+C", action: "Clear timeline" },
   ];
 
   return (
@@ -50,7 +51,7 @@ export const HelpDialog: React.FC = () => {
         }
       >
         <Text bold color={theme.colors.calendarHeader}>
-          ⌨️ Keyboard Shortcuts
+          Keyboard Shortcuts
         </Text>
         <Box flexDirection="column" marginTop={1}>
           {shortcuts.map((item, idx) => (

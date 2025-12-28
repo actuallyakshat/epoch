@@ -10,6 +10,7 @@ import { TasksPane } from "./components/tasks/TasksPane";
 import { TimelinePane } from "./components/timeline/TimelinePane";
 import { HelpDialog } from "./components/common/HelpDialog";
 import { ThemeDialog } from "./components/common/ThemeDialog";
+import { ClearTimelineDialog } from "./components/common/ClearTimelineDialog";
 import { OverviewScreen } from "./components/overview/OverviewScreen";
 import { FullscreenBackground } from "./components/common/FullscreenBackground";
 
@@ -20,6 +21,7 @@ const AppContent: React.FC = () => {
     exitConfirmation,
     activePane,
     showThemeDialog,
+    showClearTimelineDialog,
   } = useApp();
   const { theme } = useTheme();
   const { stdout } = useStdout();
@@ -37,6 +39,10 @@ const AppContent: React.FC = () => {
 
   if (showHelp) {
     return <HelpDialog />;
+  }
+
+  if (showClearTimelineDialog) {
+    return <ClearTimelineDialog />;
   }
 
   return (

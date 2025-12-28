@@ -11,7 +11,7 @@ interface KeyCode {
 }
 
 export const useKeyboardNav = () => {
-  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog, saveNow } = useApp();
+  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog, showClearTimelineDialog, setShowClearTimelineDialog, saveNow } = useApp();
 
   // Auto-reset exit confirmation after 3 seconds
   useEffect(() => {
@@ -24,6 +24,7 @@ export const useKeyboardNav = () => {
   }, [exitConfirmation, setExitConfirmation]);
 
   useInput((input: string, key: KeyCode) => {
+
     // Handle Ctrl+C with confirmation
     if (key.ctrl && input === 'c') {
       if (exitConfirmation) {
@@ -63,7 +64,7 @@ export const useKeyboardNav = () => {
     }
 
     // Skip all shortcuts when in input mode or modal dialogs
-    if (isInputMode || showThemeDialog) {
+    if (isInputMode || showThemeDialog || showClearTimelineDialog) {
       return;
     }
 
@@ -78,8 +79,14 @@ export const useKeyboardNav = () => {
       return;
     }
 
-    if (input === 't') {
+    if (key.ctrl && input === 't') {
       setShowThemeDialog(true);
+      return;
+    }
+
+    // 'C' (shift+c) to clear timeline (when timeline pane is focused)
+    if (input === 'C' && activePane === 'timeline') {
+      setShowClearTimelineDialog(true);
       return;
     }
 

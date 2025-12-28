@@ -19,14 +19,34 @@ export const TimelinePane: React.FC = () => {
   );
   const dayEvents = timeline[dateStr] || [];
 
-  // Sort events by timestamp (oldest first for chronological order)
-  const sortedEvents = useMemo(
-    () =>
-      [...dayEvents].sort(
-        (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
-      ),
-    [dayEvents]
-  );
+  // Group events by task, then sort by timestamp within each task group
+  const sortedEvents = useMemo(() => {
+    // First, group events by taskId
+    const eventsByTask = new Map<string, typeof dayEvents>();
+
+    dayEvents.forEach((event) => {
+      const taskEvents = eventsByTask.get(event.taskId) || [];
+      taskEvents.push(event);
+      eventsByTask.set(event.taskId, taskEvents);
+    });
+
+    // Sort events within each task group by timestamp
+    eventsByTask.forEach((events) => {
+      events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    });
+
+    // Convert to array of task groups and sort by earliest event timestamp
+    const taskGroups = Array.from(eventsByTask.entries()).sort(
+      ([, eventsA], [, eventsB]) => {
+        const earliestA = eventsA[0]?.timestamp.getTime() || 0;
+        const earliestB = eventsB[0]?.timestamp.getTime() || 0;
+        return earliestA - earliestB;
+      }
+    );
+
+    // Flatten back to a single array
+    return taskGroups.flatMap(([, events]) => events);
+  }, [dayEvents]);
 
   // Reset scroll when date changes
   useEffect(() => {

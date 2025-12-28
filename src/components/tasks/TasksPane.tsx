@@ -362,27 +362,49 @@ export const TasksPane: React.FC = () => {
       }
 
       if (input === "x" && selectedTask) {
-        handleChangeState("delayed");
+        // Toggle delayed state
+        if (selectedTask.state === "delayed") {
+          handleChangeState("todo");
+        } else {
+          handleChangeState("delayed");
+        }
         return;
       }
 
       if (input === "s" && selectedTask) {
-        // Start task
         try {
-          const updated = taskService.startTask(tasks, selectedTaskId!);
-          setTasks(updated);
+          // Toggle start - if already started (has startTime but no endTime), unstart it
+          if (selectedTask.startTime && !selectedTask.endTime) {
+            // Unstart: clear startTime and remove timeline event
+            const updated = taskService.updateTask(tasks, selectedTaskId!, {
+              startTime: undefined,
+            });
+            setTasks(updated);
 
-          // Create timeline event for starting task
-          const event = timelineService.createEvent(
-            selectedTaskId!,
-            selectedTask.title,
-            TimelineEventType.STARTED,
-            new Date()
-          );
-          const updatedTimeline = timelineService.addEvent(timeline, event);
-          setTimeline(updatedTimeline);
+            // Remove the started event from timeline
+            const updatedTimeline = timelineService.removeLastEventByType(
+              timeline,
+              selectedTaskId!,
+              TimelineEventType.STARTED
+            );
+            setTimeline(updatedTimeline);
+          } else {
+            // Start task
+            const updated = taskService.startTask(tasks, selectedTaskId!);
+            setTasks(updated);
+
+            // Create timeline event for starting task
+            const event = timelineService.createEvent(
+              selectedTaskId!,
+              selectedTask.title,
+              TimelineEventType.STARTED,
+              new Date()
+            );
+            const updatedTimeline = timelineService.addEvent(timeline, event);
+            setTimeline(updatedTimeline);
+          }
         } catch (err) {
-          console.error("Error starting task:", err);
+          console.error("Error toggling task start:", err);
         }
         return;
       }
@@ -475,27 +497,45 @@ export const TasksPane: React.FC = () => {
                     {isSelected ? ">" : " "}
                   </Text>
                   <Text> </Text>
-                  <Text color={getStateColor(task.state, theme)}>
+                  <Text>{"  ".repeat(depth)}</Text>
+                  <Text
+                    color={
+                      isSelected
+                        ? theme.colors.focusIndicator
+                        : getStateColor(task.state, theme)
+                    }
+                  >
                     {getCheckbox(task.state)}
                   </Text>
                   <Text> </Text>
-                  <Text>
-                    {task.children.length > 0
-                      ? isExpanded
-                        ? "▼ "
-                        : "▶ "
-                      : "  "}
-                  </Text>
-                  <Text>{"  ".repeat(depth)}</Text>
+                  {task.children.length > 0 && (
+                    <>
+                      <Text>{isExpanded ? "▼" : "▶"}</Text>
+                      <Text> </Text>
+                    </>
+                  )}
                   <Text
-                    color={getStateColor(task.state, theme)}
+                    color={
+                      isSelected
+                        ? theme.colors.focusIndicator
+                        : getStateColor(task.state, theme)
+                    }
                     strikethrough={task.state === "completed"}
-                    dimColor={task.state === "delayed"}
+                    dimColor={task.state === "delayed" && !isSelected}
                   >
                     {task.title}
                   </Text>
                   {task.startTime && !task.endTime && (
-                    <Text color={theme.colors.timelineEventStarted}> ▶</Text>
+                    <Text
+                      color={
+                        isSelected
+                          ? theme.colors.focusIndicator
+                          : theme.colors.timelineEventStarted
+                      }
+                    >
+                      {" "}
+                      ▶
+                    </Text>
                   )}
                 </Box>
               );
@@ -522,13 +562,13 @@ export const TasksPane: React.FC = () => {
 function getCheckbox(state: string): string {
   switch (state) {
     case "completed":
-      return "☑";
+      return "[✓]";
     case "delegated":
-      return "↦";
+      return "[→]";
     case "delayed":
-      return "⏸";
+      return "[‖]";
     default:
-      return "☐";
+      return "[ ]";
   }
 }
 
