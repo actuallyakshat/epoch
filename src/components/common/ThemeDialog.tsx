@@ -166,6 +166,7 @@ export const ThemeDialog: React.FC = () => {
             focus={focusMode === "search"}
             placeholder="Type to filter..."
             placeholderColor={theme.colors.foreground}
+            color={theme.colors.foreground}
           />
         </Box>
         <Box flexDirection="column" marginTop={1}>
