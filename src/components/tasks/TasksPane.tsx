@@ -48,7 +48,8 @@ export const TasksPane: React.FC = () => {
     new Date(selectedDate.year, selectedDate.month, selectedDate.day)
   );
 
-  const dayTasks = tasks[dateStr] || [];
+  // Memoize to prevent new array reference on every render when empty
+  const dayTasks = useMemo(() => tasks[dateStr] || [], [tasks, dateStr]);
   const stats = taskService.getTaskStats(tasks, dateStr);
   const isFocused = activePane === "tasks" && !isModalOpen;
 
@@ -84,7 +85,15 @@ export const TasksPane: React.FC = () => {
       }
     };
     collectParents(dayTasks);
-    setExpandedIds(allParentIds);
+
+    // Only update if the IDs have actually changed
+    setExpandedIds((prev) => {
+      if (prev.size !== allParentIds.size) return allParentIds;
+      for (const id of allParentIds) {
+        if (!prev.has(id)) return allParentIds;
+      }
+      return prev; // No change, keep same reference
+    });
   }, [dayTasks]);
 
   // Reset selection when day changes
@@ -102,12 +111,15 @@ export const TasksPane: React.FC = () => {
 
   // Keep selected task in view
   useEffect(() => {
-    if (selectedIndex < scrollOffset) {
-      setScrollOffset(selectedIndex);
-    } else if (selectedIndex >= scrollOffset + visibleRows) {
-      setScrollOffset(selectedIndex - visibleRows + 1);
-    }
-  }, [selectedIndex, visibleRows, scrollOffset]);
+    setScrollOffset((currentOffset) => {
+      if (selectedIndex < currentOffset) {
+        return selectedIndex;
+      } else if (selectedIndex >= currentOffset + visibleRows) {
+        return selectedIndex - visibleRows + 1;
+      }
+      return currentOffset; // No change needed
+    });
+  }, [selectedIndex, visibleRows]);
 
   // Reset scroll when day changes
   useEffect(() => {

@@ -12,6 +12,7 @@ export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
   const {
     selectedDate,
+    tasks,
     timeline,
     setTimeline,
     activePane,
@@ -31,6 +32,51 @@ export const TimelinePane: React.FC = () => {
     new Date(selectedDate.year, selectedDate.month, selectedDate.day)
   );
   const dayEvents = timeline[dateStr] || [];
+  const dayTasks = tasks[dateStr] || [];
+
+  // Build a map of taskId -> parentId for hierarchy lookup
+  const taskHierarchyMap = useMemo(() => {
+    const map = new Map<string, string | undefined>();
+
+    const traverse = (taskList: typeof dayTasks, parentId?: string) => {
+      taskList.forEach(task => {
+        map.set(task.id, parentId);
+        traverse(task.children, task.id);
+      });
+    };
+
+    traverse(dayTasks);
+    return map;
+  }, [dayTasks]);
+
+  // Check if taskA is an ancestor of taskB
+  const isAncestor = (taskAId: string, taskBId: string): boolean => {
+    let currentId: string | undefined = taskBId;
+
+    while (currentId) {
+      const parentId = taskHierarchyMap.get(currentId);
+      if (!parentId) break;
+      if (parentId === taskAId) return true;
+      currentId = parentId;
+    }
+
+    return false;
+  };
+
+  // Get depth of task in hierarchy (0 = root level)
+  const getTaskDepth = (taskId: string): number => {
+    let depth = 0;
+    let currentId: string | undefined = taskId;
+
+    while (currentId) {
+      const parentId = taskHierarchyMap.get(currentId);
+      if (!parentId) break;
+      depth++;
+      currentId = parentId;
+    }
+
+    return depth;
+  };
 
   // Group events by task, then sort by timestamp within each task group
   const sortedEvents = useMemo(() => {
@@ -48,9 +94,20 @@ export const TimelinePane: React.FC = () => {
       events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     });
 
-    // Convert to array of task groups and sort by earliest event timestamp
+    // Convert to array of task groups and sort by hierarchy first, then timestamp
     const taskGroups = Array.from(eventsByTask.entries()).sort(
-      ([, eventsA], [, eventsB]) => {
+      ([taskIdA, eventsA], [taskIdB, eventsB]) => {
+        // If taskA is an ancestor of taskB, taskA comes first
+        if (isAncestor(taskIdA, taskIdB)) return -1;
+        // If taskB is an ancestor of taskA, taskB comes first
+        if (isAncestor(taskIdB, taskIdA)) return 1;
+
+        // If at different depths, shallower (parent) comes first
+        const depthA = getTaskDepth(taskIdA);
+        const depthB = getTaskDepth(taskIdB);
+        if (depthA !== depthB) return depthA - depthB;
+
+        // Otherwise, sort by earliest event timestamp
         const earliestA = eventsA[0]?.timestamp.getTime() || 0;
         const earliestB = eventsB[0]?.timestamp.getTime() || 0;
         return earliestA - earliestB;
@@ -59,7 +116,7 @@ export const TimelinePane: React.FC = () => {
 
     // Flatten back to a single array
     return taskGroups.flatMap(([, events]) => events);
-  }, [dayEvents]);
+  }, [dayEvents, taskHierarchyMap]);
 
   // Reset scroll when date changes
   useEffect(() => {
@@ -95,14 +152,6 @@ export const TimelinePane: React.FC = () => {
         setScrollOffset((prev) =>
           Math.max(prev - Math.floor(visibleRows / 2), 0)
         );
-      }
-
-      // Clear timeline for current day
-      if (input === "C") {
-        setTimeline({
-          ...timeline,
-          [dateStr]: [],
-        });
       }
     },
     { isActive: isFocused && !isInputMode }
