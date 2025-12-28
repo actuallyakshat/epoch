@@ -9,7 +9,7 @@ import { calendarService } from "../../services/calendarService";
 
 export const CalendarPane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, setSelectedDate, tasks, activePane, isModalOpen } =
+  const { selectedDate, setSelectedDate, tasks, activePane, isModalOpen, isInputMode } =
     useApp();
   const [currentMonth, setCurrentMonth] = useState({
     year: selectedDate.year,
@@ -117,7 +117,7 @@ export const CalendarPane: React.FC = () => {
         return;
       }
     },
-    { isActive: isFocused }
+    { isActive: isFocused && !isInputMode }
   );
 
   const monthName = calendarService.getMonthName(currentMonth.month);

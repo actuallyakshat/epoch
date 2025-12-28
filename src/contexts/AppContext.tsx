@@ -61,8 +61,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     "calendar" | "tasks" | "timeline"
   >("tasks");
   const [showHelp, setShowHelp] = useState(false);
-  const [isInputMode, setIsInputMode] = useState(false);
+  // Use ref for isInputMode to avoid React state timing issues
+  const isInputModeRef = useRef(false);
+  const [isInputModeState, setIsInputModeState] = useState(false);
   const [showOverview, setShowOverview] = useState(false);
+
+  // Use ref for immediate updates to avoid React state timing issues with useInput hooks
+  const setIsInputMode = useCallback((mode: boolean) => {
+    isInputModeRef.current = mode;
+    setIsInputModeState(mode);
+  }, []);
+
+  // Read from ref for immediate access in useInput hooks
+  const isInputMode = isInputModeRef.current;
   const [overviewMonth, setOverviewMonth] = useState({
     year: today.getFullYear(),
     month: today.getMonth(),

@@ -8,7 +8,7 @@ import { getDateString } from "../../utils/date";
 
 export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, timeline, activePane, isModalOpen } = useApp();
+  const { selectedDate, timeline, activePane, isModalOpen, isInputMode } = useApp();
   const isFocused = activePane === "timeline" && !isModalOpen;
 
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -84,7 +84,7 @@ export const TimelinePane: React.FC = () => {
         );
       }
     },
-    { isActive: isFocused }
+    { isActive: isFocused && !isInputMode }
   );
 
   // Get visible events based on scroll

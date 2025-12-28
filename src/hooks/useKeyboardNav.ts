@@ -23,9 +23,11 @@ export const useKeyboardNav = () => {
     }
   }, [exitConfirmation, setExitConfirmation]);
 
-  useInput((input: string, key: KeyCode) => {
+  // Global input handler - inactive when in input mode or dialogs open
+  const isActive = !isInputMode && !showThemeDialog && !showClearTimelineDialog;
 
-    // Handle Ctrl+C with confirmation
+  useInput((input: string, key: KeyCode) => {
+    // Handle Ctrl+C with confirmation (always active for exit)
     if (key.ctrl && input === 'c') {
       if (exitConfirmation) {
         // Save data before exiting
@@ -35,7 +37,7 @@ export const useKeyboardNav = () => {
           if (inkApp) {
             inkApp.unmount();
           }
-          
+
           // Clear the terminal completely
           setTimeout(() => {
             console.clear();
@@ -48,7 +50,7 @@ export const useKeyboardNav = () => {
           if (inkApp) {
             inkApp.unmount();
           }
-          
+
           // Clear the terminal completely
           setTimeout(() => {
             console.clear();
@@ -61,11 +63,6 @@ export const useKeyboardNav = () => {
         setExitConfirmation(true);
         return;
       }
-    }
-
-    // Skip all shortcuts when in input mode or modal dialogs
-    if (isInputMode || showThemeDialog || showClearTimelineDialog) {
-      return;
     }
 
     // Shift+; (colon) to toggle overview
@@ -105,5 +102,8 @@ export const useKeyboardNav = () => {
       setActivePane('timeline');
       return;
     }
+  }, {
+    // Disable this hook when in input mode or dialogs are open to prevent interference with TextInput
+    isActive: isActive
   });
 };

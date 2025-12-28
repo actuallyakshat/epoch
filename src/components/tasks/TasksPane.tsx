@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Box, Text, useInput } from "ink";
-import TextInput from "ink-text-input";
+import { TextInput } from "@inkjs/ui";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useApp } from "../../contexts/AppContext";
 import { Pane } from "../layout/Pane";
@@ -34,6 +34,8 @@ export const TasksPane: React.FC = () => {
   const [editMode, setEditMode] = useState<EditMode>("none");
   const [editValue, setEditValue] = useState("");
   const [parentTaskId, setParentTaskId] = useState<string | null>(null);
+  const inputValueRef = useRef(""); // Track current input value for uncontrolled TextInput
+  const [inputKey, setInputKey] = useState(0); // Key to force TextInput remount
 
   const dateStr = getDateString(
     new Date(selectedDate.year, selectedDate.month, selectedDate.day)
@@ -77,26 +79,31 @@ export const TasksPane: React.FC = () => {
   }, [flatTasks.length, selectedIndex]);
 
   const handleAddTask = () => {
+    inputValueRef.current = "";
     setEditMode("add");
     setEditValue("");
+    setInputKey(k => k + 1);
     setIsInputMode(true);
   };
 
   const handleEditTask = () => {
     if (selectedTask) {
+      inputValueRef.current = selectedTask.title;
       setEditMode("edit");
       setEditValue(selectedTask.title);
+      setInputKey(k => k + 1);
       setIsInputMode(true);
     }
   };
 
   const handleAddSubtask = () => {
     if (selectedTask) {
+      inputValueRef.current = "";
       setEditMode("addSubtask");
       setEditValue("");
       setParentTaskId(selectedTask.id);
+      setInputKey(k => k + 1);
       setIsInputMode(true);
-      // Auto-expand the parent to show the new subtask when created
       setExpandedIds((prev) => new Set(prev).add(selectedTask.id));
     }
   };
@@ -283,18 +290,19 @@ export const TasksPane: React.FC = () => {
     setExpandedIds(new Set());
   };
 
+  // Handle escape key to cancel editing
   useInput(
-    (input: string, key) => {
-      if (!isFocused) return;
-
-      // When in edit mode, only handle escape
-      if (editMode !== "none") {
-        if (key.escape) {
-          handleCancelEdit();
-        }
-        return;
+    (_input, key) => {
+      if (key.escape) {
+        handleCancelEdit();
       }
+    },
+    { isActive: isFocused && editMode !== "none" }
+  );
 
+  // Input handler for navigation/command mode
+  useInput(
+    (input, key) => {
       // Expand/Collapse ALL with Cmd/Ctrl + arrow keys
       // Note: On Mac terminals, Cmd+Left sends Ctrl+a and Cmd+Right sends Ctrl+e
       if ((key.meta || key.ctrl) && (input === "a" || key.leftArrow)) {
@@ -419,7 +427,7 @@ export const TasksPane: React.FC = () => {
         return;
       }
     },
-    { isActive: isFocused }
+    { isActive: isFocused && editMode === "none" }
   );
 
   return (
@@ -436,13 +444,13 @@ export const TasksPane: React.FC = () => {
           <Box marginY={1}>
             <Text color={theme.colors.focusIndicator}>{">  "}</Text>
             <TextInput
-              value={editValue}
+              key={`add-${inputKey}`}
+              defaultValue=""
+              placeholder="Enter task name..."
               onChange={(val) => {
-                const sanitized = val.replace(/[\n\r]/g, "");
-                if (sanitized.length <= 100) setEditValue(sanitized);
+                inputValueRef.current = val;
               }}
               onSubmit={handleSubmitEdit}
-              placeholder="Enter task name..."
             />
           </Box>
         )}
@@ -452,13 +460,13 @@ export const TasksPane: React.FC = () => {
             <Text color={theme.colors.focusIndicator}>{">  "}</Text>
             <Text color={theme.colors.keyboardHint}>{"  "}</Text>
             <TextInput
-              value={editValue}
+              key={`subtask-${inputKey}`}
+              defaultValue=""
+              placeholder="Enter subtask name..."
               onChange={(val) => {
-                const sanitized = val.replace(/[\n\r]/g, "");
-                if (sanitized.length <= 100) setEditValue(sanitized);
+                inputValueRef.current = val;
               }}
               onSubmit={handleSubmitEdit}
-              placeholder="Enter subtask name..."
             />
           </Box>
         )}
@@ -483,10 +491,10 @@ export const TasksPane: React.FC = () => {
                   <Box key={task.id}>
                     <Text color={theme.colors.focusIndicator}>{">  "}</Text>
                     <TextInput
-                      value={editValue}
+                      key={`edit-${inputKey}`}
+                      defaultValue={editValue}
                       onChange={(val) => {
-                        const sanitized = val.replace(/[\n\r]/g, "");
-                        if (sanitized.length <= 100) setEditValue(sanitized);
+                        inputValueRef.current = val;
                       }}
                       onSubmit={handleSubmitEdit}
                     />
