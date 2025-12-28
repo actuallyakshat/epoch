@@ -5,12 +5,19 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useApp } from "../../contexts/AppContext";
 import { Pane } from "../layout/Pane";
 import { MonthView } from "./MonthView";
+import { KeyboardHints } from "../common/KeyboardHints";
 import { calendarService } from "../../services/calendarService";
 
 export const CalendarPane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, setSelectedDate, tasks, activePane, isModalOpen, isInputMode } =
-    useApp();
+  const {
+    selectedDate,
+    setSelectedDate,
+    tasks,
+    activePane,
+    isModalOpen,
+    isInputMode,
+  } = useApp();
   const [currentMonth, setCurrentMonth] = useState({
     year: selectedDate.year,
     month: selectedDate.month,
@@ -130,14 +137,14 @@ export const CalendarPane: React.FC = () => {
     >
       <Box flexDirection="column" alignItems="center">
         <MonthView calendarView={calendarView} />
-        <Box marginTop={1} flexDirection="column" alignItems="center">
-          <Text color={theme.colors.keyboardHint} dimColor>
-            h/l: days j/k: weeks
-          </Text>
-          <Text color={theme.colors.keyboardHint} dimColor>
-            n/p: month T: today
-          </Text>
-        </Box>
+        <KeyboardHints
+          hints={[
+            { key: "h/l", description: "days" },
+            { key: "j/k", description: "weeks" },
+            { key: "n/p", description: "month" },
+            { key: "T", description: "today" },
+          ]}
+        />
       </Box>
     </Pane>
   );

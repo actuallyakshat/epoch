@@ -4,13 +4,20 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useApp } from "../../contexts/AppContext";
 import { Pane } from "../layout/Pane";
 import { TimelineEntry } from "./TimelineEntry";
+import { KeyboardHints } from "../common/KeyboardHints";
 import { getDateString } from "../../utils/date";
 import { useTerminalSize } from "../../hooks/useTerminalSize";
 
 export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, timeline, activePane, isModalOpen, isInputMode } =
-    useApp();
+  const {
+    selectedDate,
+    timeline,
+    setTimeline,
+    activePane,
+    isModalOpen,
+    isInputMode,
+  } = useApp();
   const isFocused = activePane === "timeline" && !isModalOpen;
 
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -89,6 +96,14 @@ export const TimelinePane: React.FC = () => {
           Math.max(prev - Math.floor(visibleRows / 2), 0)
         );
       }
+
+      // Clear timeline for current day
+      if (input === "C") {
+        setTimeline({
+          ...timeline,
+          [dateStr]: [],
+        });
+      }
     },
     { isActive: isFocused && !isInputMode }
   );
@@ -105,9 +120,9 @@ export const TimelinePane: React.FC = () => {
 
   return (
     <Pane title="Timeline" isFocused={isFocused}>
-      <Box flexDirection="column" flexGrow={1}>
+      <Box flexDirection="column" flexGrow={1} width="100%">
         {sortedEvents.length === 0 ? (
-          <Box marginY={1} flexDirection="column" paddingX={1}>
+          <Box marginY={1} flexDirection="column">
             <Text color={theme.colors.keyboardHint} dimColor>
               No activities yet.
             </Text>
@@ -158,11 +173,12 @@ export const TimelinePane: React.FC = () => {
         )}
 
         {/* Keyboard hints */}
-        <Box marginTop={1}>
-          <Text color={theme.colors.keyboardHint} dimColor>
-            j/k: scroll
-          </Text>
-        </Box>
+        <KeyboardHints
+          hints={[
+            { key: "j/k", description: "scroll" },
+            { key: "Shift+C", description: "clear" },
+          ]}
+        />
       </Box>
     </Pane>
   );

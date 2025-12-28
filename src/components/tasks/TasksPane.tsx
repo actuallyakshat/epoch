@@ -6,6 +6,7 @@ import { useApp } from "../../contexts/AppContext";
 import { Pane } from "../layout/Pane";
 import { TaskHeader } from "./TaskHeader";
 import { TaskList } from "./TaskList";
+import { KeyboardHints } from "../common/KeyboardHints";
 import { getDateString } from "../../utils/date";
 import { taskService } from "../../services/taskService";
 import { timelineService } from "../../services/timelineService";
@@ -451,7 +452,7 @@ export const TasksPane: React.FC = () => {
 
   return (
     <Pane title="Tasks" isFocused={isFocused}>
-      <Box flexDirection="column" flexGrow={1}>
+      <Box flexDirection="column" flexGrow={1} width="100%">
         <TaskHeader
           selectedDate={
             new Date(selectedDate.year, selectedDate.month, selectedDate.day)
@@ -601,17 +602,21 @@ export const TasksPane: React.FC = () => {
           </Box>
         )}
 
-        <Box marginTop={1} flexDirection="column">
-          <Text color={theme.colors.keyboardHint} dimColor>
-            j/k: navigate a: add Tab: add subtask e: edit d: delete
-          </Text>
-          <Text color={theme.colors.keyboardHint} dimColor>
-            Space: complete D: delegate x: delay s: start
-          </Text>
-          <Text color={theme.colors.keyboardHint} dimColor>
-            ←/→: collapse/expand Cmd+←/→: collapse/expand all
-          </Text>
-        </Box>
+        <KeyboardHints
+          hints={[
+            { key: "j/k", description: "navigate" },
+            { key: "a", description: "add" },
+            { key: "Tab", description: "add subtask" },
+            { key: "e", description: "edit" },
+            { key: "d", description: "delete" },
+            { key: "Space", description: "complete" },
+            { key: "D", description: "delegate" },
+            { key: "x", description: "delay" },
+            { key: "s", description: "start" },
+            { key: "←/→", description: "collapse/expand" },
+            { key: "Cmd+←/→", description: "all" },
+          ]}
+        />
       </Box>
     </Pane>
   );
