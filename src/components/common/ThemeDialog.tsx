@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Box, Text, useInput } from "ink";
+import TextInput from "ink-text-input";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useApp } from "../../contexts/AppContext";
 import { Modal } from "./Modal";
@@ -9,25 +10,45 @@ export const ThemeDialog: React.FC = () => {
   const { theme, setTheme, themeName } = useTheme();
   const { setShowThemeDialog } = useApp();
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [focusMode, setFocusMode] = useState<"search" | "list">("search");
+
   // Get organized theme lists
   const lightThemes = useMemo(() => getLightThemeNames(), []);
   const darkThemes = useMemo(() => getDarkThemeNames(), []);
 
   // Combined list: light themes first, then dark themes
   const allThemes = useMemo(() => {
+    // Filter themes based on search query
+    const query = searchQuery.toLowerCase();
+    const filteredLightThemes = lightThemes.filter((t) =>
+      t.toLowerCase().includes(query)
+    );
+    const filteredDarkThemes = darkThemes.filter((t) =>
+      t.toLowerCase().includes(query)
+    );
+
     // Create a flat list with section markers
     const items: Array<{ type: "theme" | "separator"; value: string }> = [];
 
-    // Light themes section
-    items.push({ type: "separator", value: "☀️ Light Themes" });
-    lightThemes.forEach((t) => items.push({ type: "theme", value: t }));
+    // Light themes section (only show if there are themes)
+    if (filteredLightThemes.length > 0) {
+      items.push({ type: "separator", value: "Light Themes" });
+      filteredLightThemes.forEach((t) =>
+        items.push({ type: "theme", value: t })
+      );
+    }
 
-    // Dark themes section
-    items.push({ type: "separator", value: "🌙 Dark Themes" });
-    darkThemes.forEach((t) => items.push({ type: "theme", value: t }));
+    // Dark themes section (only show if there are themes)
+    if (filteredDarkThemes.length > 0) {
+      items.push({ type: "separator", value: "Dark Themes" });
+      filteredDarkThemes.forEach((t) =>
+        items.push({ type: "theme", value: t })
+      );
+    }
 
     return items;
-  }, [lightThemes, darkThemes]);
+  }, [lightThemes, darkThemes, searchQuery]);
 
   // Get only theme items (for navigation)
   const themeItems = useMemo(
@@ -43,28 +64,63 @@ export const ThemeDialog: React.FC = () => {
 
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
 
-  useInput((input, key) => {
-    if (key.escape) {
-      setShowThemeDialog(false);
-      return;
-    }
+  // Reset selection when search query changes to highlight the first result
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [searchQuery]);
 
-    if (key.upArrow || input === "k") {
-      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : themeItems.length - 1));
-      return;
-    }
+  useInput(
+    (input, key) => {
+      // Escape closes dialog from both modes
+      if (key.escape) {
+        setShowThemeDialog(false);
+        return;
+      }
 
-    if (key.downArrow || input === "j") {
-      setSelectedIndex((prev) => (prev < themeItems.length - 1 ? prev + 1 : 0));
-      return;
-    }
+      // Handle navigation based on focus mode
+      if (focusMode === "search") {
+        // Enter selects the first result and closes
+        if (key.return && themeItems.length > 0) {
+          setTheme(themeItems[0].value);
+          setShowThemeDialog(false);
+          return;
+        }
 
-    if (key.return) {
-      setTheme(themeItems[selectedIndex].value);
-      setShowThemeDialog(false);
-      return;
-    }
-  });
+        // In search mode, only down arrow moves to list (to avoid j/k interfering with typing)
+        if (key.downArrow && themeItems.length > 0) {
+          setFocusMode("list");
+          setSelectedIndex(0);
+          return;
+        }
+      } else {
+        // In list mode
+        if (key.upArrow || input === "k") {
+          if (selectedIndex > 0) {
+            setSelectedIndex((prev) => prev - 1);
+          } else {
+            // At top of list, move back to search
+            setFocusMode("search");
+          }
+          return;
+        }
+
+        if (key.downArrow || input === "j") {
+          setSelectedIndex((prev) =>
+            prev < themeItems.length - 1 ? prev + 1 : 0
+          );
+          return;
+        }
+
+        // Enter selects theme only in list mode
+        if (key.return && themeItems.length > 0) {
+          setTheme(themeItems[selectedIndex].value);
+          setShowThemeDialog(false);
+          return;
+        }
+      }
+    },
+    { isActive: true }
+  );
 
   // Get the currently selected theme name
   const selectedThemeName = themeItems[selectedIndex]?.value;
@@ -92,8 +148,21 @@ export const ThemeDialog: React.FC = () => {
         }
       >
         <Text bold color={theme.colors.calendarHeader} underline>
-          🎨 Select Theme
+          Select Theme
         </Text>
+        <Box marginTop={1} flexDirection="row" alignItems="center">
+          <Text color={theme.colors.foreground} dimColor>
+            Search:{" "}
+          </Text>
+          <Text color={theme.colors.foreground}>
+            <TextInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              focus={focusMode === "search"}
+              placeholder="Type to filter..."
+            />
+          </Text>
+        </Box>
         <Box flexDirection="column" marginTop={1}>
           {allThemes.map((item, idx) => {
             if (item.type === "separator") {
@@ -133,7 +202,9 @@ export const ThemeDialog: React.FC = () => {
         </Box>
         <Box marginTop={1}>
           <Text color={theme.colors.keyboardHint} dimColor>
-            Use ↑/↓ to navigate • Enter to select • Esc to close
+            {focusMode === "search"
+              ? "Type to search • ↓ to navigate list • Esc to close"
+              : "↑/↓ or k/j to navigate • Enter to select • Esc to close"}
           </Text>
         </Box>
       </Box>
