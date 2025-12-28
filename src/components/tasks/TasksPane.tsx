@@ -12,6 +12,7 @@ import { timelineService } from "../../services/timelineService";
 import { flattenTasks } from "../../utils/tree";
 import type { Task, TaskState } from "../../types/task";
 import { TimelineEventType } from "../../types/timeline";
+import { useTerminalSize } from "../../hooks/useTerminalSize";
 
 type EditMode = "none" | "add" | "edit" | "addSubtask";
 
@@ -36,6 +37,13 @@ export const TasksPane: React.FC = () => {
   const [parentTaskId, setParentTaskId] = useState<string | null>(null);
   const inputValueRef = useRef(""); // Track current input value for uncontrolled TextInput
   const [inputKey, setInputKey] = useState(0); // Key to force TextInput remount
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const { height: terminalHeight } = useTerminalSize();
+
+  const visibleRows = useMemo(() => {
+    // Header/Stats (4) + Keyboard Hints (3) + Padding/Margins (4) = ~11 lines
+    return Math.max(5, terminalHeight - 11);
+  }, [terminalHeight]);
 
   const dateStr = getDateString(
     new Date(selectedDate.year, selectedDate.month, selectedDate.day)
@@ -78,11 +86,25 @@ export const TasksPane: React.FC = () => {
     }
   }, [flatTasks.length, selectedIndex]);
 
+  // Keep selected task in view
+  useEffect(() => {
+    if (selectedIndex < scrollOffset) {
+      setScrollOffset(selectedIndex);
+    } else if (selectedIndex >= scrollOffset + visibleRows) {
+      setScrollOffset(selectedIndex - visibleRows + 1);
+    }
+  }, [selectedIndex, visibleRows, scrollOffset]);
+
+  // Reset scroll when day changes
+  useEffect(() => {
+    setScrollOffset(0);
+  }, [dateStr]);
+
   const handleAddTask = () => {
     inputValueRef.current = "";
     setEditMode("add");
     setEditValue("");
-    setInputKey(k => k + 1);
+    setInputKey((k) => k + 1);
     setIsInputMode(true);
   };
 
@@ -91,7 +113,7 @@ export const TasksPane: React.FC = () => {
       inputValueRef.current = selectedTask.title;
       setEditMode("edit");
       setEditValue(selectedTask.title);
-      setInputKey(k => k + 1);
+      setInputKey((k) => k + 1);
       setIsInputMode(true);
     }
   };
@@ -102,7 +124,7 @@ export const TasksPane: React.FC = () => {
       setEditMode("addSubtask");
       setEditValue("");
       setParentTaskId(selectedTask.id);
-      setInputKey(k => k + 1);
+      setInputKey((k) => k + 1);
       setIsInputMode(true);
       setExpandedIds((prev) => new Set(prev).add(selectedTask.id));
     }
@@ -481,82 +503,101 @@ export const TasksPane: React.FC = () => {
           </Box>
         ) : (
           <Box flexDirection="column" marginY={1} paddingRight={2}>
-            {flatTasks.map(({ task, depth }, index) => {
-              const isSelected = index === selectedIndex;
-              const isExpanded = expandedIds.has(task.id);
-              const isEditing = editMode === "edit" && isSelected;
+            {scrollOffset > 0 && (
+              <Box justifyContent="center" marginBottom={1}>
+                <Text color={theme.colors.keyboardHint} dimColor>
+                  -- more above --
+                </Text>
+              </Box>
+            )}
 
-              if (isEditing) {
+            {flatTasks
+              .slice(scrollOffset, scrollOffset + visibleRows)
+              .map(({ task, depth }, sliceIndex) => {
+                const index = scrollOffset + sliceIndex;
+                const isSelected = index === selectedIndex;
+                const isExpanded = expandedIds.has(task.id);
+                const isEditing = editMode === "edit" && isSelected;
+
+                if (isEditing) {
+                  return (
+                    <Box key={task.id}>
+                      <Text color={theme.colors.focusIndicator}>{">  "}</Text>
+                      <TextInput
+                        key={`edit-${inputKey}`}
+                        defaultValue={editValue}
+                        onChange={(val) => {
+                          inputValueRef.current = val;
+                        }}
+                        onSubmit={handleSubmitEdit}
+                      />
+                    </Box>
+                  );
+                }
+
                 return (
                   <Box key={task.id}>
-                    <Text color={theme.colors.focusIndicator}>{">  "}</Text>
-                    <TextInput
-                      key={`edit-${inputKey}`}
-                      defaultValue={editValue}
-                      onChange={(val) => {
-                        inputValueRef.current = val;
-                      }}
-                      onSubmit={handleSubmitEdit}
-                    />
-                  </Box>
-                );
-              }
-
-              return (
-                <Box key={task.id}>
-                  <Text
-                    color={
-                      isSelected
-                        ? theme.colors.focusIndicator
-                        : theme.colors.foreground
-                    }
-                  >
-                    {isSelected ? ">" : " "}
-                  </Text>
-                  <Text> </Text>
-                  <Text>{"  ".repeat(depth)}</Text>
-                  <Text
-                    color={
-                      isSelected
-                        ? theme.colors.focusIndicator
-                        : getStateColor(task.state, theme)
-                    }
-                  >
-                    {getCheckbox(task.state)}
-                  </Text>
-                  <Text> </Text>
-                  {task.children.length > 0 && (
-                    <>
-                      <Text>{isExpanded ? "▼" : "▶"}</Text>
-                      <Text> </Text>
-                    </>
-                  )}
-                  <Text
-                    color={
-                      isSelected
-                        ? theme.colors.focusIndicator
-                        : getStateColor(task.state, theme)
-                    }
-                    strikethrough={task.state === "completed"}
-                    dimColor={task.state === "delayed" && !isSelected}
-                  >
-                    {task.title}
-                  </Text>
-                  {task.startTime && !task.endTime && (
                     <Text
                       color={
                         isSelected
                           ? theme.colors.focusIndicator
-                          : theme.colors.timelineEventStarted
+                          : theme.colors.foreground
                       }
                     >
-                      {" "}
-                      ▶
+                      {isSelected ? ">" : " "}
                     </Text>
-                  )}
-                </Box>
-              );
-            })}
+                    <Text> </Text>
+                    <Text>{"  ".repeat(depth)}</Text>
+                    <Text
+                      color={
+                        isSelected
+                          ? theme.colors.focusIndicator
+                          : getStateColor(task.state, theme)
+                      }
+                    >
+                      {getCheckbox(task.state)}
+                    </Text>
+                    <Text> </Text>
+                    {task.children.length > 0 && (
+                      <>
+                        <Text>{isExpanded ? "▼" : "▶"}</Text>
+                        <Text> </Text>
+                      </>
+                    )}
+                    <Text
+                      color={
+                        isSelected
+                          ? theme.colors.focusIndicator
+                          : getStateColor(task.state, theme)
+                      }
+                      strikethrough={task.state === "completed"}
+                      dimColor={task.state === "delayed" && !isSelected}
+                    >
+                      {task.title}
+                    </Text>
+                    {task.startTime && !task.endTime && (
+                      <Text
+                        color={
+                          isSelected
+                            ? theme.colors.focusIndicator
+                            : theme.colors.timelineEventStarted
+                        }
+                      >
+                        {" "}
+                        ▶
+                      </Text>
+                    )}
+                  </Box>
+                );
+              })}
+
+            {scrollOffset + visibleRows < flatTasks.length && (
+              <Box justifyContent="center" marginTop={1}>
+                <Text color={theme.colors.keyboardHint} dimColor>
+                  -- more below --
+                </Text>
+              </Box>
+            )}
           </Box>
         )}
 

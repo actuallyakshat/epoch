@@ -5,14 +5,20 @@ import { useApp } from "../../contexts/AppContext";
 import { Pane } from "../layout/Pane";
 import { TimelineEntry } from "./TimelineEntry";
 import { getDateString } from "../../utils/date";
+import { useTerminalSize } from "../../hooks/useTerminalSize";
 
 export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, timeline, activePane, isModalOpen, isInputMode } = useApp();
+  const { selectedDate, timeline, activePane, isModalOpen, isInputMode } =
+    useApp();
   const isFocused = activePane === "timeline" && !isModalOpen;
 
   const [scrollOffset, setScrollOffset] = useState(0);
-  const visibleRows = 15; // Number of visible entries
+  const { height: terminalHeight } = useTerminalSize();
+  const visibleRows = useMemo(() => {
+    // Pane header/footer and padding takes some space
+    return Math.max(5, terminalHeight - 10);
+  }, [terminalHeight]);
 
   const dateStr = getDateString(
     new Date(selectedDate.year, selectedDate.month, selectedDate.day)

@@ -6,12 +6,20 @@ import { getDateString, formatDate } from "../../utils/date";
 import { flattenTasks } from "../../utils/tree";
 import type { Task } from "../../types/task";
 import { startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { useTerminalSize } from "../../hooks/useTerminalSize";
 
 export const OverviewScreen: React.FC = () => {
   const { theme } = useTheme();
   const { tasks, overviewMonth, setOverviewMonth, setShowOverview } = useApp();
+  const [scrollOffset, setScrollOffset] = React.useState(0);
+  const { height: terminalHeight } = useTerminalSize();
 
-  // Get all days in the current overview month
+  // Calculate visible rows based on terminal height to avoid wasting space
+  // Header (~3) + Footer (~2) + Padding (~2) + Indicators (~2) = ~9 lines fixed
+  // Minimum row height is 3 lines (Date + "No tasks" + margin)
+  const visibleRows = useMemo(() => {
+    return Math.max(2, Math.floor((terminalHeight - 9) / 3));
+  }, [terminalHeight]);
   const monthDates = useMemo(() => {
     const monthStart = startOfMonth(
       new Date(overviewMonth.year, overviewMonth.month, 1)
@@ -49,6 +57,11 @@ export const OverviewScreen: React.FC = () => {
     }
   };
 
+  // Reset scroll when month changes
+  React.useEffect(() => {
+    setScrollOffset(0);
+  }, [overviewMonth]);
+
   useInput((input: string, key) => {
     if (key.escape) {
       setShowOverview(false);
@@ -64,6 +77,18 @@ export const OverviewScreen: React.FC = () => {
       handlePrevMonth();
       return;
     }
+
+    if (input === "j" || key.downArrow) {
+      setScrollOffset((prev) =>
+        Math.min(prev + 1, Math.max(0, rows - visibleRows))
+      );
+      return;
+    }
+
+    if (input === "k" || key.upArrow) {
+      setScrollOffset((prev) => Math.max(prev - 1, 0));
+      return;
+    }
   });
 
   const monthName = formatDate(
@@ -75,15 +100,16 @@ export const OverviewScreen: React.FC = () => {
   const columns = 4;
   const rows = Math.ceil(monthDates.length / columns);
 
+  const visibleRowData = Array.from({ length: rows }).slice(
+    scrollOffset,
+    scrollOffset + visibleRows
+  );
+
+  const canScrollUp = scrollOffset > 0;
+  const canScrollDown = scrollOffset + visibleRows < rows;
+
   return (
-    <Box
-      flexDirection="column"
-      padding={2}
-      borderStyle="round"
-      borderColor={theme.colors.taskBorder}
-      width="100%"
-      height="100%"
-    >
+    <Box flexDirection="column" padding={1} width="100%" height="100%">
       {/* Header */}
       <Box flexDirection="column" marginBottom={1}>
         <Text bold color={theme.colors.focusIndicator}>
@@ -94,59 +120,90 @@ export const OverviewScreen: React.FC = () => {
 
       {/* Grid of days */}
       <Box flexDirection="column" flexGrow={1}>
-        {Array.from({ length: rows }).map((_, rowIndex) => (
-          <Box key={rowIndex} flexDirection="row" marginBottom={1}>
-            {Array.from({ length: columns }).map((_, colIndex) => {
-              const dateIndex = rowIndex * columns + colIndex;
-              if (dateIndex >= monthDates.length) return null;
-
-              const date = monthDates[dateIndex];
-              const dateStr = getDateString(date);
-              const dayTasks = tasksByDate[dateStr] || [];
-              const flatTasks = flattenTasks(dayTasks);
-
-              return (
-                <Box
-                  key={dateStr}
-                  flexDirection="column"
-                  width={25}
-                  marginRight={2}
-                >
-                  {/* Date header */}
-                  <Text bold color={theme.colors.calendarSelected}>
-                    {formatDate(date, "do MMM")}
-                  </Text>
-
-                  {/* Tasks */}
-                  <Box flexDirection="column">
-                    {flatTasks.length === 0 ? (
-                      <Text dimColor color={theme.colors.keyboardHint}>
-                        No tasks
-                      </Text>
-                    ) : (
-                      flatTasks
-                        .slice(0, 10)
-                        .map((task) => (
-                          <TaskItem key={task.id} task={task} theme={theme} />
-                        ))
-                    )}
-                    {flatTasks.length > 10 && (
-                      <Text dimColor color={theme.colors.keyboardHint}>
-                        +{flatTasks.length - 10} more...
-                      </Text>
-                    )}
-                  </Box>
-                </Box>
-              );
-            })}
+        {canScrollUp && (
+          <Box justifyContent="center" marginBottom={1}>
+            <Text color={theme.colors.keyboardHint} dimColor>
+              -- more above --
+            </Text>
           </Box>
-        ))}
+        )}
+
+        {visibleRowData.map((_, index) => {
+          const rowIndex = scrollOffset + index;
+          return (
+            <Box key={rowIndex} flexDirection="row" marginBottom={1}>
+              {Array.from({ length: columns }).map((_, colIndex) => {
+                const dateIndex = rowIndex * columns + colIndex;
+                const date = monthDates[dateIndex];
+
+                if (!date) {
+                  return (
+                    <Box
+                      key={`empty-${colIndex}`}
+                      flexDirection="column"
+                      flexGrow={1}
+                      flexBasis={0}
+                      marginRight={colIndex === columns - 1 ? 0 : 2}
+                    />
+                  );
+                }
+
+                const dateStr = getDateString(date);
+                const dayTasks = tasksByDate[dateStr] || [];
+                const flatTasks = flattenTasks(dayTasks);
+
+                return (
+                  <Box
+                    key={dateStr}
+                    flexDirection="column"
+                    flexGrow={1}
+                    flexBasis={0}
+                    marginRight={colIndex === columns - 1 ? 0 : 2}
+                  >
+                    {/* Date header */}
+                    <Text bold color={theme.colors.calendarSelected}>
+                      {formatDate(date, "do MMM")}
+                    </Text>
+
+                    {/* Tasks */}
+                    <Box flexDirection="column">
+                      {flatTasks.length === 0 ? (
+                        <Text dimColor color={theme.colors.keyboardHint}>
+                          No tasks
+                        </Text>
+                      ) : (
+                        flatTasks
+                          .slice(0, 10)
+                          .map((task) => (
+                            <TaskItem key={task.id} task={task} theme={theme} />
+                          ))
+                      )}
+                      {flatTasks.length > 10 && (
+                        <Text dimColor color={theme.colors.keyboardHint}>
+                          +{flatTasks.length - 10} more...
+                        </Text>
+                      )}
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          );
+        })}
+
+        {canScrollDown && (
+          <Box justifyContent="center" marginTop={1}>
+            <Text color={theme.colors.keyboardHint} dimColor>
+              -- more below --
+            </Text>
+          </Box>
+        )}
       </Box>
 
       {/* Footer */}
       <Box marginTop={1}>
         <Text color={theme.colors.keyboardHint} dimColor>
-          n/p or ←/→: change month Esc: close Shift+;: toggle
+          n/p or ←/→: month | j/k or ↓/↑: scroll | Esc: close | Shift+;: toggle
         </Text>
       </Box>
     </Box>
@@ -173,8 +230,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth = 0 }) => {
           strikethrough={task.state === "completed"}
           dimColor={task.state === "delayed"}
         >
-          {task.title.length > 18
-            ? task.title.slice(0, 15) + "..."
+          {task.title.length > 40
+            ? task.title.slice(0, 37) + "..."
             : task.title}
         </Text>
       </Box>
