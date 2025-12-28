@@ -168,7 +168,7 @@ export const TimelinePane: React.FC = () => {
 
   return (
     <Pane title="Timeline" isFocused={isFocused}>
-      <Box flexDirection="column" flexGrow={1} width="100%">
+      <Box flexDirection="column" flexGrow={1} width="100%" overflow="hidden">
         {sortedEvents.length === 0 ? (
           <Box marginY={1} flexDirection="column">
             <Text color={theme.colors.keyboardHint} dimColor>
@@ -179,7 +179,7 @@ export const TimelinePane: React.FC = () => {
             </Text>
           </Box>
         ) : (
-          <Box flexDirection="column">
+          <Box flexDirection="column" width="100%" overflow="hidden">
             {/* Scroll indicator top */}
             {canScrollUp && (
               <Box justifyContent="center" marginBottom={1}>
@@ -190,7 +190,7 @@ export const TimelinePane: React.FC = () => {
             )}
 
             {/* Timeline entries */}
-            <Box flexDirection="column">
+            <Box flexDirection="column" width="100%" overflow="hidden">
               {visibleEvents.map((event, index) => {
                 const globalIndex = scrollOffset + index;
                 const isLast = globalIndex === sortedEvents.length - 1;

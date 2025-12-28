@@ -106,6 +106,7 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
         flexShrink={0.3}
         flexDirection="column"
         backgroundColor={bgColor}
+        overflow="hidden"
       >
         {rightPane}
       </Box>

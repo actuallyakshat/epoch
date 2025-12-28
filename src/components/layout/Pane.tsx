@@ -33,6 +33,7 @@ export const Pane: React.FC<PaneProps> = ({
       paddingRight={1}
       paddingX={2}
       alignItems={center ? "center" : "flex-start"}
+      overflow="hidden"
     >
       {title && (
         <Box marginBottom={1}>
@@ -52,7 +53,8 @@ export const Pane: React.FC<PaneProps> = ({
       <Box
         flexDirection="column"
         flexGrow={1}
-        overflowY="hidden"
+        width="100%"
+        overflow="hidden"
         alignItems={center ? "center" : "flex-start"}
       >
         {children}
