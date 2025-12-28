@@ -43,28 +43,24 @@ export const TimelineEntry: React.FC<TimelineEntryProps> = ({
   );
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" width="100%">
       {/* Main entry row */}
-      <Box>
+      <Box width="100%">
         {/* Circle indicator */}
-        <Box width={3} justifyContent="center">
+        <Box width={3} flexShrink={0} justifyContent="center">
           <Text color={color}>{isFilledCircle ? "●" : "○"}</Text>
         </Box>
         {/* Event content */}
-        <Box flexDirection="column" flexGrow={1}>
-          <Box>
-            <Text>
-              <Text color={color} bold>
-                {typeStr}:
-              </Text>
-              <Text color={theme.colors.foreground}> {event.taskTitle}</Text>
+        <Box flexDirection="column" flexGrow={1} flexShrink={1} minWidth={0}>
+          <Text wrap="wrap">
+            <Text color={color} bold>
+              {typeStr}:
             </Text>
-          </Box>
-          <Box>
-            <Text color={theme.colors.keyboardHint} dimColor>
-              {timeStr}
-            </Text>
-          </Box>
+            <Text color={theme.colors.foreground}> {event.taskTitle}</Text>
+          </Text>
+          <Text color={theme.colors.keyboardHint} dimColor>
+            {timeStr}
+          </Text>
         </Box>
       </Box>
       {/* Vertical connector line */}

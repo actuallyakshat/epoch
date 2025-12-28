@@ -24,8 +24,11 @@ export const TimelinePane: React.FC = () => {
   const [scrollOffset, setScrollOffset] = useState(0);
   const { height: terminalHeight } = useTerminalSize();
   const visibleRows = useMemo(() => {
-    // Pane header/footer and padding takes some space
-    return Math.max(5, terminalHeight - 10);
+    // Each entry can take 3-4 lines with wrapping (type+title wrapped, time, connector)
+    // Conservative estimate: divide available height by 4 to get number of entries
+    // Pane header/footer and keyboard hints take ~8 lines
+    const availableHeight = Math.max(8, terminalHeight - 8);
+    return Math.max(3, Math.floor(availableHeight / 4));
   }, [terminalHeight]);
 
   const dateStr = getDateString(
@@ -138,7 +141,7 @@ export const TimelinePane: React.FC = () => {
         setScrollOffset((prev) => Math.max(prev - 1, 0));
       }
 
-      // Page down/up
+      // Page down with Ctrl+D
       if (input === "d" && key.ctrl) {
         setScrollOffset((prev) =>
           Math.min(
@@ -148,11 +151,7 @@ export const TimelinePane: React.FC = () => {
         );
       }
 
-      if (input === "u" && key.ctrl) {
-        setScrollOffset((prev) =>
-          Math.max(prev - Math.floor(visibleRows / 2), 0)
-        );
-      }
+      // Note: Ctrl+U is reserved for global undo, removed from here
     },
     { isActive: isFocused && !isInputMode }
   );
