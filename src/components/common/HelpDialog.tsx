@@ -8,6 +8,7 @@ export const HelpDialog: React.FC = () => {
 
   const shortcuts = [
     { key: "Ctrl+C (twice)", action: "Quit application" },
+    { key: "Ctrl+U", action: "Undo last action" },
     { key: "?", action: "Toggle help dialog" },
     { key: "Shift+;", action: "Show month overview" },
     { key: "t", action: "Select theme" },

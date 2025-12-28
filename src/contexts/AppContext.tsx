@@ -7,9 +7,11 @@ import React, {
   useCallback,
 } from "react";
 import { useStorage } from "./StorageContext";
+import { useUndo } from "./UndoContext";
 import type { Task, TaskTree } from "../types/task";
 import type { TimelineEvent } from "../types/timeline";
 import type { CalendarDate } from "../types/calendar";
+import type { UndoActionType } from "../types/undo";
 
 interface AppContextType {
   selectedDate: CalendarDate;
@@ -37,6 +39,9 @@ interface AppContextType {
   clearTimelineForDate: (dateStr: string) => void;
   isModalOpen: boolean;
   saveNow: () => Promise<void>;
+  pushUndoableAction: (actionType: UndoActionType) => void;
+  performUndo: () => void;
+  canUndo: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -47,6 +52,7 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const { data, save, saveNow } = useStorage();
+  const { pushUndoAction, undo, canUndo } = useUndo();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<CalendarDate>({
     year: today.getFullYear(),
@@ -84,12 +90,30 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // Function to clear timeline for a specific date
   const clearTimelineForDate = useCallback((dateStr: string) => {
+    pushUndoAction("TIMELINE_CLEAR", tasks, timeline);
     setTimeline((prev) => {
       const newTimeline = { ...prev };
       delete newTimeline[dateStr];
       return newTimeline;
     });
-  }, []);
+  }, [pushUndoAction, tasks, timeline]);
+
+  // Push current state to undo stack before a mutation
+  const pushUndoableAction = useCallback(
+    (actionType: UndoActionType) => {
+      pushUndoAction(actionType, tasks, timeline);
+    },
+    [pushUndoAction, tasks, timeline]
+  );
+
+  // Perform undo operation
+  const performUndo = useCallback(() => {
+    const action = undo();
+    if (action) {
+      setTasks(action.previousTasks);
+      setTimeline(action.previousTimeline);
+    }
+  }, [undo]);
 
   // Track if initial data has been loaded to prevent save loop
   const initialLoadDone = useRef(false);
@@ -150,6 +174,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         clearTimelineForDate,
         isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog,
         saveNow,
+        pushUndoableAction,
+        performUndo,
+        canUndo,
       }}
     >
       {children}

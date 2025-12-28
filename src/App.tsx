@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { StorageProvider } from "./contexts/StorageContext";
 import { AppProvider, useApp } from "./contexts/AppContext";
+import { UndoProvider } from "./contexts/UndoContext";
 import { useKeyboardNav } from "./hooks/useKeyboardNav";
 import { useTerminalSize } from "./hooks/useTerminalSize";
 import { ThreeColumnLayout } from "./components/layout/ThreeColumnLayout";
@@ -75,9 +76,11 @@ const App: React.FC = () => {
   return (
     <StorageProvider>
       <ThemeProvider initialTheme="dark">
-        <AppProvider>
-          <AppContent />
-        </AppProvider>
+        <UndoProvider>
+          <AppProvider>
+            <AppContent />
+          </AppProvider>
+        </UndoProvider>
       </ThemeProvider>
     </StorageProvider>
   );

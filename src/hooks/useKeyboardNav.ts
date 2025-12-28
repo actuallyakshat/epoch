@@ -11,7 +11,7 @@ interface KeyCode {
 }
 
 export const useKeyboardNav = () => {
-  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog, showClearTimelineDialog, setShowClearTimelineDialog, saveNow } = useApp();
+  const { showHelp, setShowHelp, activePane, setActivePane, isInputMode, showOverview, setShowOverview, overviewMonth, setOverviewMonth, exitConfirmation, setExitConfirmation, showThemeDialog, setShowThemeDialog, showClearTimelineDialog, setShowClearTimelineDialog, saveNow, performUndo, canUndo } = useApp();
 
   // Auto-reset exit confirmation after 3 seconds
   useEffect(() => {
@@ -63,6 +63,12 @@ export const useKeyboardNav = () => {
         setExitConfirmation(true);
         return;
       }
+    }
+
+    // Ctrl+U to undo
+    if (key.ctrl && input === 'u' && canUndo) {
+      performUndo();
+      return;
     }
 
     // Shift+; (colon) to toggle overview

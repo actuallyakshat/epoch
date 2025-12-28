@@ -28,6 +28,7 @@ export const TasksPane: React.FC = () => {
     isInputMode,
     setIsInputMode,
     isModalOpen,
+    pushUndoableAction,
   } = useApp();
   const { theme } = useTheme();
 
@@ -153,6 +154,7 @@ export const TasksPane: React.FC = () => {
   const handleDeleteTask = () => {
     if (selectedTaskId) {
       try {
+        pushUndoableAction("TASK_DELETE");
         const updated = taskService.deleteTask(tasks, selectedTaskId);
         setTasks(updated);
 
@@ -173,6 +175,7 @@ export const TasksPane: React.FC = () => {
   ) => {
     if (selectedTaskId && selectedTask) {
       try {
+        pushUndoableAction("TASK_UPDATE");
         const previousState = selectedTask.state;
         const updated = taskService.changeTaskState(
           tasks,
@@ -241,6 +244,7 @@ export const TasksPane: React.FC = () => {
 
     try {
       if (editMode === "add") {
+        pushUndoableAction("TASK_ADD");
         const newTask = taskService.createTask(trimmed, dateStr);
         const newTasks = {
           ...tasks,
@@ -250,6 +254,7 @@ export const TasksPane: React.FC = () => {
         setSelectedIndex(flatTasks.length); // Select newly added task
         // No timeline event for task creation - only track started/completed/etc
       } else if (editMode === "addSubtask" && parentTaskId) {
+        pushUndoableAction("TASK_ADD");
         const updated = taskService.addSubtask(tasks, parentTaskId, trimmed);
         setTasks(updated);
         // Find and select the newly added subtask
@@ -261,6 +266,7 @@ export const TasksPane: React.FC = () => {
         }
         // No timeline event for subtask creation
       } else if (editMode === "edit" && selectedTaskId) {
+        pushUndoableAction("TASK_UPDATE");
         const updated = taskService.updateTask(tasks, selectedTaskId, {
           title: trimmed,
         });
@@ -413,6 +419,7 @@ export const TasksPane: React.FC = () => {
 
       if (input === "s" && selectedTask) {
         try {
+          pushUndoableAction("TASK_UPDATE");
           // Toggle start - if already started (has startTime but no endTime), unstart it
           if (selectedTask.startTime && !selectedTask.endTime) {
             // Unstart: clear startTime and remove timeline event
