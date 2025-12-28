@@ -13,23 +13,19 @@ interface ThreeColumnLayoutProps {
   activePane?: "calendar" | "tasks" | "timeline";
 }
 
-// Vertical separator component that fills height with proper background
-const VerticalSeparator: React.FC<{
+// Thin vertical separator using box drawing character
+const ThinSeparator: React.FC<{
   color: string;
   backgroundColor?: string;
-  height?: number;
-  isFocused?: boolean;
-}> = ({ color, backgroundColor, height, isFocused }) => {
-  // Create a column of characters - use heavy vertical line if focused
-  const char = isFocused ? "┃" : "│";
-  const lines = height ? Array(height).fill(char) : [char];
+  height: number;
+}> = ({ color, backgroundColor, height }) => {
+  // Use thin vertical line character
+  const line = "│";
+  const lines = Array(height).fill(line).join("\n");
+
   return (
-    <Box flexDirection="column" backgroundColor={backgroundColor}>
-      {lines.map((c, i) => (
-        <Text key={i} color={color} backgroundColor={backgroundColor}>
-          {c}
-        </Text>
-      ))}
+    <Box width={1} flexShrink={0} backgroundColor={backgroundColor}>
+      <Text color={color}>{lines}</Text>
     </Box>
   );
 };
@@ -45,8 +41,19 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
 }) => {
   const { theme } = useTheme();
 
-  const focusedColor = theme.colors.focusIndicator;
-  const normalColor = theme.colors.border;
+  // Highlighting logic:
+  // - Calendar selected → left separator highlighted
+  // - Tasks selected → both separators highlighted
+  // - Timeline selected → only right separator highlighted
+  const leftSeparatorColor =
+    activePane === "calendar" || activePane === "tasks"
+      ? theme.colors.focusIndicator!
+      : theme.colors.separator!;
+
+  const rightSeparatorColor =
+    activePane === "tasks" || activePane === "timeline"
+      ? theme.colors.focusIndicator!
+      : theme.colors.separator!;
 
   // Apply background color for non-terminal themes
   const bgColor =
@@ -59,7 +66,7 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
       height={height}
       backgroundColor={bgColor}
     >
-      {/* Left Pane - Calendar */}
+      {/* Pane 1: Calendar */}
       <Box
         width={leftWidth}
         flexShrink={0}
@@ -69,19 +76,14 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
         {leftPane}
       </Box>
 
-      {/* Separator between Calendar and Tasks */}
-      <VerticalSeparator
-        isFocused={activePane === "calendar" || activePane === "tasks"}
-        color={
-          activePane === "calendar" || activePane === "tasks"
-            ? focusedColor!
-            : normalColor!
-        }
+      {/* Pane 2: Left Separator */}
+      <ThinSeparator
+        color={leftSeparatorColor}
         backgroundColor={bgColor}
-        height={height}
+        height={height || 30}
       />
 
-      {/* Center Pane - Tasks */}
+      {/* Pane 3: Tasks */}
       <Box
         flexGrow={1}
         flexShrink={1}
@@ -91,19 +93,14 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
         {centerPane}
       </Box>
 
-      {/* Separator between Tasks and Timeline */}
-      <VerticalSeparator
-        isFocused={activePane === "tasks" || activePane === "timeline"}
-        color={
-          activePane === "tasks" || activePane === "timeline"
-            ? focusedColor!
-            : normalColor!
-        }
+      {/* Pane 4: Right Separator */}
+      <ThinSeparator
+        color={rightSeparatorColor}
         backgroundColor={bgColor}
-        height={height}
+        height={height || 30}
       />
 
-      {/* Right Pane - Timeline */}
+      {/* Pane 5: Timeline */}
       <Box
         width={rightWidth}
         flexShrink={0.3}
