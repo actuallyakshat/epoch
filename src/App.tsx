@@ -1,9 +1,10 @@
 import React from "react";
-import { Box, Text, useStdout } from "ink";
+import { Box, Text } from "ink";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { StorageProvider } from "./contexts/StorageContext";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { useKeyboardNav } from "./hooks/useKeyboardNav";
+import { useTerminalSize } from "./hooks/useTerminalSize";
 import { ThreeColumnLayout } from "./components/layout/ThreeColumnLayout";
 import { CalendarPane } from "./components/calendar/CalendarPane";
 import { TasksPane } from "./components/tasks/TasksPane";
@@ -24,13 +25,11 @@ const AppContent: React.FC = () => {
     showClearTimelineDialog,
   } = useApp();
   const { theme } = useTheme();
-  const { stdout } = useStdout();
 
   useKeyboardNav();
 
-  /* Use available width and height */
-  const width = stdout?.columns || 100;
-  const height = stdout?.rows || 30;
+  /* Use available width and height - automatically updates on resize */
+  const { width, height } = useTerminalSize();
 
   // When a modal dialog is open, render only the modal
   if (showThemeDialog) {

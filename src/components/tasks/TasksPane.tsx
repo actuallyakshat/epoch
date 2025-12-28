@@ -437,7 +437,9 @@ export const TasksPane: React.FC = () => {
             <Text color={theme.colors.focusIndicator}>{">  "}</Text>
             <TextInput
               value={editValue}
-              onChange={setEditValue}
+              onChange={(val) => {
+                if (val.length <= 100) setEditValue(val);
+              }}
               onSubmit={handleSubmitEdit}
               placeholder="Enter task name..."
             />
@@ -450,7 +452,9 @@ export const TasksPane: React.FC = () => {
             <Text color={theme.colors.keyboardHint}>{"  "}</Text>
             <TextInput
               value={editValue}
-              onChange={setEditValue}
+              onChange={(val) => {
+                if (val.length <= 100) setEditValue(val);
+              }}
               onSubmit={handleSubmitEdit}
               placeholder="Enter subtask name..."
             />
@@ -466,7 +470,7 @@ export const TasksPane: React.FC = () => {
             </Text>
           </Box>
         ) : (
-          <Box flexDirection="column" marginY={1}>
+          <Box flexDirection="column" marginY={1} paddingRight={2}>
             {flatTasks.map(({ task, depth }, index) => {
               const isSelected = index === selectedIndex;
               const isExpanded = expandedIds.has(task.id);
@@ -478,7 +482,9 @@ export const TasksPane: React.FC = () => {
                     <Text color={theme.colors.focusIndicator}>{">  "}</Text>
                     <TextInput
                       value={editValue}
-                      onChange={setEditValue}
+                      onChange={(val) => {
+                        if (val.length <= 100) setEditValue(val);
+                      }}
                       onSubmit={handleSubmitEdit}
                     />
                   </Box>
