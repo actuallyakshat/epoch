@@ -38,15 +38,20 @@ export const TimelineEntry: React.FC<TimelineEntryProps> = ({
   const color = eventTypeColors[event.type] || theme.colors.foreground;
 
   // Circle style: hollow for started, filled for completed/delegated/delayed
-  const isFilledCircle = ["completed", "delegated", "delayed"].includes(event.type);
+  const isFilledCircle = ["completed", "delegated", "delayed"].includes(
+    event.type
+  );
 
   return (
     <Box flexDirection="column">
       {/* Main entry row */}
       <Box>
         {/* Circle indicator */}
-        <Box width={3} justifyContent="center">
+        <Box width={3} flexDirection="column" alignItems="center">
           <Text color={color}>{isFilledCircle ? "●" : "○"}</Text>
+          {!isLast && (
+            <Text color={hasNextSameTask ? color : theme.colors.border}>│</Text>
+          )}
         </Box>
         {/* Event content */}
         <Box flexDirection="column" flexGrow={1}>
