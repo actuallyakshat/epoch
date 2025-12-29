@@ -22,7 +22,7 @@
     "time-tracking",
     "cli"
   ],
-  "author": "",
+  "author": "Akshat Dubey <akshatdubey0808@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@inkjs/ui": "^2.0.0",
