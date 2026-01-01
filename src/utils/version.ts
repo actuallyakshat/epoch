@@ -1,4 +1,4 @@
-export const CURRENT_VERSION = "0.1.7";
+export const CURRENT_VERSION = "0.1.8";
 export const PACKAGE_NAME = "epoch-tui";
 
 export interface UpdateInfo {
