@@ -12,6 +12,7 @@ import type { Task, TaskTree } from "../types/task";
 import type { TimelineEvent } from "../types/timeline";
 import type { CalendarDate } from "../types/calendar";
 import type { UndoActionType } from "../types/undo";
+import { checkForUpdate, UpdateInfo } from "../utils/version";
 
 interface AppContextType {
   selectedDate: CalendarDate;
@@ -42,6 +43,10 @@ interface AppContextType {
   pushUndoableAction: (actionType: UndoActionType) => void;
   performUndo: () => void;
   canUndo: boolean;
+  showUpdateDialog: boolean;
+  setShowUpdateDialog: (show: boolean) => void;
+  updateInfo: UpdateInfo | null;
+  skipVersion: (version: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -87,6 +92,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [exitConfirmation, setExitConfirmation] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [showClearTimelineDialog, setShowClearTimelineDialog] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   // Function to clear timeline for a specific date
   const clearTimelineForDate = useCallback((dateStr: string) => {
@@ -115,6 +122,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [undo]);
 
+  // Skip a version for update notifications
+  const skipVersion = useCallback(
+    (version: string) => {
+      if (data) {
+        save({
+          ...data,
+          settings: {
+            ...data.settings,
+            skippedVersion: version,
+          },
+        });
+      }
+      setShowUpdateDialog(false);
+    },
+    [data, save]
+  );
+
   // Track if initial data has been loaded to prevent save loop
   const initialLoadDone = useRef(false);
   const dataRef = useRef(data);
@@ -132,6 +156,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setTasks(data.tasks);
       setTimeline(data.timeline);
       initialLoadDone.current = true;
+
+      // Check for updates after initial load
+      checkForUpdate().then((info) => {
+        if (info.hasUpdate) {
+          // Only show dialog if this version hasn't been skipped
+          const skippedVersion = data.settings?.skippedVersion;
+          if (skippedVersion !== info.latestVersion) {
+            setUpdateInfo(info);
+            setShowUpdateDialog(true);
+          }
+        }
+      });
     }
   }, [data]);
 
@@ -172,11 +208,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         showClearTimelineDialog,
         setShowClearTimelineDialog,
         clearTimelineForDate,
-        isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog,
+        isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog || showUpdateDialog,
         saveNow,
         pushUndoableAction,
         performUndo,
         canUndo,
+        showUpdateDialog,
+        setShowUpdateDialog,
+        updateInfo,
+        skipVersion,
       }}
     >
       {children}

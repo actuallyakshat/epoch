@@ -6,6 +6,7 @@ export interface UserSettings {
   defaultStartTime: 'now' | 'custom';
   dateFormat: string;
   timeFormat: '12h' | '24h';
+  skippedVersion?: string;
 }
 
 export interface StorageSchema {

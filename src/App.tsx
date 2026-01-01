@@ -13,6 +13,7 @@ import { TimelinePane } from "./components/timeline/TimelinePane";
 import { HelpDialog } from "./components/common/HelpDialog";
 import { ThemeDialog } from "./components/common/ThemeDialog";
 import { ClearTimelineDialog } from "./components/common/ClearTimelineDialog";
+import { UpdateDialog } from "./components/common/UpdateDialog";
 import { OverviewScreen } from "./components/overview/OverviewScreen";
 import { FullscreenBackground } from "./components/common/FullscreenBackground";
 
@@ -24,6 +25,10 @@ const AppContent: React.FC = () => {
     activePane,
     showThemeDialog,
     showClearTimelineDialog,
+    showUpdateDialog,
+    setShowUpdateDialog,
+    updateInfo,
+    skipVersion,
   } = useApp();
   const { theme } = useTheme();
 
@@ -33,6 +38,17 @@ const AppContent: React.FC = () => {
   const { width, height } = useTerminalSize();
 
   // When a modal dialog is open, render only the modal
+  if (showUpdateDialog && updateInfo) {
+    return (
+      <UpdateDialog
+        currentVersion={updateInfo.currentVersion}
+        latestVersion={updateInfo.latestVersion}
+        onDismiss={() => setShowUpdateDialog(false)}
+        onSkipVersion={skipVersion}
+      />
+    );
+  }
+
   if (showThemeDialog) {
     return <ThemeDialog />;
   }
