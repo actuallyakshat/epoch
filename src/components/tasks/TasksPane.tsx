@@ -7,7 +7,7 @@ import { Pane } from "../layout/Pane";
 import { TaskHeader } from "./TaskHeader";
 import { TaskList } from "./TaskList";
 import { KeyboardHints } from "../common/KeyboardHints";
-import { getDateString } from "../../utils/date";
+import { getDateString, isToday } from "../../utils/date";
 import { taskService } from "../../services/taskService";
 import { timelineService } from "../../services/timelineService";
 import { flattenTasks } from "../../utils/tree";
@@ -45,9 +45,9 @@ export const TasksPane: React.FC = () => {
     return Math.max(5, terminalHeight - 11);
   }, [terminalHeight]);
 
-  const dateStr = getDateString(
-    new Date(selectedDate.year, selectedDate.month, selectedDate.day)
-  );
+  const selectedDateObj = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
+  const dateStr = getDateString(selectedDateObj);
+  const isSelectedDateToday = isToday(selectedDateObj);
 
   // Memoize to prevent new array reference on every render when empty
   const dayTasks = useMemo(() => tasks[dateStr] || [], [tasks, dateStr]);
@@ -199,8 +199,8 @@ export const TasksPane: React.FC = () => {
             eventTypeToRemove[previousState]
           );
           setTimeline(updatedTimeline);
-        } else {
-          // Create timeline event for state change
+        } else if (isSelectedDateToday) {
+          // Only create timeline events for today's tasks
           const eventTypeMap: Record<TaskState, TimelineEventType> = {
             todo: TimelineEventType.STARTED, // shouldn't happen
             completed: TimelineEventType.COMPLETED,
@@ -440,15 +440,17 @@ export const TasksPane: React.FC = () => {
             const updated = taskService.startTask(tasks, selectedTaskId!);
             setTasks(updated);
 
-            // Create timeline event for starting task
-            const event = timelineService.createEvent(
-              selectedTaskId!,
-              selectedTask.title,
-              TimelineEventType.STARTED,
-              new Date()
-            );
-            const updatedTimeline = timelineService.addEvent(timeline, event);
-            setTimeline(updatedTimeline);
+            // Only create timeline event for today's tasks
+            if (isSelectedDateToday) {
+              const event = timelineService.createEvent(
+                selectedTaskId!,
+                selectedTask.title,
+                TimelineEventType.STARTED,
+                new Date()
+              );
+              const updatedTimeline = timelineService.addEvent(timeline, event);
+              setTimeline(updatedTimeline);
+            }
           }
         } catch (err) {
           console.error("Error toggling task start:", err);
