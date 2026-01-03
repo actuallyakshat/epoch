@@ -43,7 +43,7 @@ export class TaskService {
       throw new Error('Task not found');
     }
 
-    if (updates.title) {
+    if (updates.title !== undefined) {
       const validation = validateTaskTitle(updates.title);
       if (!validation.valid) {
         throw new Error(validation.error);
