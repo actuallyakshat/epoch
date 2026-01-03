@@ -1,4 +1,5 @@
 import type { Task } from '../types/task';
+import { logger } from './logger';
 
 export const findTaskById = (tasks: Task[], id: string): Task | null => {
   for (const task of tasks) {
@@ -10,8 +11,21 @@ export const findTaskById = (tasks: Task[], id: string): Task | null => {
 };
 
 export const updateTaskInTree = (tasks: Task[], id: string, updates: Partial<Task>): Task[] => {
-  return tasks.map(task => {
+  logger.log("[updateTaskInTree] Called", {
+    id,
+    updates,
+    tasksCount: tasks.length,
+    tasksIds: tasks.map(t => ({ id: t.id, title: t.title, childrenCount: t.children.length }))
+  });
+  
+  const result = tasks.map(task => {
     if (task.id === id) {
+      logger.log("[updateTaskInTree] Found task to update", {
+        id,
+        taskTitle: task.title,
+        currentState: task.state,
+        updates
+      });
       return { ...task, ...updates, updatedAt: new Date() };
     }
     return {
@@ -19,6 +33,13 @@ export const updateTaskInTree = (tasks: Task[], id: string, updates: Partial<Tas
       children: updateTaskInTree(task.children, id, updates),
     };
   });
+  
+  logger.log("[updateTaskInTree] Completed", {
+    id,
+    resultCount: result.length
+  });
+  
+  return result;
 };
 
 export const deleteTaskFromTree = (tasks: Task[], id: string): Task[] => {

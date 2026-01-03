@@ -7,6 +7,7 @@ export interface UserSettings {
   dateFormat: string;
   timeFormat: '12h' | '24h';
   skippedVersion?: string;
+  autoMoveUnfinishedTasks: boolean;
 }
 
 export interface StorageSchema {

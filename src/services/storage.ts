@@ -28,6 +28,7 @@ const getDefaultSchema = (): StorageSchema => ({
     defaultStartTime: 'now',
     dateFormat: 'MMMM do, yyyy',
     timeFormat: '12h',
+    autoMoveUnfinishedTasks: true,
   },
 });
 
@@ -116,6 +117,10 @@ export class StorageService {
       updatedAt: new Date(task.updatedAt),
       startTime: task.startTime ? new Date(task.startTime) : undefined,
       endTime: task.endTime ? new Date(task.endTime) : undefined,
+      recurrence: task.recurrence ? {
+        ...task.recurrence,
+        endDate: task.recurrence.endDate ? new Date(task.recurrence.endDate) : undefined,
+      } : undefined,
       children: task.children ? task.children.map((child: any) => this.hydrateTask(child)) : [],
     };
   }
@@ -144,6 +149,10 @@ export class StorageService {
       updatedAt: task.updatedAt.toISOString(),
       startTime: task.startTime ? task.startTime.toISOString() : undefined,
       endTime: task.endTime ? task.endTime.toISOString() : undefined,
+      recurrence: task.recurrence ? {
+        ...task.recurrence,
+        endDate: task.recurrence.endDate ? task.recurrence.endDate.toISOString() : undefined,
+      } : undefined,
       children: task.children ? task.children.map((child: any) => this.serializeTask(child)) : [],
     };
   }

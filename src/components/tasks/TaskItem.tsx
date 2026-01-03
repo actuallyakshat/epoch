@@ -62,6 +62,18 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       >
         {task.title}
       </Text>
+      {task.recurrence && (
+        <Text
+          color={
+            isSelected
+              ? theme.colors.focusIndicator
+              : theme.colors.timelineEventStarted
+          }
+        >
+          {" "}
+          ↺
+        </Text>
+      )}
       {task.startTime && !task.endTime && (
         <Text color={theme.colors.timelineEventStarted}> ▶</Text>
       )}

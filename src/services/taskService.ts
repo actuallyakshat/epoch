@@ -9,6 +9,7 @@ import {
   getTaskStats,
 } from '../utils/tree';
 import { validateTaskTitle, validateTaskTimes } from '../utils/validation';
+import { logger } from '../utils/logger';
 
 export class TaskService {
   createTask(title: string, date: string, state: TaskState = 'todo'): Task {
@@ -16,6 +17,8 @@ export class TaskService {
     if (!validation.valid) {
       throw new Error(validation.error);
     }
+
+    logger.log("Creating new task", { title, date, state });
 
     const now = new Date();
     return {
@@ -30,6 +33,8 @@ export class TaskService {
   }
 
   updateTask(tasks: TaskTree, taskId: string, updates: Partial<Task>): TaskTree {
+    logger.log("Updating task", { taskId, updates });
+
     const dateStr = Object.keys(tasks).find(date =>
       findTaskById(tasks[date], taskId)
     );
@@ -66,12 +71,15 @@ export class TaskService {
   }
 
   deleteTask(tasks: TaskTree, taskId: string): TaskTree {
+    logger.log("Deleting task", { taskId });
+
     const dateStr = Object.keys(tasks).find(date =>
       findTaskById(tasks[date], taskId)
     );
 
     if (!dateStr) {
-      throw new Error('Task not found');
+      logger.log("Task not found for deletion, it might be an ephemeral recurring instance", { taskId });
+      return tasks;
     }
 
     return {
@@ -109,6 +117,8 @@ export class TaskService {
   }
 
   changeTaskState(tasks: TaskTree, taskId: string, newState: TaskState): TaskTree {
+    logger.log("Changing task state", { taskId, newState });
+
     return this.updateTask(tasks, taskId, {
       state: newState,
       endTime: ['completed', 'delegated', 'delayed'].includes(newState)
@@ -136,6 +146,41 @@ export class TaskService {
 
   getTaskStats(tasks: TaskTree, date: string) {
     return getTaskStats(this.getTasksForDate(tasks, date));
+  }
+
+  excludeRecurringInstance(tasks: TaskTree, parentTaskId: string, dateStr: string): TaskTree {
+    logger.log("Excluding recurring instance", { parentTaskId, dateStr });
+
+    const parentDateStr = Object.keys(tasks).find(date =>
+      tasks[date].some(t => t.id === parentTaskId)
+    );
+
+    if (!parentDateStr) {
+      throw new Error('Parent recurring task not found');
+    }
+
+    return {
+      ...tasks,
+      [parentDateStr]: tasks[parentDateStr].map(task => {
+        if (task.id === parentTaskId) {
+          const recurrence = task.recurrence;
+          if (!recurrence) return task;
+
+          const excludedDates = recurrence.excludedDates || [];
+          if (!excludedDates.includes(dateStr)) {
+            return {
+              ...task,
+              recurrence: {
+                ...recurrence,
+                excludedDates: [...excludedDates, dateStr]
+              },
+              updatedAt: new Date()
+            };
+          }
+        }
+        return task;
+      })
+    };
   }
 }
 

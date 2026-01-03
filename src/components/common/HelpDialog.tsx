@@ -1,14 +1,28 @@
 import React from "react";
-import { Box, Text } from "ink";
+import { Box, Text, useInput } from "ink";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Modal } from "./Modal";
+import { useApp } from "../../contexts/AppContext";
 
 export const HelpDialog: React.FC = () => {
   const { theme } = useTheme();
+  const { setShowHelp, setShowSettingsDialog } = useApp();
+
+  useInput((input, key) => {
+    if (key.escape || input === "?") {
+      setShowHelp(false);
+    }
+
+    if (key.ctrl && input === "s") {
+      setShowHelp(false);
+      setShowSettingsDialog(true);
+    }
+  }, { isActive: true });
 
   const shortcuts = [
     { key: "Ctrl+C (twice)", action: "Quit application" },
     { key: "Ctrl+U", action: "Undo last action" },
+    { key: "Ctrl+S", action: "Open settings" },
     { key: "?", action: "Toggle help dialog" },
     { key: "Shift+;", action: "Show month overview" },
     { key: "t", action: "Select theme" },
@@ -31,11 +45,22 @@ export const HelpDialog: React.FC = () => {
     { key: "s", action: "Start task" },
     { key: "D", action: "Mark delegated" },
     { key: "x", action: "Mark delayed/cancelled" },
+    { key: "r", action: "Make task recurring" },
     { key: "Enter", action: "Expand/collapse subtasks" },
     { key: "", action: "" },
     { key: "Timeline Pane", action: "" },
     { key: "j/k", action: "Scroll timeline" },
     { key: "Shift+C", action: "Clear timeline" },
+    { key: "", action: "" },
+    { key: "Input Editing", action: "" },
+    { key: "←/→", action: "Move cursor left/right" },
+    { key: "Ctrl+←/→", action: "Move by word" },
+    { key: "Ctrl+A", action: "Move to start of line" },
+    { key: "Ctrl+E", action: "Move to end of line" },
+    { key: "Delete/Backspace", action: "Delete character" },
+    { key: "Ctrl+W", action: "Delete word before cursor" },
+    { key: "Ctrl+U", action: "Delete to start of line" },
+    { key: "Ctrl+K", action: "Delete to end of line" },
   ];
 
   return (
@@ -76,7 +101,7 @@ export const HelpDialog: React.FC = () => {
         </Box>
         <Box marginY={1}>
           <Text color={theme.colors.keyboardHint} dimColor>
-            Press &apos;?&apos; to close
+            Press &apos;?&apos; or Esc to close
           </Text>
         </Box>
       </Box>

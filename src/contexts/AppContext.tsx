@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { useStorage } from "./StorageContext";
 import { useUndo } from "./UndoContext";
+import { taskMoveService } from "../services/taskMoveService";
+import { logger } from "../utils/logger";
 import type { Task, TaskTree } from "../types/task";
 import type { TimelineEvent } from "../types/timeline";
 import type { CalendarDate } from "../types/calendar";
@@ -37,6 +39,26 @@ interface AppContextType {
   setShowThemeDialog: (show: boolean) => void;
   showClearTimelineDialog: boolean;
   setShowClearTimelineDialog: (show: boolean) => void;
+  showSettingsDialog: boolean;
+  setShowSettingsDialog: (show: boolean) => void;
+  showRecurringTaskDialog: boolean;
+  setShowRecurringTaskDialog: (show: boolean) => void;
+  recurringTaskId: string | null;
+  setRecurringTaskId: (taskId: string | null) => void;
+  showRecurringEditDialog: boolean;
+  setShowRecurringEditDialog: (show: boolean) => void;
+  recurringEditConfig: {
+    taskId: string;
+    taskTitle: string;
+    actionType: "edit" | "delete" | "complete" | "state-change" | "add-subtask";
+    onConfirm: (action: "this" | "all" | "from-today") => void;
+  } | null;
+  setRecurringEditConfig: (config: {
+    taskId: string;
+    taskTitle: string;
+    actionType: "edit" | "delete" | "complete" | "state-change" | "add-subtask";
+    onConfirm: (action: "this" | "all" | "from-today") => void;
+  } | null) => void;
   clearTimelineForDate: (dateStr: string) => void;
   isModalOpen: boolean;
   saveNow: () => Promise<void>;
@@ -92,6 +114,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [exitConfirmation, setExitConfirmation] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [showClearTimelineDialog, setShowClearTimelineDialog] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showRecurringTaskDialog, setShowRecurringTaskDialog] = useState(false);
+  const [recurringTaskId, setRecurringTaskId] = useState<string | null>(null);
+  const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
+  const [recurringEditConfig, setRecurringEditConfig] = useState<{
+    taskId: string;
+    taskTitle: string;
+    actionType: "edit" | "delete" | "complete" | "state-change" | "add-subtask";
+    onConfirm: (action: "this" | "all" | "from-today") => void;
+  } | null>(null);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
@@ -153,7 +185,29 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Load data from storage (only once)
   useEffect(() => {
     if (data && !initialLoadDone.current) {
-      setTasks(data.tasks);
+      logger.log("Loading data from storage", {
+        settings: data.settings,
+        taskDates: Object.keys(data.tasks),
+        timelineDates: Object.keys(data.timeline)
+      });
+
+      // Check if auto-move is enabled and move tasks before setting initial state
+      let tasksToSet = data.tasks;
+      if (data.settings?.autoMoveUnfinishedTasks !== false) {
+        logger.log("Auto-move enabled, moving unfinished tasks");
+        tasksToSet = taskMoveService.autoMoveUnfinishedTasksToToday(data.tasks);
+        // Save the updated tasks if any were moved
+        if (tasksToSet !== data.tasks) {
+          saveRef.current({
+            ...data,
+            tasks: tasksToSet,
+          });
+        }
+      } else {
+        logger.log("Auto-move disabled, skipping");
+      }
+
+      setTasks(tasksToSet);
       setTimeline(data.timeline);
       initialLoadDone.current = true;
 
@@ -178,6 +232,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         ...dataRef.current,
         tasks,
         timeline,
+      });
+      logger.log("Auto-saving data", {
+        taskCount: Object.keys(tasks).reduce((acc, date) => acc + tasks[date].length, 0),
+        timelineCount: Object.keys(timeline).reduce((acc, date) => acc + (timeline[date]?.length || 0), 0)
       });
     }
   }, [tasks, timeline]);
@@ -207,8 +265,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setShowThemeDialog,
         showClearTimelineDialog,
         setShowClearTimelineDialog,
+        showSettingsDialog,
+        setShowSettingsDialog,
+        showRecurringTaskDialog,
+        setShowRecurringTaskDialog,
+        recurringTaskId,
+        setRecurringTaskId,
+        showRecurringEditDialog,
+        setShowRecurringEditDialog,
+        recurringEditConfig,
+        setRecurringEditConfig,
         clearTimelineForDate,
-        isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog || showUpdateDialog,
+        isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog || showUpdateDialog || showSettingsDialog || showRecurringTaskDialog || showRecurringEditDialog,
         saveNow,
         pushUndoableAction,
         performUndo,
