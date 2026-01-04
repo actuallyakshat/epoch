@@ -77,23 +77,45 @@ export const TasksPane: React.FC = () => {
 
   // Flatten tasks for navigation (only visible ones based on expanded state)
   const flatTasks = useMemo(() => {
-    const result: { task: Task; depth: number }[] = [];
+    try {
+      const result: { task: Task; depth: number }[] = [];
 
-    const traverse = (taskList: Task[], depth: number) => {
-      for (const task of taskList) {
-        result.push({ task, depth });
-        if (task.children.length > 0 && expandedIds.has(task.id)) {
-          traverse(task.children, depth + 1);
+      const traverse = (taskList: Task[], depth: number) => {
+        for (const task of taskList) {
+          result.push({ task, depth });
+          if (task.children.length > 0 && expandedIds.has(task.id)) {
+            traverse(task.children, depth + 1);
+          }
         }
-      }
-    };
+      };
 
-    traverse(dayTasks, 0);
-    return result;
+      traverse(dayTasks, 0);
+      logger.log('[flatTasks] Computed', {
+        dayTasksLength: dayTasks.length,
+        flatTasksLength: result.length,
+        expandedIdsCount: expandedIds.size,
+        taskTitles: result.map((item, idx) => `[${idx}] ${item.task.title}`),
+      });
+      return result;
+    } catch (err) {
+      logger.log('[flatTasks] Error computing flatTasks', { error: err });
+      return [];
+    }
   }, [dayTasks, expandedIds]);
 
   const selectedTask = flatTasks[selectedIndex]?.task;
   const selectedTaskId = selectedTask?.id;
+
+  // Log when selectedIndex or selectedTask changes
+  useEffect(() => {
+    logger.log('[selectedIndex] Changed', {
+      selectedIndex,
+      flatTasksLength: flatTasks.length,
+      selectedTaskId,
+      selectedTaskTitle: selectedTask?.title,
+      selectedTaskValid: selectedTask !== undefined,
+    });
+  }, [selectedIndex, selectedTaskId, selectedTask?.title, flatTasks.length]);
 
   // Expand all nested tasks by default when tasks change
   useEffect(() => {
@@ -286,23 +308,32 @@ export const TasksPane: React.FC = () => {
     today: Date,
   ) => {
     let updated = { ...tasks };
-    for (const [date, taskList] of Object.entries(tasks)) {
-      const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
-      if (rootIndex !== -1) {
-        const titlePath = helpers.findSubtaskByTitlePath(taskList[rootIndex], task);
-        const updatedRoot = titlePath
-          ? helpers.deleteByTitlePath(taskList[rootIndex], titlePath)
-          : helpers.deleteSubtaskFromTree(taskList[rootIndex], taskId);
+    const todayObj = new Date(today);
+    todayObj.setHours(0, 0, 0, 0);
 
-        updated[date] = [
-          ...taskList.slice(0, rootIndex),
-          updatedRoot,
-          ...taskList.slice(rootIndex + 1),
-        ];
-        break;
+    // Only delete the subtask from root parents on or after today
+    for (const [date, taskList] of Object.entries(tasks)) {
+      const dateObj = new Date(date);
+      dateObj.setHours(0, 0, 0, 0);
+
+      if (dateObj >= todayObj) {
+        const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
+        if (rootIndex !== -1) {
+          const titlePath = helpers.findSubtaskByTitlePath(taskList[rootIndex], task);
+          const updatedRoot = titlePath
+            ? helpers.deleteByTitlePath(taskList[rootIndex], titlePath)
+            : helpers.deleteSubtaskFromTree(taskList[rootIndex], taskId);
+
+          updated[date] = [
+            ...taskList.slice(0, rootIndex),
+            updatedRoot,
+            ...taskList.slice(rootIndex + 1),
+          ];
+        }
       }
     }
 
+    // Also delete from materialized instances from today onwards
     updated = helpers.deleteSubtaskFromMaterializedInstances(
       updated,
       rootParent.id,
@@ -313,19 +344,10 @@ export const TasksPane: React.FC = () => {
   };
 
   const handleDeleteTaskFromToday = (taskId: string, task: Task, today: Date) => {
-    let updated = tasks;
-    const isMaterialized = Object.values(tasks).some((taskList) =>
-      taskList.some((t) => t.id === taskId),
-    );
-
-    if (isMaterialized) {
-      updated = taskService.deleteTask(tasks, taskId);
-    } else if (task.recurringParentId) {
-      updated = taskService.deleteTask(tasks, task.recurringParentId);
-    }
-
+    // For "from-today", we should NOT delete the original recurring task definition
+    // We only delete materialized instances from today onwards
     const recurringParentToDelete = task.recurringParentId || taskId;
-    updated = helpers.deleteMaterializedInstances(updated, recurringParentToDelete, today);
+    const updated = helpers.deleteMaterializedInstances(tasks, recurringParentToDelete, today);
     setTasks(updated);
   };
 
@@ -805,10 +827,24 @@ export const TasksPane: React.FC = () => {
 
   const handleNavigationKeys = (input: string, key: any) => {
     if (input === 'j' || key.downArrow) {
+      logger.log('[handleNavigationKeys] Down key pressed', {
+        currentIndex: selectedIndex,
+        flatTasksLength: flatTasks.length,
+        newIndex: Math.min(selectedIndex + 1, flatTasks.length - 1),
+        selectedTaskId,
+        selectedTaskTitle: selectedTask?.title,
+      });
       setSelectedIndex((prev) => Math.min(prev + 1, flatTasks.length - 1));
       return true;
     }
     if (input === 'k' || key.upArrow) {
+      logger.log('[handleNavigationKeys] Up key pressed', {
+        currentIndex: selectedIndex,
+        flatTasksLength: flatTasks.length,
+        newIndex: Math.max(selectedIndex - 1, 0),
+        selectedTaskId,
+        selectedTaskTitle: selectedTask?.title,
+      });
       setSelectedIndex((prev) => Math.max(prev - 1, 0));
       return true;
     }

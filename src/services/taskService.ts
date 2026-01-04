@@ -161,7 +161,14 @@ export class TaskService {
           !task.isRecurringInstance &&
           recurringTaskService.shouldTaskGenerateForDate(task, currentDateObj)
         ) {
-          const instanceExists = existingTasks.some((t) => t.recurringParentId === task.id);
+          // Check if an instance already exists (materialized or already generated)
+          // An instance exists if:
+          // 1. It has recurringParentId matching the parent task ID
+          // 2. OR it's the parent task itself on this date (shouldn't happen, but check anyway)
+          const instanceExists = existingTasks.some(
+            (t) => t.recurringParentId === task.id || (t.id === task.id && t.isRecurringInstance),
+          );
+
           if (!instanceExists) {
             const instance = recurringTaskService.generateRecurringInstance(task, currentDateObj);
             recurringInstances.push(instance);
@@ -189,19 +196,15 @@ export class TaskService {
     );
 
     if (!parentDateStr) {
-      logger.log(
-        'Parent recurring task not found, returning tasks unchanged. This may happen if the parent was deleted.',
-        { parentTaskId, dateStr },
-      );
-      return tasks;
+      throw new Error('Parent recurring task not found');
     }
 
     const parentTask = findTaskById(tasks[parentDateStr], parentTaskId);
     if (!parentTask) {
-      logger.log('Parent task not found in date, returning tasks unchanged', {
-        parentTaskId,
-        parentDateStr,
-      });
+      throw new Error('Parent recurring task not found');
+    }
+
+    if (!parentTask.recurrence) {
       return tasks;
     }
 
@@ -209,8 +212,8 @@ export class TaskService {
       ...tasks,
       [parentDateStr]: updateTaskInTree(tasks[parentDateStr], parentTaskId, {
         recurrence: {
-          ...parentTask.recurrence!,
-          excludedDates: [...(parentTask.recurrence?.excludedDates || []), dateStr].filter(
+          ...parentTask.recurrence,
+          excludedDates: [...(parentTask.recurrence.excludedDates || []), dateStr].filter(
             (date, index, self) => self.indexOf(date) === index,
           ),
         },
