@@ -20,16 +20,19 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, depth, isSelected, isE
     delayed: theme.colors.taskStateDelayed,
   };
 
-  const checkbox =
-    task.state === 'completed'
-      ? '☑'
-      : task.state === 'delegated'
-        ? '↦'
-        : task.state === 'delayed'
-          ? '⏸'
-          : '☐';
+  let checkbox = '☐';
+  if (task.state === 'completed') {
+    checkbox = '☑';
+  } else if (task.state === 'delegated') {
+    checkbox = '↦';
+  } else if (task.state === 'delayed') {
+    checkbox = '⏸';
+  }
 
-  const expandIcon = task.children.length > 0 ? (isExpanded ? '▼ ' : '▶ ') : '  ';
+  let expandIcon = '  ';
+  if (task.children.length > 0) {
+    expandIcon = isExpanded ? '▼ ' : '▶ ';
+  }
   const indent = '  '.repeat(depth);
   const selector = isSelected ? '>' : ' ';
   const textColor = stateColors[task.state] || theme.colors.foreground;

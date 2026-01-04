@@ -58,7 +58,7 @@ export const ClearTimelineDialog: React.FC = () => {
           </Box>
           {eventCount > 0 ? (
             <Text color={theme.colors.keyboardHint}>
-              This will remove {eventCount} event{eventCount !== 1 ? 's' : ''} from the timeline.
+              This will remove {eventCount} event{eventCount === 1 ? '' : 's'} from the timeline.
             </Text>
           ) : (
             <Text color={theme.colors.keyboardHint} dimColor>

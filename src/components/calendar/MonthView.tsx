@@ -27,13 +27,16 @@ export const MonthView: React.FC<MonthViewProps> = ({ calendarView }) => {
       </Box>
 
       {/* Calendar weeks */}
-      {calendarView.weeks.map((week, weekIdx) => (
-        <Box key={weekIdx} marginBottom={0}>
-          {week.map((day) => (
-            <DayCell key={day.dateString} day={day} />
-          ))}
-        </Box>
-      ))}
+      {calendarView.weeks.map((week) => {
+        const weekKey = week[0]?.dateString || 'empty-week';
+        return (
+          <Box key={weekKey} marginBottom={0}>
+            {week.map((day) => (
+              <DayCell key={day.dateString} day={day} />
+            ))}
+          </Box>
+        );
+      })}
     </Box>
   );
 };

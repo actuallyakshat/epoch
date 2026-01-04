@@ -16,8 +16,8 @@ export const KeyboardHints: React.FC<KeyboardHintsProps> = ({ hints }) => {
 
   return (
     <Box marginTop={1} flexDirection="row" flexWrap="wrap" columnGap={2} width="100%">
-      {hints.map((hint, index) => (
-        <Box key={index}>
+      {hints.map((hint) => (
+        <Box key={`${hint.key}-${hint.description}`}>
           <Text color={theme.colors.focusIndicator} bold>
             {hint.key}
           </Text>

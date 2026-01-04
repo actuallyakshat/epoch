@@ -90,11 +90,12 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({ children }) =>
     };
   }, []);
 
-  return (
-    <StorageContext.Provider value={{ data, isLoading, error, save, saveNow }}>
-      {children}
-    </StorageContext.Provider>
+  const contextValue = React.useMemo(
+    () => ({ data, isLoading, error, save, saveNow }),
+    [data, isLoading, error, save, saveNow],
   );
+
+  return <StorageContext.Provider value={contextValue}>{children}</StorageContext.Provider>;
 };
 
 export const useStorage = (): StorageContextType => {

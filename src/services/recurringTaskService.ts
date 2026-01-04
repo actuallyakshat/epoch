@@ -1,4 +1,4 @@
-import type { Task, RecurrencePattern, RecurrenceFrequency } from '../types/task';
+import type { Task, RecurrencePattern } from '../types/task';
 import { getDateString, parseDateString } from '../utils/date';
 import {
   addDays,
@@ -24,7 +24,7 @@ export class RecurringTaskService {
     const targetDateStr = getDateString(targetDate);
 
     // Check excluded dates
-    if (pattern.excludedDates && pattern.excludedDates.includes(targetDateStr)) {
+    if (pattern.excludedDates?.includes(targetDateStr)) {
       return false;
     }
 
@@ -141,23 +141,57 @@ export class RecurringTaskService {
   }
 
   /**
+   * Get next occurrence for weekdays frequency
+   */
+  private getNextWeekday(baseDate: Date): Date {
+    let nextDate = addDays(baseDate, 1);
+    while (isWeekend(nextDate)) {
+      nextDate = addDays(nextDate, 1);
+    }
+    return nextDate;
+  }
+
+  /**
+   * Get next occurrence for custom days of week
+   */
+  private getNextCustomDayOfWeek(baseDate: Date, daysOfWeek: number[]): Date | null {
+    let nextDate = addDays(baseDate, 1);
+    while (!daysOfWeek.includes(nextDate.getDay())) {
+      nextDate = addDays(nextDate, 1);
+      // Safety check to prevent infinite loop
+      if (nextDate.getTime() - baseDate.getTime() > 7 * 24 * 60 * 60 * 1000) {
+        return null;
+      }
+    }
+    return nextDate;
+  }
+
+  /**
+   * Get next occurrence for custom frequency
+   */
+  private getNextCustomOccurrence(baseDate: Date, pattern: RecurrencePattern): Date | null {
+    if (pattern.daysOfWeek && pattern.daysOfWeek.length > 0) {
+      return this.getNextCustomDayOfWeek(baseDate, pattern.daysOfWeek);
+    } else if (pattern.interval) {
+      return addDays(baseDate, pattern.interval);
+    }
+    return null;
+  }
+
+  /**
    * Get the next occurrence date for a recurring task
    */
   getNextOccurrence(pattern: RecurrencePattern, baseDate: Date): Date | null {
-    let nextDate = new Date(baseDate);
+    let nextDate: Date | null = null;
 
     switch (pattern.frequency) {
       case 'daily':
         nextDate = addDays(baseDate, 1);
         break;
 
-      case 'weekdays': {
-        nextDate = addDays(baseDate, 1);
-        while (isWeekend(nextDate)) {
-          nextDate = addDays(nextDate, 1);
-        }
+      case 'weekdays':
+        nextDate = this.getNextWeekday(baseDate);
         break;
-      }
 
       case 'weekly':
         nextDate = addWeeks(baseDate, 1);
@@ -171,31 +205,16 @@ export class RecurringTaskService {
         nextDate = addYears(baseDate, 1);
         break;
 
-      case 'custom': {
-        if (pattern.daysOfWeek && pattern.daysOfWeek.length > 0) {
-          // Find next day of week
-          nextDate = addDays(baseDate, 1);
-          while (!pattern.daysOfWeek.includes(nextDate.getDay())) {
-            nextDate = addDays(nextDate, 1);
-            // Safety check to prevent infinite loop
-            if (nextDate.getTime() - baseDate.getTime() > 7 * 24 * 60 * 60 * 1000) {
-              return null;
-            }
-          }
-        } else if (pattern.interval) {
-          nextDate = addDays(baseDate, pattern.interval);
-        } else {
-          return null;
-        }
+      case 'custom':
+        nextDate = this.getNextCustomOccurrence(baseDate, pattern);
         break;
-      }
 
       default:
         return null;
     }
 
     // Check end date
-    if (pattern.endDate && isAfter(nextDate, pattern.endDate)) {
+    if (nextDate && pattern.endDate && isAfter(nextDate, pattern.endDate)) {
       return null;
     }
 
