@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs';
-import { dirname } from 'path';
-import { homedir } from 'os';
+import { promises as fs } from 'node:fs';
+import { dirname } from 'node:path';
+import { homedir } from 'node:os';
 import type { StorageSchema } from '../types/storage';
 
 const getStoragePath = (): string => {
@@ -12,8 +12,8 @@ const getStoragePath = (): string => {
   } else if (platform === 'linux') {
     return `${home}/.config/epoch/data.json`;
   } else if (platform === 'win32') {
-    const appData = process.env.APPDATA || `${home}\\AppData\\Roaming`;
-    return `${appData}\\epoch\\data.json`;
+    const appData = process.env.APPDATA || String.raw`${home}\AppData\Roaming`;
+    return String.raw`${appData}\epoch\data.json`;
   }
 
   return `${home}/.epoch/data.json`;
@@ -33,7 +33,7 @@ const getDefaultSchema = (): StorageSchema => ({
 });
 
 export class StorageService {
-  private filePath: string;
+  private readonly filePath: string;
 
   constructor(filePath?: string) {
     this.filePath = filePath || getStoragePath();
@@ -70,7 +70,7 @@ export class StorageService {
 
   async backup(): Promise<void> {
     try {
-      const timestamp = new Date().toISOString().replace(/:/g, '-');
+      const timestamp = new Date().toISOString().replaceAll(':', '-');
       const backupPath = `${this.filePath}.backup-${timestamp}`;
       const data = await fs.readFile(this.filePath, 'utf-8');
       await fs.writeFile(backupPath, data, 'utf-8');

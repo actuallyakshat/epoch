@@ -20,8 +20,6 @@ export const useKeyboardNav = () => {
     isInputMode,
     showOverview,
     setShowOverview,
-    overviewMonth,
-    setOverviewMonth,
     exitConfirmation,
     setExitConfirmation,
     showThemeDialog,
@@ -67,7 +65,7 @@ export const useKeyboardNav = () => {
         saveNow()
           .then(() => {
             // Unmount the Ink app first
-            const inkApp = (global as any).__inkApp;
+            const inkApp = (globalThis as any).__inkApp;
             if (inkApp) {
               inkApp.unmount();
             }
@@ -81,7 +79,7 @@ export const useKeyboardNav = () => {
           })
           .catch(() => {
             // Unmount the Ink app first even on error
-            const inkApp = (global as any).__inkApp;
+            const inkApp = (globalThis as any).__inkApp;
             if (inkApp) {
               inkApp.unmount();
             }
@@ -93,11 +91,9 @@ export const useKeyboardNav = () => {
               process.exit(0);
             }, 100); // Give Ink time to unmount
           });
-        return;
       } else {
         logger.log('Exit confirmation requested');
         setExitConfirmation(true);
-        return;
       }
     }
   }); // Always active
@@ -109,58 +105,49 @@ export const useKeyboardNav = () => {
       if (key.ctrl && input === 'u' && canUndo) {
         logger.log('Performing undo');
         performUndo();
-        return;
       }
 
       // Shift+; (colon) to toggle overview
       if (input === ':') {
         logger.log('Toggling overview', { show: !showOverview });
         setShowOverview(!showOverview);
-        return;
       }
 
       if (input === '?') {
         logger.log('Toggling help dialog', { show: !showHelp });
         setShowHelp(!showHelp);
-        return;
       }
 
       if (key.ctrl && input === 't') {
         logger.log('Opening theme dialog');
         setShowThemeDialog(true);
-        return;
       }
 
       if (key.ctrl && input === 's') {
         logger.log('Opening settings dialog');
         setShowSettingsDialog(true);
-        return;
       }
 
       // 'C' (shift+c) to clear timeline (when timeline pane is focused)
       if (input === 'C' && activePane === 'timeline') {
         logger.log('Opening clear timeline dialog');
         setShowClearTimelineDialog(true);
-        return;
       }
 
       // Pane switching
       if (input === '1') {
         logger.log('Switching to calendar pane');
         setActivePane('calendar');
-        return;
       }
 
       if (input === '2' || (key.tab && !key.shift)) {
         logger.log('Switching to tasks pane');
         setActivePane('tasks');
-        return;
       }
 
       if (input === '3' || (key.tab && key.shift)) {
         logger.log('Switching to timeline pane');
         setActivePane('timeline');
-        return;
       }
     },
     {

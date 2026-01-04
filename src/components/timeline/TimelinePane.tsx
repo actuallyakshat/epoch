@@ -10,8 +10,7 @@ import { useTerminalSize } from '../../hooks/useTerminalSize';
 
 export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
-  const { selectedDate, tasks, timeline, setTimeline, activePane, isModalOpen, isInputMode } =
-    useApp();
+  const { selectedDate, tasks, timeline, activePane, isModalOpen, isInputMode } = useApp();
   const isFocused = activePane === 'timeline' && !isModalOpen;
 
   const [scrollOffset, setScrollOffset] = useState(0);

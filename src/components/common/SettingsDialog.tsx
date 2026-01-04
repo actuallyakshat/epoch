@@ -43,24 +43,20 @@ export const SettingsDialog: React.FC = () => {
       if (key.escape) {
         logger.log('Closing settings dialog');
         setShowSettingsDialog(false);
-        return;
       }
 
       // Navigate settings
       if (key.upArrow || input === 'k') {
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : settings.length - 1));
-        return;
       }
 
       if (key.downArrow || input === 'j') {
         setSelectedIndex((prev) => (prev < settings.length - 1 ? prev + 1 : 0));
-        return;
       }
 
       // Toggle setting with Space or Enter
       if (key.return || input === ' ') {
         toggleSetting(settings[selectedIndex].key);
-        return;
       }
     },
     { isActive: true },

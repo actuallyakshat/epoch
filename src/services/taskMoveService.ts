@@ -85,7 +85,7 @@ export class TaskMoveService {
       }
     }
 
-    return dates.sort(); // Sort chronologically
+    return dates.sort((a, b) => a.localeCompare(b)); // Sort chronologically
   }
 
   /**

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box } from 'ink';
 import { TaskItem } from './TaskItem';
 import type { Task } from '../../types/task';

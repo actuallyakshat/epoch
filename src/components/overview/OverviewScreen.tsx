@@ -3,7 +3,7 @@ import { Box, Text, useInput } from 'ink';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useApp } from '../../contexts/AppContext';
 import { getDateString, formatDate } from '../../utils/date';
-import { flattenTasks } from '../../utils/tree';
+import { getCheckbox, getStateColor } from '../../utils/task';
 import type { Task } from '../../types/task';
 import { startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { useTerminalSize } from '../../hooks/useTerminalSize';
@@ -63,27 +63,22 @@ export const OverviewScreen: React.FC = () => {
   useInput((input: string, key) => {
     if (key.escape) {
       setShowOverview(false);
-      return;
     }
 
     if (input === 'n' || key.rightArrow) {
       handleNextMonth();
-      return;
     }
 
     if (input === 'p' || key.leftArrow) {
       handlePrevMonth();
-      return;
     }
 
     if (input === 'j' || key.downArrow) {
       setScrollOffset((prev) => Math.min(prev + 1, Math.max(0, rows - visibleRows)));
-      return;
     }
 
     if (input === 'k' || key.upArrow) {
       setScrollOffset((prev) => Math.max(prev - 1, 0));
-      return;
     }
   });
 
@@ -123,16 +118,21 @@ export const OverviewScreen: React.FC = () => {
 
         {visibleRowData.map((_, index) => {
           const rowIndex = scrollOffset + index;
+          const rowStartDate = monthDates[rowIndex * columns];
+          const rowKey = rowStartDate
+            ? `row-${rowStartDate.toISOString()}`
+            : `row-index-${rowIndex}`;
+
           return (
-            <Box key={rowIndex} flexDirection="row" marginBottom={1}>
-              {Array.from({ length: columns }).map((_, colIndex) => {
+            <Box key={rowKey} flexDirection="row" marginBottom={1}>
+              {Array.from({ length: columns }).map((__, colIndex) => {
                 const dateIndex = rowIndex * columns + colIndex;
                 const date = monthDates[dateIndex];
 
                 if (!date) {
                   return (
                     <Box
-                      key={`empty-${colIndex}`}
+                      key={`empty-${rowIndex}-${colIndex}`}
                       flexDirection="column"
                       flexGrow={1}
                       flexBasis={0}
@@ -238,26 +238,3 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth }) => {
     </Box>
   );
 };
-
-function getCheckbox(state: string): string {
-  switch (state) {
-    case 'completed':
-      return '[✓]';
-    case 'delegated':
-      return '[→]';
-    case 'delayed':
-      return '[‖]';
-    default:
-      return '[ ]';
-  }
-}
-
-function getStateColor(state: string, theme: any): string {
-  const colors: Record<string, string> = {
-    todo: theme.colors.taskStateTodo,
-    completed: theme.colors.taskStateCompleted,
-    delegated: theme.colors.taskStateDelegated,
-    delayed: theme.colors.taskStateDelayed,
-  };
-  return colors[state] || theme.colors.foreground;
-}

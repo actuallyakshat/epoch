@@ -49,18 +49,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     }
   };
 
-  return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        themeName,
-        setTheme: handleSetTheme,
-        availableThemes: getThemeNames(),
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+  const contextValue = React.useMemo(
+    () => ({
+      theme,
+      themeName,
+      setTheme: handleSetTheme,
+      availableThemes: getThemeNames(),
+    }),
+    [theme, themeName, handleSetTheme],
   );
+
+  return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = (): ThemeContextType => {

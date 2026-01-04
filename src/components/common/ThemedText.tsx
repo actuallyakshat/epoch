@@ -16,7 +16,7 @@ export const ThemedText: React.FC<TextProps> = ({ children, backgroundColor, ...
   // Only apply theme background for non-terminal themes
   // If an explicit backgroundColor is passed, use that instead
   const bgColor =
-    backgroundColor ?? (theme.name !== 'terminal' ? theme.colors.background : undefined);
+    backgroundColor ?? (theme.name === 'terminal' ? undefined : theme.colors.background);
 
   return (
     <Text {...props} backgroundColor={bgColor}>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, useInput } from 'ink';
+import { Box, useInput } from 'ink';
 import { addDays, addWeeks, subDays, subWeeks } from 'date-fns';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useApp } from '../../contexts/AppContext';
 import { Pane } from '../layout/Pane';
 import { MonthView } from './MonthView';
@@ -9,7 +8,6 @@ import { KeyboardHints } from '../common/KeyboardHints';
 import { calendarService } from '../../services/calendarService';
 
 export const CalendarPane: React.FC = () => {
-  const { theme } = useTheme();
   const { selectedDate, setSelectedDate, tasks, activePane, isModalOpen, isInputMode } = useApp();
   const [currentMonth, setCurrentMonth] = useState({
     year: selectedDate.year,
@@ -49,23 +47,19 @@ export const CalendarPane: React.FC = () => {
       // Navigate by day (h/l or left/right)
       if (input === 'h' || key.leftArrow) {
         navigateDate(subDays(currentDate, 1));
-        return;
       }
 
       if (input === 'l' || key.rightArrow) {
         navigateDate(addDays(currentDate, 1));
-        return;
       }
 
       // Navigate by week (j/k or down/up)
       if (input === 'j' || key.downArrow) {
         navigateDate(addWeeks(currentDate, 1));
-        return;
       }
 
       if (input === 'k' || key.upArrow) {
         navigateDate(subWeeks(currentDate, 1));
-        return;
       }
 
       // Navigate by month
@@ -78,7 +72,6 @@ export const CalendarPane: React.FC = () => {
           month: next.month,
           day: 1,
         });
-        return;
       }
 
       if (input === 'p') {
@@ -90,7 +83,6 @@ export const CalendarPane: React.FC = () => {
           month: prev.month,
           day: 1,
         });
-        return;
       }
 
       // Go to today
@@ -101,7 +93,6 @@ export const CalendarPane: React.FC = () => {
           month: today.getMonth(),
           day: today.getDate(),
         });
-        return;
       }
     },
     { isActive: isFocused && !isInputMode },

@@ -3,10 +3,12 @@ import { useStorage } from './StorageContext';
 import { useUndo } from './UndoContext';
 import { taskMoveService } from '../services/taskMoveService';
 import { logger } from '../utils/logger';
-import type { Task, TaskTree } from '../types/task';
+import type { TaskTree } from '../types/task';
 import type { TimelineEvent } from '../types/timeline';
 import type { CalendarDate } from '../types/calendar';
 import type { UndoActionType } from '../types/undo';
+import type { RecurringChoice, RecurringActionType } from '../types/recurring';
+import type { PaneType } from '../types/app';
 import { checkForUpdate, UpdateInfo } from '../utils/version';
 
 interface AppContextType {
@@ -16,8 +18,8 @@ interface AppContextType {
   setTasks: (tasks: TaskTree) => void;
   timeline: { [date: string]: TimelineEvent[] };
   setTimeline: (timeline: { [date: string]: TimelineEvent[] }) => void;
-  activePane: 'calendar' | 'tasks' | 'timeline';
-  setActivePane: (pane: 'calendar' | 'tasks' | 'timeline') => void;
+  activePane: PaneType;
+  setActivePane: (pane: PaneType) => void;
   showHelp: boolean;
   setShowHelp: (show: boolean) => void;
   isInputMode: boolean;
@@ -43,15 +45,15 @@ interface AppContextType {
   recurringEditConfig: {
     taskId: string;
     taskTitle: string;
-    actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
-    onConfirm: (action: 'this' | 'all' | 'from-today') => void;
+    actionType: RecurringActionType;
+    onConfirm: (action: RecurringChoice) => void;
   } | null;
   setRecurringEditConfig: (
     config: {
       taskId: string;
       taskTitle: string;
-      actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
-      onConfirm: (action: 'this' | 'all' | 'from-today') => void;
+      actionType: RecurringActionType;
+      onConfirm: (action: RecurringChoice) => void;
     } | null,
   ) => void;
   clearTimelineForDate: (dateStr: string) => void;
@@ -85,19 +87,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [timeline, setTimeline] = useState<{ [date: string]: TimelineEvent[] }>({});
   const [activePane, setActivePane] = useState<'calendar' | 'tasks' | 'timeline'>('tasks');
   const [showHelp, setShowHelp] = useState(false);
-  // Use ref for isInputMode to avoid React state timing issues
-  const isInputModeRef = useRef(false);
-  const [isInputModeState, setIsInputModeState] = useState(false);
+  const [isInputMode, setIsInputMode] = useState(false);
   const [showOverview, setShowOverview] = useState(false);
-
-  // Use ref for immediate updates to avoid React state timing issues with useInput hooks
-  const setIsInputMode = useCallback((mode: boolean) => {
-    isInputModeRef.current = mode;
-    setIsInputModeState(mode);
-  }, []);
-
-  // Read from ref for immediate access in useInput hooks
-  const isInputMode = isInputModeRef.current;
   const [overviewMonth, setOverviewMonth] = useState({
     year: today.getFullYear(),
     month: today.getMonth(),
@@ -112,8 +103,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [recurringEditConfig, setRecurringEditConfig] = useState<{
     taskId: string;
     taskTitle: string;
-    actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
-    onConfirm: (action: 'this' | 'all' | 'from-today') => void;
+    actionType: RecurringActionType;
+    onConfirm: (action: RecurringChoice) => void;
   } | null>(null);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
@@ -187,7 +178,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       // Check if auto-move is enabled and move tasks before setting initial state
       let tasksToSet = data.tasks;
-      if (data.settings?.autoMoveUnfinishedTasks !== false) {
+      if (data.settings?.autoMoveUnfinishedTasks ?? true) {
         logger.log('Auto-move enabled, moving unfinished tasks');
         tasksToSet = taskMoveService.autoMoveUnfinishedTasksToToday(data.tasks);
         // Save the updated tasks if any were moved
@@ -237,64 +228,105 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [tasks, timeline]);
 
-  return (
-    <AppContext.Provider
-      value={{
-        selectedDate,
-        setSelectedDate,
-        tasks,
-        setTasks,
-        timeline,
-        setTimeline,
-        activePane,
-        setActivePane,
-        showHelp,
-        setShowHelp,
-        isInputMode,
-        setIsInputMode,
-        showOverview,
-        setShowOverview,
-        overviewMonth,
-        setOverviewMonth,
-        exitConfirmation,
-        setExitConfirmation,
-        showThemeDialog,
-        setShowThemeDialog,
-        showClearTimelineDialog,
-        setShowClearTimelineDialog,
-        showSettingsDialog,
-        setShowSettingsDialog,
-        showRecurringTaskDialog,
-        setShowRecurringTaskDialog,
-        recurringTaskId,
-        setRecurringTaskId,
+  const contextValue = React.useMemo(
+    () => ({
+      selectedDate,
+      setSelectedDate,
+      tasks,
+      setTasks,
+      timeline,
+      setTimeline,
+      activePane,
+      setActivePane,
+      showHelp,
+      setShowHelp,
+      isInputMode,
+      setIsInputMode,
+      showOverview,
+      setShowOverview,
+      overviewMonth,
+      setOverviewMonth,
+      exitConfirmation,
+      setExitConfirmation,
+      showThemeDialog,
+      setShowThemeDialog,
+      showClearTimelineDialog,
+      setShowClearTimelineDialog,
+      showSettingsDialog,
+      setShowSettingsDialog,
+      showRecurringTaskDialog,
+      setShowRecurringTaskDialog,
+      recurringTaskId,
+      setRecurringTaskId,
+      showRecurringEditDialog,
+      setShowRecurringEditDialog,
+      recurringEditConfig,
+      setRecurringEditConfig,
+      clearTimelineForDate,
+      isModalOpen:
+        showHelp ||
+        showThemeDialog ||
+        showOverview ||
+        showClearTimelineDialog ||
+        showUpdateDialog ||
+        showSettingsDialog ||
+        showRecurringTaskDialog ||
         showRecurringEditDialog,
-        setShowRecurringEditDialog,
-        recurringEditConfig,
-        setRecurringEditConfig,
-        clearTimelineForDate,
-        isModalOpen:
-          showHelp ||
-          showThemeDialog ||
-          showOverview ||
-          showClearTimelineDialog ||
-          showUpdateDialog ||
-          showSettingsDialog ||
-          showRecurringTaskDialog ||
-          showRecurringEditDialog,
-        saveNow,
-        pushUndoableAction,
-        performUndo,
-        canUndo,
-        showUpdateDialog,
-        setShowUpdateDialog,
-        updateInfo,
-        skipVersion,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+      saveNow,
+      pushUndoableAction,
+      performUndo,
+      canUndo,
+      showUpdateDialog,
+      setShowUpdateDialog,
+      updateInfo,
+      skipVersion,
+    }),
+    [
+      selectedDate,
+      setSelectedDate,
+      tasks,
+      setTasks,
+      timeline,
+      setTimeline,
+      activePane,
+      setActivePane,
+      showHelp,
+      setShowHelp,
+      isInputMode,
+      setIsInputMode,
+      showOverview,
+      setShowOverview,
+      overviewMonth,
+      setOverviewMonth,
+      exitConfirmation,
+      setExitConfirmation,
+      showThemeDialog,
+      setShowThemeDialog,
+      showClearTimelineDialog,
+      setShowClearTimelineDialog,
+      showSettingsDialog,
+      setShowSettingsDialog,
+      showRecurringTaskDialog,
+      setShowRecurringTaskDialog,
+      recurringTaskId,
+      setRecurringTaskId,
+      showRecurringEditDialog,
+      setShowRecurringEditDialog,
+      recurringEditConfig,
+      setRecurringEditConfig,
+      clearTimelineForDate,
+      saveNow,
+      pushUndoableAction,
+      performUndo,
+      canUndo,
+      showUpdateDialog,
+      setShowUpdateDialog,
+      updateInfo,
+      skipVersion,
+    ],
   );
+
+  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };
 
 export const useApp = (): AppContextType => {

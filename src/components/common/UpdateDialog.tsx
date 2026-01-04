@@ -27,22 +27,18 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
   useInput((input, key) => {
     if (key.escape) {
       onDismiss();
-      return;
     }
 
     if (key.upArrow || input === 'k') {
       setSelectedOption((prev) => (prev > 0 ? ((prev - 1) as 0 | 1) : prev));
-      return;
     }
 
     if (key.downArrow || input === 'j') {
       setSelectedOption((prev) => (prev < options.length - 1 ? ((prev + 1) as 0 | 1 | 2) : prev));
-      return;
     }
 
     if (key.return) {
       options[selectedOption].action();
-      return;
     }
   });
 
@@ -68,11 +64,11 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
             <Text color={theme.colors.foreground} dimColor>
               Current:{' '}
             </Text>
-            <Text color={theme.colors.taskDelayed}>{currentVersion}</Text>
+            <Text color={theme.colors.taskStateDelayed}>{currentVersion}</Text>
             <Text color={theme.colors.foreground} dimColor>
               {'  →  '}
             </Text>
-            <Text color={theme.colors.taskCompleted} bold>
+            <Text color={theme.colors.taskStateCompleted} bold>
               {latestVersion}
             </Text>
           </Box>

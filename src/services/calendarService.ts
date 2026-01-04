@@ -1,4 +1,4 @@
-import { generateMonthCalendar, getDateString, isToday, isSameDay } from '../utils/date';
+import { generateMonthCalendar, getDateString, isToday } from '../utils/date';
 import type { CalendarView, CalendarDay, CalendarDate } from '../types/calendar';
 import type { TaskTree } from '../types/task';
 

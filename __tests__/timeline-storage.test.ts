@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TimelineService } from '../src/services/timelineService';
 import { StorageService } from '../src/services/storage';
 import { TimelineEventType } from '../src/types/timeline';
-import { promises as fs } from 'fs';
+import { promises as fs } from 'node:fs';
 import path from 'path';
 import { homedir } from 'os';
 
 // Mock fs module
-vi.mock('fs', () => {
+vi.mock('node:fs', () => {
   const mockPromises = {
     readFile: vi.fn(),
     writeFile: vi.fn(),
@@ -335,6 +335,7 @@ describe('StorageService', () => {
               state: 'todo',
               createdAt: '2024-01-01T10:00:00.000Z',
               updatedAt: '2024-01-01T10:00:00.000Z',
+              date: '2024-01-01',
               children: [],
             },
           ],
@@ -357,6 +358,8 @@ describe('StorageService', () => {
 
       const data = await storageService.load();
 
+      expect(data.tasks['2024-01-01']).toHaveLength(1);
+      expect(data.timeline['2024-01-01']).toHaveLength(1);
       expect(data.tasks['2024-01-01'][0].createdAt).toBeInstanceOf(Date);
       expect(data.timeline['2024-01-01'][0].timestamp).toBeInstanceOf(Date);
     });
@@ -393,6 +396,9 @@ describe('StorageService', () => {
           autoMoveUnfinishedTasks: true,
         },
       };
+
+      // Mock mkdir to resolve successfully (directory created)
+      (fs.mkdir as any).mockResolvedValue(undefined);
 
       await storageService.save(data);
 
@@ -436,11 +442,18 @@ describe('StorageService', () => {
         },
       };
 
+      // Mock fs operations
+      (fs.mkdir as any).mockResolvedValue(undefined);
+      (fs.writeFile as any).mockResolvedValue(undefined);
+
       await storageService.save(data);
 
       const writeCall = (fs.writeFile as any).mock.calls[0];
+      expect(writeCall).toBeDefined();
       const writtenContent = JSON.parse(writeCall[1]);
 
+      expect(writtenContent.tasks['2024-01-01']).toHaveLength(1);
+      expect(writtenContent.timeline['2024-01-01']).toHaveLength(1);
       expect(writtenContent.tasks['2024-01-01'][0].createdAt).toBe(date.toISOString());
       expect(writtenContent.timeline['2024-01-01'][0].timestamp).toBe(date.toISOString());
     });
@@ -448,6 +461,7 @@ describe('StorageService', () => {
     it('handles save error gracefully', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const error = new Error('Write failed');
+      (fs.mkdir as any).mockResolvedValue(undefined);
       (fs.writeFile as any).mockRejectedValue(error);
 
       const data = { version: '1.0.0', tasks: {}, timeline: {}, settings: {} } as any;
@@ -462,6 +476,7 @@ describe('StorageService', () => {
     it('creates backup file with timestamp', async () => {
       const mockContent = '{"version":"1.0.0"}';
       (fs.readFile as any).mockResolvedValue(mockContent);
+      (fs.writeFile as any).mockResolvedValue(undefined);
 
       await storageService.backup();
 

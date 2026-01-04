@@ -32,18 +32,15 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
       if (key.escape) {
         logger.log('Cancelling recurring task dialog');
         onCancel();
-        return;
       }
 
       // Navigate frequencies
       if (key.upArrow || input === 'k') {
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : frequencies.length - 1));
-        return;
       }
 
       if (key.downArrow || input === 'j') {
         setSelectedIndex((prev) => (prev < frequencies.length - 1 ? prev + 1 : 0));
-        return;
       }
 
       // Confirm with Enter
@@ -55,7 +52,6 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
 
         logger.log('Setting task recurrence', { frequency: selectedFrequency });
         onConfirm(pattern);
-        return;
       }
     },
     { isActive: true },

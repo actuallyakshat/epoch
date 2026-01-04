@@ -3,12 +3,13 @@ import { Box, Text, useInput } from 'ink';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Modal } from './Modal';
 import { logger } from '../../utils/logger';
+import { RecurringChoice, RecurringActionType } from '../../types/recurring';
 
-export type RecurringEditAction = 'this' | 'all' | 'from-today' | 'cancel';
+export type RecurringEditAction = RecurringChoice | 'cancel';
 
 interface RecurringEditDialogProps {
   taskTitle: string;
-  actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
+  actionType: RecurringActionType;
   onConfirm: (action: RecurringEditAction) => void;
 }
 
@@ -23,44 +24,21 @@ export const RecurringEditDialog: React.FC<RecurringEditDialogProps> = ({
 
   // Different options based on action type
   const options = [
-    { value: 'this' as RecurringEditAction, label: getThisOptionLabel(actionType) },
+    { value: 'this' as RecurringEditAction, label: 'This task only' },
     { value: 'all' as RecurringEditAction, label: 'All occurrences' },
     { value: 'from-today' as RecurringEditAction, label: 'All occurrences from today' },
   ];
 
-  function getThisOptionLabel(action: typeof actionType): string {
-    switch (action) {
-      case 'edit':
-        return 'This task only';
-      case 'delete':
-        return 'This task only';
-      case 'complete':
-        return 'This task only';
-      case 'state-change':
-        return 'This task only';
-      case 'add-subtask':
-        return 'This task only';
-      default:
-        return 'This task only';
-    }
-  }
-
-  function getActionDescription(action: typeof actionType): string {
-    switch (action) {
-      case 'edit':
-        return 'editing';
-      case 'delete':
-        return 'deleting';
-      case 'complete':
-        return 'completing';
-      case 'state-change':
-        return 'changing the state of';
-      case 'add-subtask':
-        return 'adding a subtask to';
-      default:
-        return 'modifying';
-    }
-  }
+  const getActionDescription = (action: RecurringEditDialogProps['actionType']): string => {
+    const descriptions: Record<string, string> = {
+      edit: 'editing',
+      delete: 'deleting',
+      complete: 'completing',
+      'state-change': 'changing the state of',
+      'add-subtask': 'adding a subtask to',
+    };
+    return descriptions[action] || 'modifying';
+  };
 
   useInput(
     (input, key) => {
@@ -91,7 +69,6 @@ export const RecurringEditDialog: React.FC<RecurringEditDialogProps> = ({
           taskTitle,
         });
         onConfirm(selectedAction);
-        return;
       }
     },
     { isActive: true },

@@ -47,8 +47,10 @@ export const ThemeDialog: React.FC = () => {
 
   // Find initial selected index
   const initialIndex = useMemo(() => {
-    const idx = themeItems.findIndex((item) => item.value === themeName);
-    return idx >= 0 ? idx : 0;
+    return Math.max(
+      0,
+      themeItems.findIndex((item) => item.value === themeName),
+    );
   }, [themeItems, themeName]);
 
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
@@ -58,6 +60,49 @@ export const ThemeDialog: React.FC = () => {
     setSelectedIndex(0);
   }, [searchQuery]);
 
+  // Handle search mode navigation
+  const handleSearchMode = (
+    key: any,
+    themeItems: Array<{ type: string; value: string }>,
+  ): boolean => {
+    if (key.downArrow && themeItems.length > 0) {
+      setFocusMode('list');
+      setSelectedIndex(0);
+      return true;
+    }
+    return false;
+  };
+
+  // Handle list mode navigation
+  const handleListMode = (
+    input: string,
+    key: any,
+    selectedIndex: number,
+    themeItems: Array<{ type: string; value: string }>,
+  ): boolean => {
+    if (key.upArrow || input === 'k') {
+      if (selectedIndex > 0) {
+        setSelectedIndex((prev) => prev - 1);
+      } else {
+        setFocusMode('search');
+      }
+      return true;
+    }
+
+    if (key.downArrow || input === 'j') {
+      setSelectedIndex((prev) => (prev < themeItems.length - 1 ? prev + 1 : 0));
+      return true;
+    }
+
+    if (key.return && themeItems.length > 0) {
+      setTheme(themeItems[selectedIndex].value);
+      setShowThemeDialog(false);
+      return true;
+    }
+
+    return false;
+  };
+
   useInput(
     (input, key) => {
       // Escape closes dialog from both modes
@@ -66,7 +111,6 @@ export const ThemeDialog: React.FC = () => {
         return;
       }
 
-      // Block raw newlines (Shift+Enter sends \r or \n)
       // Block raw newlines (Shift+Enter sends \r or \n) which don't trigger key.return
       if ((input === '\r' || input === '\n') && !key.return) {
         return;
@@ -74,35 +118,9 @@ export const ThemeDialog: React.FC = () => {
 
       // Handle navigation based on focus mode
       if (focusMode === 'search') {
-        // In search mode, only down arrow moves to list (to avoid j/k interfering with typing)
-        if (key.downArrow && themeItems.length > 0) {
-          setFocusMode('list');
-          setSelectedIndex(0);
-          return;
-        }
+        handleSearchMode(key, themeItems);
       } else {
-        // In list mode
-        if (key.upArrow || input === 'k') {
-          if (selectedIndex > 0) {
-            setSelectedIndex((prev) => prev - 1);
-          } else {
-            // At top of list, move back to search
-            setFocusMode('search');
-          }
-          return;
-        }
-
-        if (key.downArrow || input === 'j') {
-          setSelectedIndex((prev) => (prev < themeItems.length - 1 ? prev + 1 : 0));
-          return;
-        }
-
-        // Enter selects theme only in list mode
-        if (key.return && themeItems.length > 0) {
-          setTheme(themeItems[selectedIndex].value);
-          setShowThemeDialog(false);
-          return;
-        }
+        handleListMode(input, key, selectedIndex, themeItems);
       }
     },
     { isActive: true },
@@ -158,7 +176,7 @@ export const ThemeDialog: React.FC = () => {
           {allThemes.map((item, idx) => {
             if (item.type === 'separator') {
               return (
-                <Box key={`sep-${idx}`} marginTop={idx > 0 ? 1 : 0} marginBottom={0}>
+                <Box key={`sep-${item.value}`} marginTop={idx > 0 ? 1 : 0} marginBottom={0}>
                   <Text bold color={theme.colors.calendarHeader} dimColor>
                     {item.value}
                   </Text>

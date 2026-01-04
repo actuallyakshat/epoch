@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Text } from 'ink';
 import type { ReactNode } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { PaneType } from '../../types/app';
 
 interface ThreeColumnLayoutProps {
   leftPane: ReactNode;
@@ -10,7 +11,7 @@ interface ThreeColumnLayoutProps {
   leftWidth?: number | string;
   rightWidth?: number | string;
   height?: number;
-  activePane?: 'calendar' | 'tasks' | 'timeline';
+  activePane?: PaneType;
 }
 
 // Thin vertical separator using box drawing character
@@ -21,7 +22,7 @@ const ThinSeparator: React.FC<{
 }> = ({ color, backgroundColor, height }) => {
   // Use thin vertical line character
   const line = '│';
-  const lines = Array(height).fill(line).join('\n');
+  const lines = new Array(height).fill(line).join('\n');
 
   return (
     <Box width={1} flexShrink={0} backgroundColor={backgroundColor}>
@@ -56,7 +57,7 @@ export const ThreeColumnLayout: React.FC<ThreeColumnLayoutProps> = ({
       : theme.colors.separator!;
 
   // Apply background color for non-terminal themes
-  const bgColor = theme.name !== 'terminal' ? theme.colors.background : undefined;
+  const bgColor = theme.name === 'terminal' ? undefined : theme.colors.background;
 
   return (
     <Box flexDirection="row" width="100%" height={height} backgroundColor={bgColor}>
