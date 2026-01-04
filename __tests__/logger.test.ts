@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { logger } from '../src/utils/logger';
-import fs from 'fs';
+import fs from 'node:fs';
 import path from 'path';
 
-vi.mock('fs', () => {
+// Mock fs before importing logger
+vi.mock('node:fs', () => {
   return {
     default: {
       existsSync: vi.fn(),
@@ -15,6 +15,9 @@ vi.mock('fs', () => {
     createWriteStream: vi.fn(),
   };
 });
+
+// Import logger after fs is mocked
+import { logger } from '../src/utils/logger';
 
 describe('Logger', () => {
   const mockWrite = vi.fn();
@@ -29,14 +32,10 @@ describe('Logger', () => {
     (fs.createWriteStream as any).mockReturnValue(mockStream);
     (fs.existsSync as any).mockReturnValue(false);
 
-    // Reset logger instance
-    // Since logger is a singleton, we need to manually re-initialize if possible
-    // or trust that each test sets up the mocks before the logger is used.
-    // However, logger is initialized on import. To test initialization logic,
-    // we might need to access the private methods or re-instantiate.
-    // For this test, we'll access the private 'initializeLog' method via 'any'
-    // to force re-initialization with our mocks.
-    (logger as any).initializeLog();
+    // Reset logger state for testing
+    (logger as any).stream = null;
+    // Re-initialize with mocks
+    logger.initializeLog();
   });
 
   describe('initialization', () => {

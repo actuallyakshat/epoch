@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 class Logger {
-  private logFile: string;
+  private readonly logFile: string;
   private stream: fs.WriteStream | null = null;
 
   constructor() {
@@ -10,7 +10,8 @@ class Logger {
     this.initializeLog();
   }
 
-  private initializeLog() {
+  // Made public for testing
+  initializeLog() {
     // Clear existing log file
     if (fs.existsSync(this.logFile)) {
       fs.unlinkSync(this.logFile);

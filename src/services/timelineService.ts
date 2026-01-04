@@ -66,32 +66,42 @@ export class TimelineService {
     let removed = false;
 
     // Process dates in reverse order to find the most recent event
-    const dates = Object.keys(timeline).sort().reverse();
+    const dates = Object.keys(timeline).sort((a, b) => b.localeCompare(a));
 
     for (const date of dates) {
       const events = timeline[date];
-      if (!removed) {
-        // Find the last matching event in this date's events
-        const lastIndex = events
-          .map((e, i) => ({ e, i }))
-          .filter(({ e }) => e.taskId === taskId && e.type === eventType)
-          .pop()?.i;
-
-        if (lastIndex !== undefined) {
-          const filtered = events.filter((_, i) => i !== lastIndex);
-          if (filtered.length > 0) {
-            result[date] = filtered;
-          }
-          removed = true;
-        } else {
-          result[date] = events;
-        }
-      } else {
+      if (removed) {
         result[date] = events;
+        continue;
+      }
+
+      const lastIndex = this.findLastEventIndex(events, taskId, eventType);
+
+      if (lastIndex === -1) {
+        result[date] = events;
+      } else {
+        const filtered = events.filter((_, i) => i !== lastIndex);
+        if (filtered.length > 0) {
+          result[date] = filtered;
+        }
+        removed = true;
       }
     }
 
     return result;
+  }
+
+  private findLastEventIndex(
+    events: TimelineEvent[],
+    taskId: string,
+    eventType: TimelineEventType,
+  ): number {
+    for (let i = events.length - 1; i >= 0; i--) {
+      if (events[i].taskId === taskId && events[i].type === eventType) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   formatEventDescription(event: TimelineEvent): string {

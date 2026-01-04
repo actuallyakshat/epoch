@@ -1,6 +1,5 @@
 import { v4 as uuid } from 'uuid';
 import type { Task, TaskState, TaskTree } from '../types/task';
-import type { TimelineEvent, TimelineEventType } from '../types/timeline';
 import {
   findTaskById,
   updateTaskInTree,
@@ -126,12 +125,52 @@ export class TaskService {
     return this.updateTask(tasks, taskId, {
       startTime: startTime || new Date(),
       endTime: undefined,
-      state: 'todo', // Reset to todo when starting
+      state: 'todo', // Reset to incomplete state when starting
     });
   }
 
   getTasksForDate(tasks: TaskTree, date: string): Task[] {
     return tasks[date] || [];
+  }
+
+  getDayTasks(tasks: TaskTree, dateStr: string, recurringTaskService: any): Task[] {
+    const existingTasks = tasks[dateStr] || [];
+    const currentDateObj = new Date(dateStr);
+    const recurringInstances = this.generateRecurringInstancesForDate(
+      tasks,
+      currentDateObj,
+      existingTasks,
+      recurringTaskService,
+    );
+
+    return [...existingTasks, ...recurringInstances];
+  }
+
+  private generateRecurringInstancesForDate(
+    tasks: TaskTree,
+    currentDateObj: Date,
+    existingTasks: Task[],
+    recurringTaskService: any,
+  ): Task[] {
+    const recurringInstances: Task[] = [];
+
+    for (const taskList of Object.values(tasks)) {
+      for (const task of taskList) {
+        if (
+          task.recurrence &&
+          !task.isRecurringInstance &&
+          recurringTaskService.shouldTaskGenerateForDate(task, currentDateObj)
+        ) {
+          const instanceExists = existingTasks.some((t) => t.recurringParentId === task.id);
+          if (!instanceExists) {
+            const instance = recurringTaskService.generateRecurringInstance(task, currentDateObj);
+            recurringInstances.push(instance);
+          }
+        }
+      }
+    }
+
+    return recurringInstances;
   }
 
   getAllTasks(tasks: TaskTree): Task[] {
@@ -145,34 +184,36 @@ export class TaskService {
   excludeRecurringInstance(tasks: TaskTree, parentTaskId: string, dateStr: string): TaskTree {
     logger.log('Excluding recurring instance', { parentTaskId, dateStr });
 
-    const parentDateStr = Object.keys(tasks).find((date) =>
-      tasks[date].some((t) => t.id === parentTaskId),
+    const parentDateStr = Object.keys(tasks).find(
+      (date) => findTaskById(tasks[date], parentTaskId) !== null,
     );
 
     if (!parentDateStr) {
-      throw new Error('Parent recurring task not found');
+      logger.log(
+        'Parent recurring task not found, returning tasks unchanged. This may happen if the parent was deleted.',
+        { parentTaskId, dateStr },
+      );
+      return tasks;
+    }
+
+    const parentTask = findTaskById(tasks[parentDateStr], parentTaskId);
+    if (!parentTask) {
+      logger.log('Parent task not found in date, returning tasks unchanged', {
+        parentTaskId,
+        parentDateStr,
+      });
+      return tasks;
     }
 
     return {
       ...tasks,
-      [parentDateStr]: tasks[parentDateStr].map((task) => {
-        if (task.id === parentTaskId) {
-          const recurrence = task.recurrence;
-          if (!recurrence) return task;
-
-          const excludedDates = recurrence.excludedDates || [];
-          if (!excludedDates.includes(dateStr)) {
-            return {
-              ...task,
-              recurrence: {
-                ...recurrence,
-                excludedDates: [...excludedDates, dateStr],
-              },
-              updatedAt: new Date(),
-            };
-          }
-        }
-        return task;
+      [parentDateStr]: updateTaskInTree(tasks[parentDateStr], parentTaskId, {
+        recurrence: {
+          ...parentTask.recurrence!,
+          excludedDates: [...(parentTask.recurrence?.excludedDates || []), dateStr].filter(
+            (date, index, self) => self.indexOf(date) === index,
+          ),
+        },
       }),
     };
   }

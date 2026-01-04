@@ -29,7 +29,7 @@ function deepClone<T>(obj: T): T {
   }
 
   if (obj instanceof Date) {
-    return new Date(obj.getTime()) as T;
+    return new Date(obj) as T;
   }
 
   if (Array.isArray(obj)) {
@@ -38,8 +38,8 @@ function deepClone<T>(obj: T): T {
 
   const cloned: any = {};
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      cloned[key] = deepClone(obj[key]);
+    if (Object.hasOwn(obj, key)) {
+      cloned[key] = deepClone((obj as any)[key]);
     }
   }
   return cloned;
@@ -73,7 +73,10 @@ export const UndoProvider: React.FC<UndoProviderProps> = ({ children }) => {
       return null;
     }
 
-    const action = undoStack[undoStack.length - 1];
+    const action = undoStack.at(-1) || null;
+    if (!action) {
+      return null;
+    }
     setUndoStack((prev) => prev.slice(0, -1));
     return action;
   }, [undoStack]);
@@ -82,18 +85,17 @@ export const UndoProvider: React.FC<UndoProviderProps> = ({ children }) => {
     setUndoStack([]);
   }, []);
 
-  return (
-    <UndoContext.Provider
-      value={{
-        pushUndoAction,
-        undo,
-        canUndo: undoStack.length > 0,
-        clearUndoStack,
-      }}
-    >
-      {children}
-    </UndoContext.Provider>
+  const contextValue = React.useMemo(
+    () => ({
+      pushUndoAction,
+      undo,
+      canUndo: undoStack.length > 0,
+      clearUndoStack,
+    }),
+    [pushUndoAction, undo, undoStack.length, clearUndoStack],
   );
+
+  return <UndoContext.Provider value={contextValue}>{children}</UndoContext.Provider>;
 };
 
 export const useUndo = (): UndoContextType => {

@@ -1,4 +1,4 @@
-import { Task, TaskTree } from './task';
+import { TaskTree } from './task';
 import { TimelineEvent } from './timeline';
 
 export interface UserSettings {

@@ -70,115 +70,191 @@ export const ControlledTextInput: React.FC<Props> = ({
     return i;
   };
 
+  // Handle exit keys (Escape, Return)
+  const handleExitKeys = (
+    key: any,
+    currentValue: string,
+    onCancel?: () => void,
+    onSubmit?: (value: string) => void,
+  ): boolean => {
+    if (key.escape) {
+      onCancel?.();
+      return true;
+    }
+    if (key.return) {
+      onSubmit?.(currentValue);
+      return true;
+    }
+    return false;
+  };
+
+  // Handle backspace and delete operations
+  const handleBackspaceDelete = (
+    key: any,
+    currentValue: string,
+    cursor: number,
+  ): { value: string; cursor: number; handled: boolean } => {
+    if (key.backspace) {
+      if (key.ctrl) {
+        const wordStart = findWordStart(currentValue, cursor);
+        return {
+          value: currentValue.slice(0, wordStart) + currentValue.slice(cursor),
+          cursor: wordStart,
+          handled: true,
+        };
+      } else if (cursor > 0) {
+        return {
+          value: currentValue.slice(0, cursor - 1) + currentValue.slice(cursor),
+          cursor: cursor - 1,
+          handled: true,
+        };
+      }
+    } else if (key.delete) {
+      if (cursor >= currentValue.length && cursor > 0) {
+        return {
+          value: currentValue.slice(0, cursor - 1) + currentValue.slice(cursor),
+          cursor: cursor - 1,
+          handled: true,
+        };
+      } else if (cursor < currentValue.length) {
+        return {
+          value: currentValue.slice(0, cursor) + currentValue.slice(cursor + 1),
+          cursor,
+          handled: true,
+        };
+      }
+    }
+    return { value: currentValue, cursor, handled: false };
+  };
+
+  // Handle cursor movement
+  const handleCursorMovement = (
+    input: string,
+    key: any,
+    currentValue: string,
+    cursor: number,
+  ): { cursor: number; handled: boolean } => {
+    if (key.leftArrow && !key.ctrl) {
+      return { cursor: Math.max(0, cursor - 1), handled: true };
+    }
+    if (key.rightArrow && !key.ctrl) {
+      return { cursor: Math.min(currentValue.length, cursor + 1), handled: true };
+    }
+    if ((key.leftArrow && key.ctrl) || (key.meta && input === 'b')) {
+      return { cursor: findWordStart(currentValue, cursor), handled: true };
+    }
+    if ((key.rightArrow && key.ctrl) || (key.meta && input === 'f')) {
+      return { cursor: findWordEnd(currentValue, cursor), handled: true };
+    }
+    return { cursor, handled: false };
+  };
+
+  // Handle Ctrl key combinations
+  const handleCtrlCombinations = (
+    input: string,
+    key: any,
+    currentValue: string,
+    cursor: number,
+  ): { value: string; cursor: number; handled: boolean } => {
+    if (key.ctrl && input === 'a') {
+      return { value: currentValue, cursor: 0, handled: true };
+    } else if (key.ctrl && input === 'e') {
+      return { value: currentValue, cursor: currentValue.length, handled: true };
+    } else if (key.ctrl && input === 'u') {
+      return { value: currentValue.slice(cursor), cursor: 0, handled: true };
+    } else if (key.ctrl && input === 'k') {
+      return { value: currentValue.slice(0, cursor), cursor, handled: true };
+    } else if (key.ctrl && input === 'w') {
+      const wordStart = findWordStart(currentValue, cursor);
+      return {
+        value: currentValue.slice(0, wordStart) + currentValue.slice(cursor),
+        cursor: wordStart,
+        handled: true,
+      };
+    }
+    return { value: currentValue, cursor, handled: false };
+  };
+
+  // Handle character input
+  const handleCharacterInput = (
+    input: string,
+    key: any,
+    currentValue: string,
+    cursor: number,
+    maxLength?: number,
+  ): { value: string; cursor: number; handled: boolean } => {
+    if (!key.ctrl && !key.meta && input.length > 0) {
+      // Filter out non-printable control characters without using control characters in regex
+      const filtered = Array.from(input)
+        .filter((char) => {
+          const code = char.codePointAt(0);
+          if (code === undefined) return false;
+          return (code >= 32 && code <= 126) || code > 127; // Basic printable ASCII + Extended
+        })
+        .join('');
+
+      if (filtered) {
+        const possibleValue = currentValue.slice(0, cursor) + filtered + currentValue.slice(cursor);
+        if (!maxLength || possibleValue.length <= maxLength) {
+          return {
+            value: possibleValue,
+            cursor: cursor + filtered.length,
+            handled: true,
+          };
+        }
+      }
+    }
+    return { value: currentValue, cursor, handled: false };
+  };
+
+  // Main key press handler that delegates to specific handlers
+  const handleKeyPress = (
+    input: string,
+    key: any,
+    currentValue: string,
+    cursor: number,
+    maxLength?: number,
+  ): { value: string; cursor: number; handled: boolean } => {
+    // Try backspace/delete
+    const deleteResult = handleBackspaceDelete(key, currentValue, cursor);
+    if (deleteResult.handled) return deleteResult;
+
+    // Try cursor movement
+    const movementResult = handleCursorMovement(input, key, currentValue, cursor);
+    if (movementResult.handled) {
+      return { value: currentValue, cursor: movementResult.cursor, handled: true };
+    }
+
+    // Try Ctrl combinations
+    const ctrlResult = handleCtrlCombinations(input, key, currentValue, cursor);
+    if (ctrlResult.handled) return ctrlResult;
+
+    // Try character input
+    const charResult = handleCharacterInput(input, key, currentValue, cursor, maxLength);
+    if (charResult.handled) return charResult;
+
+    return { value: currentValue, cursor, handled: false };
+  };
+
   useInput(
     (input, key) => {
       const currentValue = valueRef.current;
       const cursor = cursorRef.current;
 
       // === EXIT HANDLERS ===
-      if (key.escape) {
-        onCancel?.();
-        return;
-      }
-
-      if (key.return) {
-        onSubmit(currentValue);
-        return;
-      }
+      if (handleExitKeys(key, currentValue, onCancel, onSubmit)) return;
 
       if (input === '\r' || input === '\n') return;
 
-      let nextValue = currentValue;
-      let nextCursor = cursor;
+      // Handle all key types
+      const {
+        value: nextValue,
+        cursor: nextCursor,
+        handled,
+      } = handleKeyPress(input, key, currentValue, cursor, maxLength);
 
-      // === BACKSPACE - handle first, most common operation ===
-      if (key.backspace) {
-        // Ctrl+W or Ctrl+Backspace: delete word
-        if (key.ctrl) {
-          const wordStart = findWordStart(currentValue, cursor);
-          nextValue = currentValue.slice(0, wordStart) + currentValue.slice(cursor);
-          nextCursor = wordStart;
-        }
-        // Regular backspace: delete one char
-        else if (cursor > 0) {
-          nextValue = currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
-          nextCursor = cursor - 1;
-        }
-      }
-      // === DELETE KEY (some terminals send this for backspace) ===
-      else if (key.delete) {
-        // At end of line? Treat as backspace (delete before cursor)
-        if (cursor >= currentValue.length && cursor > 0) {
-          nextValue = currentValue.slice(0, cursor - 1) + currentValue.slice(cursor);
-          nextCursor = cursor - 1;
-        }
-        // In middle? Forward delete (delete at cursor)
-        else if (cursor < currentValue.length) {
-          nextValue = currentValue.slice(0, cursor) + currentValue.slice(cursor + 1);
-        }
-      }
-      // === CURSOR MOVEMENT ===
-      else if (key.leftArrow && !key.ctrl) {
-        nextCursor = Math.max(0, cursor - 1);
-      } else if (key.rightArrow && !key.ctrl) {
-        nextCursor = Math.min(currentValue.length, cursor + 1);
-      }
-      // Ctrl+Left: move back one word
-      else if (key.leftArrow && key.ctrl) {
-        const wordStart = findWordStart(currentValue, cursor);
-        nextCursor = wordStart;
-      }
-      // Ctrl+Right: move forward one word
-      else if (key.rightArrow && key.ctrl) {
-        const wordEnd = findWordEnd(currentValue, cursor);
-        nextCursor = wordEnd;
-      }
-      // Alt+B: move back one word (readline standard)
-      else if (key.meta && input === 'b') {
-        const wordStart = findWordStart(currentValue, cursor);
-        nextCursor = wordStart;
-      }
-      // Alt+F: move forward one word (readline standard)
-      else if (key.meta && input === 'f') {
-        const wordEnd = findWordEnd(currentValue, cursor);
-        nextCursor = wordEnd;
-      }
-      // === CTRL COMBINATIONS ===
-      else if (key.ctrl && input === 'a') {
-        // Move to start
-        nextCursor = 0;
-      } else if (key.ctrl && input === 'e') {
-        // Move to end
-        nextCursor = currentValue.length;
-      } else if (key.ctrl && input === 'u') {
-        // Delete to start of line
-        nextValue = currentValue.slice(cursor);
-        nextCursor = 0;
-      } else if (key.ctrl && input === 'k') {
-        // Delete to end of line
-        nextValue = currentValue.slice(0, cursor);
-      } else if (key.ctrl && input === 'w') {
-        // Delete word (backup if backspace check didn't catch it)
-        const wordStart = findWordStart(currentValue, cursor);
-        nextValue = currentValue.slice(0, wordStart) + currentValue.slice(cursor);
-        nextCursor = wordStart;
-      }
-      // === CHARACTER INPUT ===
-      else if (!key.ctrl && !key.meta && input.length > 0) {
-        const filtered = input.replace(/[\x00-\x1F\x7F]/g, '');
-        if (filtered) {
-          const possibleValue =
-            currentValue.slice(0, cursor) + filtered + currentValue.slice(cursor);
-          if (!maxLength || possibleValue.length <= maxLength) {
-            nextValue = possibleValue;
-            nextCursor = cursor + filtered.length;
-          }
-        }
-      }
-      // Unhandled key
-      else {
-        return;
-      }
+      // Unhandled key - exit early
+      if (!handled) return;
 
       // Update refs and trigger render if changed
       const valueChanged = nextValue !== currentValue;

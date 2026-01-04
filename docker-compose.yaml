@@ -14,11 +14,11 @@ services:
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
     ports:
-      - "9000:9000"
+      - '9000:9000'
     networks:
       - sonarnet
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9000/api/system/status"]
+      test: ['CMD-SHELL', 'curl -f http://localhost:9000/api/system/status']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -35,11 +35,11 @@ services:
       - postgresql:/var/lib/postgresql
       - postgresql_data:/var/lib/postgresql/data
     ports:
-      - "5003:5432"
+      - '5003:5432'
     networks:
       - sonarnet
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      test: ['CMD-SHELL', 'pg_isready -U sonar']
       interval: 10s
       timeout: 5s
       retries: 5

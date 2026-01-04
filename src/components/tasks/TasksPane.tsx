@@ -5,17 +5,19 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useApp } from '../../contexts/AppContext';
 import { Pane } from '../layout/Pane';
 import { TaskHeader } from './TaskHeader';
-import { TaskList } from './TaskList';
 import { KeyboardHints } from '../common/KeyboardHints';
 import { getDateString, isToday } from '../../utils/date';
 import { taskService } from '../../services/taskService';
 import { timelineService } from '../../services/timelineService';
 import { recurringTaskService } from '../../services/recurringTaskService';
-import { flattenTasks, findTaskById } from '../../utils/tree';
+import { findTaskById } from '../../utils/tree';
+import { getCheckbox, getStateColor } from '../../utils/task';
 import { logger } from '../../utils/logger';
-import type { Task, TaskState, RecurrencePattern } from '../../types/task';
+import { RecurringChoice } from '../../types/recurring';
+import type { Task, TaskState } from '../../types/task';
 import { TimelineEventType } from '../../types/timeline';
 import { useTerminalSize } from '../../hooks/useTerminalSize';
+import * as helpers from './TasksPaneHelpers';
 
 type EditMode = 'none' | 'add' | 'edit' | 'addSubtask';
 type PendingSaveType =
@@ -41,7 +43,6 @@ export const TasksPane: React.FC = () => {
     setRecurringTaskId,
     setShowRecurringEditDialog,
     setRecurringEditConfig,
-    recurringEditConfig,
   } = useApp();
   const { theme } = useTheme();
 
@@ -52,11 +53,7 @@ export const TasksPane: React.FC = () => {
   const [parentTaskId, setParentTaskId] = useState<string | null>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null); // Track which task is being edited
-  const [pendingAction, setPendingAction] = useState<{
-    action: 'edit' | 'delete';
-    taskId: string;
-    data?: any;
-  } | null>(null);
+  const [inputFocusReady, setInputFocusReady] = useState(false); // Delay input focus to prevent key capture
   const { height: terminalHeight } = useTerminalSize();
 
   const visibleRows = useMemo(() => {
@@ -73,61 +70,8 @@ export const TasksPane: React.FC = () => {
 
   // Get tasks for the current date including recurring instances
   const dayTasks = useMemo(() => {
-    const existingTasks = tasks[dateStr] || [];
-    const recurringInstances: Task[] = [];
-    const currentDateObj = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
-
-    logger.log('[dayTasks] Calculating dayTasks with recurring instances', {
-      dateStr,
-      existingTaskCount: existingTasks.length,
-      existingTasks: existingTasks.map((t) => ({
-        id: t.id,
-        title: t.title,
-        state: t.state,
-        isRecurringInstance: t.isRecurringInstance,
-        recurringParentId: t.recurringParentId,
-        hasRecurrence: !!t.recurrence,
-      })),
-    });
-
-    // Find all recurring tasks from all dates
-    for (const [taskDate, taskList] of Object.entries(tasks)) {
-      for (const task of taskList) {
-        if (task.recurrence && !task.isRecurringInstance) {
-          // Check if this recurring task should appear on the selected date
-          if (recurringTaskService.shouldTaskGenerateForDate(task, currentDateObj)) {
-            // Check if an instance already exists for this date
-            const instanceExists = existingTasks.some((t) => t.recurringParentId === task.id);
-            if (!instanceExists) {
-              const instance = recurringTaskService.generateRecurringInstance(task, currentDateObj);
-              logger.log('[dayTasks] Generated recurring instance', {
-                instanceId: instance.id,
-                instanceTitle: instance.title,
-                parentId: task.id,
-                parentDate: taskDate,
-                targetDate: dateStr,
-              });
-              recurringInstances.push(instance);
-            } else {
-              logger.log('[dayTasks] Instance already exists for parent', {
-                parentId: task.id,
-                parentTitle: task.title,
-                targetDate: dateStr,
-              });
-            }
-          }
-        }
-      }
-    }
-
-    logger.log('[dayTasks] Recurring instances generated', {
-      dateStr,
-      recurringInstanceCount: recurringInstances.length,
-      totalTasks: existingTasks.length + recurringInstances.length,
-    });
-
-    return [...existingTasks, ...recurringInstances];
-  }, [tasks, dateStr, selectedDate.year, selectedDate.month, selectedDate.day]);
+    return taskService.getDayTasks(tasks, dateStr, recurringTaskService);
+  }, [tasks, dateStr]);
   const stats = taskService.getTaskStats(tasks, dateStr);
   const isFocused = activePane === 'tasks' && !isModalOpen;
 
@@ -154,15 +98,7 @@ export const TasksPane: React.FC = () => {
   // Expand all nested tasks by default when tasks change
   useEffect(() => {
     const allParentIds = new Set<string>();
-    const collectParents = (taskList: Task[]) => {
-      for (const task of taskList) {
-        if (task.children.length > 0) {
-          allParentIds.add(task.id);
-          collectParents(task.children);
-        }
-      }
-    };
-    collectParents(dayTasks);
+    helpers.collectParentIds(dayTasks, allParentIds);
 
     // Only update if the IDs have actually changed
     setExpandedIds((prev) => {
@@ -185,6 +121,17 @@ export const TasksPane: React.FC = () => {
       isFocused,
     });
   }, [editMode, isInputMode, parentTaskId, editValue, isModalOpen, isFocused]);
+
+  // Enable input focus on the next frame when entering input mode
+  useEffect(() => {
+    if (isInputMode && !inputFocusReady) {
+      // Use setTimeout to delay focus until after the current event is processed
+      const timer = setTimeout(() => setInputFocusReady(true), 0);
+      return () => clearTimeout(timer);
+    } else if (!isInputMode && inputFocusReady) {
+      setInputFocusReady(false);
+    }
+  }, [isInputMode, inputFocusReady]);
 
   // Reset selection when day changes
   useEffect(() => {
@@ -265,114 +212,130 @@ export const TasksPane: React.FC = () => {
     return root ? isRecurringTask(root) : false;
   };
 
-  // Execute the pending action
-  const executePendingAction = (action: typeof pendingAction, thisOnly: boolean) => {
-    if (!action) return;
-
-    const task = flatTasks.find((ft) => ft.task.id === action.taskId)?.task;
-    if (!task) return;
-
-    logger.log('[TasksPane] executePendingAction called', {
-      action: action.action,
-      thisOnly,
-      taskId: action.taskId,
-      currentEditMode: editMode,
-      currentIsInputMode: isInputMode,
-    });
-
-    switch (action.action) {
-      case 'delete':
-        performDelete(action.taskId, task, thisOnly);
-        break;
-      case 'edit':
-        performEdit(action.taskId, task, thisOnly);
-        break;
-    }
-
-    logger.log('[TasksPane] executePendingAction completed', {
-      newEditMode: editMode,
-      newIsInputMode: isInputMode,
-    });
-  };
-
-  // Perform functions for recurring task actions
-  const performDelete = (taskId: string, task: Task, thisOnly: boolean) => {
-    try {
-      pushUndoableAction('TASK_DELETE');
-
-      if (thisOnly) {
-        // Delete only this instance
-        let updated = tasks;
-        const isMaterialized = Object.values(tasks).some((taskList) =>
-          findTaskById(taskList, taskId),
-        );
-
-        if (isMaterialized) {
-          updated = taskService.deleteTask(tasks, taskId);
-        }
-
-        // If it's a recurring task (parent or instance), add to excludedDates
-        if (task.isRecurringInstance && task.recurringParentId) {
-          updated = taskService.excludeRecurringInstance(updated, task.recurringParentId, dateStr);
-        } else if (task.recurrence) {
-          updated = taskService.excludeRecurringInstance(updated, taskId, dateStr);
-        }
-
-        setTasks(updated);
-
-        // Remove all timeline events for this task
-        const updatedTimeline = timelineService.removeEventsByTaskId(timeline, taskId);
-        setTimeline(updatedTimeline);
-      } else {
-        // Delete all occurrences - delete the parent task entirely
-        const parentIdToDelete = task.recurringParentId || taskId;
-        const updated = taskService.deleteTask(tasks, parentIdToDelete);
-        setTasks(updated);
-
-        // Remove all timeline events for this task
-        const updatedTimeline = timelineService.removeEventsByTaskId(timeline, taskId);
-        if (task.recurringParentId) {
-          const parentTimeline = timelineService.removeEventsByTaskId(
-            updatedTimeline,
-            task.recurringParentId,
-          );
-          setTimeline(parentTimeline);
-        } else {
-          setTimeline(updatedTimeline);
-        }
-      }
-    } catch (err) {
-      console.error('Error deleting task:', err);
-    }
-  };
-
-  const performEdit = (taskId: string, task: Task, thisOnly: boolean) => {
-    if (thisOnly || task.isRecurringInstance) {
-      // Edit just this instance - remove it from recurrence
-      setEditMode('edit');
-      setEditValue(task.title);
-      setIsInputMode(true);
-    } else {
-      // Edit all occurrences - edit the parent recurring task
-      setEditMode('edit');
-      setEditValue(task.title);
-      setIsInputMode(true);
-    }
-  };
-
-  const performStateChange = (
+  const onConfirmDelete = (
+    choice: RecurringChoice,
     taskId: string,
     task: Task,
-    newState: TaskState,
-    thisOnly: boolean,
+    rootParent: Task | null,
   ) => {
+    logger.log('Recurring delete confirmed', { choice });
+    pushUndoableAction('TASK_DELETE');
+
+    if (choice === 'this') {
+      handleDeleteThis(taskId, task);
+    } else if (choice === 'all' && rootParent) {
+      handleDeleteAll(taskId, task, rootParent);
+    } else if (choice === 'from-today' && rootParent) {
+      handleDeleteFromToday(taskId, task, rootParent);
+    }
+  };
+
+  const handleDeleteThis = (taskId: string, task: Task) => {
+    let updated = tasks;
+    const isMaterialized = Object.values(tasks).some((taskList) => findTaskById(taskList, taskId));
+
+    if (isMaterialized) {
+      updated = taskService.deleteTask(tasks, taskId);
+    }
+
+    if (task.isRecurringInstance && task.recurringParentId) {
+      updated = taskService.excludeRecurringInstance(updated, task.recurringParentId, dateStr);
+    } else if (task.recurrence) {
+      updated = taskService.excludeRecurringInstance(updated, taskId, dateStr);
+    }
+
+    setTasks(updated);
+    setTimeline(timelineService.removeEventsByTaskId(timeline, taskId));
+  };
+
+  const handleDeleteAll = (taskId: string, task: Task, rootParent: Task) => {
+    if (task.parentId) {
+      setTasks(helpers.deleteSubtaskFromRootParent(tasks, rootParent.id, taskId));
+    } else {
+      const parentIdToDelete = task.recurringParentId || taskId;
+      setTasks(taskService.deleteTask(tasks, parentIdToDelete));
+    }
+
+    let updatedTimeline = timelineService.removeEventsByTaskId(timeline, taskId);
+    if (task.recurringParentId) {
+      updatedTimeline = timelineService.removeEventsByTaskId(
+        updatedTimeline,
+        task.recurringParentId,
+      );
+    }
+    setTimeline(updatedTimeline);
+  };
+
+  const handleDeleteFromToday = (taskId: string, task: Task, rootParent: Task) => {
+    const todayDateObj = new Date();
+    todayDateObj.setHours(0, 0, 0, 0);
+
+    if (task.parentId) {
+      handleDeleteSubtaskFromToday(taskId, task, rootParent, todayDateObj);
+    } else {
+      handleDeleteTaskFromToday(taskId, task, todayDateObj);
+    }
+
+    setTimeline(timelineService.removeEventsByTaskId(timeline, taskId));
+  };
+
+  const handleDeleteSubtaskFromToday = (
+    taskId: string,
+    task: Task,
+    rootParent: Task,
+    today: Date,
+  ) => {
+    let updated = { ...tasks };
+    for (const [date, taskList] of Object.entries(tasks)) {
+      const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
+      if (rootIndex !== -1) {
+        const titlePath = helpers.findSubtaskByTitlePath(taskList[rootIndex], task);
+        const updatedRoot = titlePath
+          ? helpers.deleteByTitlePath(taskList[rootIndex], titlePath)
+          : helpers.deleteSubtaskFromTree(taskList[rootIndex], taskId);
+
+        updated[date] = [
+          ...taskList.slice(0, rootIndex),
+          updatedRoot,
+          ...taskList.slice(rootIndex + 1),
+        ];
+        break;
+      }
+    }
+
+    updated = helpers.deleteSubtaskFromMaterializedInstances(
+      updated,
+      rootParent.id,
+      task.title,
+      today,
+    );
+    setTasks(updated);
+  };
+
+  const handleDeleteTaskFromToday = (taskId: string, task: Task, today: Date) => {
+    let updated = tasks;
+    const isMaterialized = Object.values(tasks).some((taskList) =>
+      taskList.some((t) => t.id === taskId),
+    );
+
+    if (isMaterialized) {
+      updated = taskService.deleteTask(tasks, taskId);
+    } else if (task.recurringParentId) {
+      updated = taskService.deleteTask(tasks, task.recurringParentId);
+    }
+
+    const recurringParentToDelete = task.recurringParentId || taskId;
+    updated = helpers.deleteMaterializedInstances(updated, recurringParentToDelete, today);
+    setTasks(updated);
+  };
+
+  const performStateChange = (taskId: string, task: Task, newState: TaskState) => {
     logger.log('[performStateChange] Called', {
       taskId,
       taskTitle: task.title,
       taskDate: task.date,
       previousState: task.state,
       newState,
-      thisOnly,
       isRecurringInstance: task.isRecurringInstance,
       recurringParentId: task.recurringParentId,
       hasRecurrence: !!task.recurrence,
@@ -389,7 +352,11 @@ export const TasksPane: React.FC = () => {
         const existingTasks = tasks[task.date] || [];
         const taskExists = existingTasks.some((t) => t.id === taskId);
 
-        if (!taskExists) {
+        if (taskExists) {
+          // Task already materialized - update it normally
+          const updated = taskService.changeTaskState(tasks, taskId, newState);
+          setTasks(updated);
+        } else {
           // This is an ephemeral recurring instance - we need to materialize it first
           logger.log('[performStateChange] Materializing recurring instance', {
             taskId,
@@ -419,44 +386,16 @@ export const TasksPane: React.FC = () => {
           });
 
           setTasks(updated);
-        } else {
-          // Task already materialized - update it normally
-          logger.log('[performStateChange] Task already materialized, updating normally', {
-            taskId,
-            newState,
-          });
-
-          const updated = taskService.changeTaskState(tasks, taskId, newState);
-
-          logger.log('[performStateChange] Task state updated, setting tasks', {
-            taskId,
-            updatedTasksKeys: Object.keys(updated),
-            tasksForDate: updated[task.date]?.length || 0,
-          });
-
-          setTasks(updated);
         }
       } else {
         // Normal task or already materialized - update normally
-        logger.log('[performStateChange] Calling taskService.changeTaskState', {
-          taskId,
-          newState,
-        });
-
         const updated = taskService.changeTaskState(tasks, taskId, newState);
-
-        logger.log('[performStateChange] Task state updated, setting tasks', {
-          taskId,
-          updatedTasksKeys: Object.keys(updated),
-          tasksForDate: updated[task.date]?.length || 0,
-        });
-
         setTasks(updated);
       }
 
       // Handle timeline based on state change
       if (newState === 'todo') {
-        // If toggling back to todo, remove the previous state event
+        // If toggling back to incomplete state, remove the previous state event
         const eventTypeToRemove: Record<TaskState, TimelineEventType> = {
           todo: TimelineEventType.STARTED, // shouldn't happen
           completed: TimelineEventType.COMPLETED,
@@ -535,339 +474,21 @@ export const TasksPane: React.FC = () => {
 
   const handleDeleteTask = () => {
     if (selectedTaskId && selectedTask) {
-      logger.log('handleDeleteTask called', {
-        taskId: selectedTaskId,
-        isRecurring: isRecurringTask(selectedTask),
-        hasRecurrence: !!selectedTask.recurrence,
-        isInstance: !!selectedTask.isRecurringInstance,
-        hasRecurringAncestor: hasRecurringAncestor(selectedTask),
-      });
-
       if (hasRecurringAncestor(selectedTask)) {
-        // Show recurring edit dialog
-        const action = { action: 'delete' as const, taskId: selectedTaskId };
-        const savedIndex = selectedIndex; // Save current selection
         const rootParent = findRootParent(selectedTask);
-
-        setPendingAction(action);
         setRecurringEditConfig({
           taskId: selectedTaskId,
           taskTitle: selectedTask.title,
           actionType: 'delete',
-          onConfirm: (choice: 'this' | 'all' | 'from-today') => {
-            logger.log('Recurring delete confirmed', { choice, action });
-
-            pushUndoableAction('TASK_DELETE');
-
-            if (choice === 'this') {
-              // Delete just from this instance
-              let updated = tasks;
-              const isMaterialized = Object.values(tasks).some((taskList) =>
-                findTaskById(taskList, selectedTaskId),
-              );
-
-              if (isMaterialized) {
-                updated = taskService.deleteTask(tasks, selectedTaskId);
-              }
-
-              // If it's a recurring task (parent or instance), add to excludedDates to prevent it from reappearing
-              if (selectedTask.isRecurringInstance && selectedTask.recurringParentId) {
-                updated = taskService.excludeRecurringInstance(
-                  updated,
-                  selectedTask.recurringParentId,
-                  dateStr,
-                );
-              } else if (selectedTask.recurrence) {
-                updated = taskService.excludeRecurringInstance(updated, selectedTaskId, dateStr);
-              }
-
-              setTasks(updated);
-
-              // Remove all timeline events for this task
-              const updatedTimeline = timelineService.removeEventsByTaskId(
-                timeline,
-                selectedTaskId,
-              );
-              setTimeline(updatedTimeline);
-            } else if (choice === 'all' && rootParent) {
-              // Delete from the root parent (all future occurrences won't have this)
-              if (selectedTask.parentId) {
-                // This is a subtask - find and delete it from the root parent
-                const deleteSubtaskFromTree = (task: Task, targetId: string): Task => {
-                  return {
-                    ...task,
-                    children: task.children
-                      .filter((child) => child.id !== targetId)
-                      .map((child) => deleteSubtaskFromTree(child, targetId)),
-                  };
-                };
-
-                // Find the root parent in tasks and delete the subtask
-                let updated = { ...tasks };
-                for (const [date, taskList] of Object.entries(tasks)) {
-                  const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
-                  if (rootIndex !== -1) {
-                    const updatedRoot = deleteSubtaskFromTree(taskList[rootIndex], selectedTaskId);
-                    updated[date] = [
-                      ...taskList.slice(0, rootIndex),
-                      updatedRoot,
-                      ...taskList.slice(rootIndex + 1),
-                    ];
-                    break;
-                  }
-                }
-                setTasks(updated);
-              } else {
-                // Root task itself - delete it entirely (delete the parent task)
-                const parentIdToDelete = selectedTask.recurringParentId || selectedTaskId;
-                const updated = taskService.deleteTask(tasks, parentIdToDelete);
-                setTasks(updated);
-              }
-
-              // Remove all timeline events for this task
-              const updatedTimeline = timelineService.removeEventsByTaskId(
-                timeline,
-                selectedTaskId,
-              );
-              if (selectedTask.recurringParentId) {
-                const parentTimeline = timelineService.removeEventsByTaskId(
-                  updatedTimeline,
-                  selectedTask.recurringParentId,
-                );
-                setTimeline(parentTimeline);
-              } else {
-                setTimeline(updatedTimeline);
-              }
-            } else if (choice === 'from-today' && rootParent) {
-              // Delete from root parent AND all materialized instances from today onwards
-              const todayDateObj = new Date();
-              todayDateObj.setHours(0, 0, 0, 0);
-
-              if (selectedTask.parentId) {
-                // This is a subtask - delete it from the root parent and future materialized instances
-                const deleteSubtaskFromTree = (task: Task, targetId: string): Task => {
-                  return {
-                    ...task,
-                    children: task.children
-                      .filter((child) => child.id !== targetId)
-                      .map((child) => deleteSubtaskFromTree(child, targetId)),
-                  };
-                };
-
-                // Find the root parent in tasks and delete the subtask
-                let updated = { ...tasks };
-
-                // For subtasks, we need to delete by matching the subtask structure in the parent
-                // Since ephemeral instances generate new IDs for children, we need a different approach
-                // We'll delete the subtask from the root parent, which will affect all future generated instances
-                for (const [date, taskList] of Object.entries(tasks)) {
-                  const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
-                  if (rootIndex !== -1) {
-                    // For ephemeral subtasks, we need to find by title match since IDs are regenerated
-                    const findSubtaskByTitlePath = (
-                      task: Task,
-                      targetTask: Task,
-                      path: string[] = [],
-                    ): string[] | null => {
-                      if (task.title === targetTask.title && path.length > 0) {
-                        return path;
-                      }
-                      for (const child of task.children) {
-                        const result = findSubtaskByTitlePath(child, targetTask, [
-                          ...path,
-                          child.title,
-                        ]);
-                        if (result) return result;
-                      }
-                      return null;
-                    };
-
-                    const deleteByTitlePath = (
-                      task: Task,
-                      titlePath: string[],
-                      currentDepth: number = 0,
-                    ): Task => {
-                      if (currentDepth >= titlePath.length) return task;
-                      return {
-                        ...task,
-                        children: task.children
-                          .filter((child) => child.title !== titlePath[currentDepth])
-                          .map((child) => deleteByTitlePath(child, titlePath, currentDepth + 1)),
-                      };
-                    };
-
-                    // Try to find the subtask path in the root parent
-                    const titlePath = findSubtaskByTitlePath(taskList[rootIndex], selectedTask);
-
-                    if (titlePath) {
-                      const updatedRoot = deleteByTitlePath(taskList[rootIndex], titlePath);
-                      updated[date] = [
-                        ...taskList.slice(0, rootIndex),
-                        updatedRoot,
-                        ...taskList.slice(rootIndex + 1),
-                      ];
-                      logger.log('Deleting subtask from root parent by title path (from-today)', {
-                        rootParentId: rootParent.id,
-                        titlePath,
-                      });
-                    } else {
-                      // Fallback to ID-based deletion for materialized subtasks
-                      const updatedRoot = deleteSubtaskFromTree(
-                        taskList[rootIndex],
-                        selectedTaskId,
-                      );
-                      updated[date] = [
-                        ...taskList.slice(0, rootIndex),
-                        updatedRoot,
-                        ...taskList.slice(rootIndex + 1),
-                      ];
-                      logger.log('Deleting subtask from root parent by ID (from-today)', {
-                        rootParentId: rootParent.id,
-                        subtaskId: selectedTaskId,
-                      });
-                    }
-                    break;
-                  }
-                }
-
-                // Also delete from materialized instances from today onwards
-                for (const [date, taskList] of Object.entries(updated)) {
-                  const dateObj = new Date(date);
-                  dateObj.setHours(0, 0, 0, 0);
-
-                  if (dateObj >= todayDateObj) {
-                    let hasChanges = false;
-                    const updatedTaskList = taskList.map((task) => {
-                      if (task.isRecurringInstance && task.recurringParentId === rootParent.id) {
-                        logger.log('Deleting subtask from materialized instance (from-today)', {
-                          instanceId: task.id,
-                          instanceDate: date,
-                          subtaskTitle: selectedTask.title,
-                        });
-                        hasChanges = true;
-                        // Use title-based deletion for materialized instances too
-                        const deleteByTitle = (t: Task, targetTitle: string): Task => {
-                          return {
-                            ...t,
-                            children: t.children
-                              .filter((child) => child.title !== targetTitle)
-                              .map((child) => deleteByTitle(child, targetTitle)),
-                          };
-                        };
-                        return deleteByTitle(task, selectedTask.title);
-                      }
-                      return task;
-                    });
-
-                    if (hasChanges) {
-                      updated[date] = updatedTaskList;
-                    }
-                  }
-                }
-
-                setTasks(updated);
-              } else {
-                // Root task itself - delete it and all materialized instances from today onwards
-                let updated = { ...tasks };
-
-                // Check if this is a materialized task or ephemeral instance
-                const isMaterialized = Object.values(tasks).some((taskList) =>
-                  taskList.some((t) => t.id === selectedTaskId),
-                );
-
-                if (isMaterialized) {
-                  // Delete the materialized task
-                  updated = taskService.deleteTask(tasks, selectedTaskId);
-                  logger.log('Deleting materialized root task (from-today)', {
-                    taskId: selectedTaskId,
-                  });
-                } else {
-                  // This is an ephemeral instance, find and delete the parent recurring task
-                  const parentId = selectedTask.recurringParentId;
-                  if (parentId) {
-                    updated = taskService.deleteTask(tasks, parentId);
-                    logger.log('Deleting parent recurring task (from-today)', {
-                      parentId,
-                      ephemeralTaskId: selectedTaskId,
-                    });
-                  }
-                }
-
-                // Delete materialized instances from today onwards
-                const recurringParentToDelete = selectedTask.recurringParentId || selectedTaskId;
-                for (const [date, taskList] of Object.entries(updated)) {
-                  const dateObj = new Date(date);
-                  dateObj.setHours(0, 0, 0, 0);
-
-                  if (dateObj >= todayDateObj) {
-                    const filteredTaskList = taskList.filter((task) => {
-                      if (
-                        task.isRecurringInstance &&
-                        task.recurringParentId === recurringParentToDelete
-                      ) {
-                        logger.log('Deleting materialized instance (from-today)', {
-                          instanceId: task.id,
-                          instanceDate: date,
-                        });
-                        return false;
-                      }
-                      return true;
-                    });
-
-                    if (filteredTaskList.length !== taskList.length) {
-                      updated[date] = filteredTaskList;
-                    }
-                  }
-                }
-
-                setTasks(updated);
-              }
-
-              // Remove all timeline events for this task
-              const updatedTimeline = timelineService.removeEventsByTaskId(
-                timeline,
-                selectedTaskId,
-              );
-              setTimeline(updatedTimeline);
-            }
-
-            setPendingAction(null);
-            // For delete, don't restore index as task will be gone
-          },
+          onConfirm: (choice: 'this' | 'all' | 'from-today') =>
+            onConfirmDelete(choice, selectedTaskId, selectedTask, rootParent),
         });
         setShowRecurringEditDialog(true);
       } else {
-        logger.log('Not recurring, deleting directly');
-        try {
-          pushUndoableAction('TASK_DELETE');
-          const updated = taskService.deleteTask(tasks, selectedTaskId);
-          setTasks(updated);
-
-          // Remove all timeline events for this task
-          const updatedTimeline = timelineService.removeEventsByTaskId(timeline, selectedTaskId);
-          setTimeline(updatedTimeline);
-        } catch (err) {
-          console.error('Error deleting task:', err);
-        }
+        pushUndoableAction('TASK_DELETE');
+        setTasks(taskService.deleteTask(tasks, selectedTaskId));
+        setTimeline(timelineService.removeEventsByTaskId(timeline, selectedTaskId));
       }
-    }
-  };
-
-  const handleChangeState = (newState: 'todo' | 'completed' | 'delegated' | 'delayed') => {
-    // State changes always apply to "this task only" - never ask for confirmation
-    if (selectedTaskId && selectedTask) {
-      logger.log('[handleChangeState] Called', {
-        selectedTaskId,
-        taskTitle: selectedTask.title,
-        taskDate: selectedTask.date,
-        currentState: selectedTask.state,
-        newState,
-        isRecurringInstance: selectedTask.isRecurringInstance,
-        recurringParentId: selectedTask.recurringParentId,
-        hasRecurrence: !!selectedTask.recurrence,
-        parentId: selectedTask.parentId,
-      });
-      performStateChange(selectedTaskId, selectedTask, newState, true);
     }
   };
 
@@ -888,470 +509,237 @@ export const TasksPane: React.FC = () => {
     }
   };
 
+  const handleChangeState = (newState: 'todo' | 'completed' | 'delegated' | 'delayed') => {
+    // State changes always apply to "this task only" - never ask for confirmation
+    if (selectedTaskId && selectedTask) {
+      logger.log('[handleChangeState] Called', {
+        selectedTaskId,
+        taskTitle: selectedTask.title,
+        taskDate: selectedTask.date,
+        currentState: selectedTask.state,
+        newState,
+        isRecurringInstance: selectedTask.isRecurringInstance,
+        recurringParentId: selectedTask.recurringParentId,
+        hasRecurrence: !!selectedTask.recurrence,
+        parentId: selectedTask.parentId,
+      });
+      performStateChange(selectedTaskId, selectedTask, newState);
+    }
+  };
+
+  const handleAddSubmit = (trimmed: string) => {
+    pushUndoableAction('TASK_ADD');
+    const newTask = taskService.createTask(trimmed, dateStr);
+    const newTasks = {
+      ...tasks,
+      [dateStr]: [...dayTasks, newTask],
+    };
+    setTasks(newTasks);
+    setSelectedIndex(flatTasks.length); // Select newly added task
+    finishEdit();
+  };
+
+  const handleAddSubtaskSubmit = (trimmed: string) => {
+    if (!parentTaskId) return;
+    const parentTask = flatTasks.find((ft) => ft.task.id === parentTaskId)?.task;
+
+    if (parentTask && isRecurringTask(parentTask)) {
+      setRecurringEditConfig({
+        taskId: parentTaskId,
+        taskTitle: parentTask.title,
+        actionType: 'add-subtask',
+        onConfirm: (choice) => onConfirmAddSubtask(choice, parentTaskId, trimmed, parentTask),
+      });
+      setShowRecurringEditDialog(true);
+    } else {
+      pushUndoableAction('TASK_ADD');
+      const updated = taskService.addSubtask(tasks, parentTaskId, trimmed);
+      setTasks(updated);
+      const parentIndex = flatTasks.findIndex((ft) => ft.task.id === parentTaskId);
+      if (parentIndex !== -1) {
+        setSelectedIndex(parentIndex + 1);
+      }
+      finishEdit();
+    }
+  };
+
+  const onConfirmAddSubtask = (
+    choice: RecurringChoice,
+    parentId: string,
+    title: string,
+    parentTask: Task,
+  ) => {
+    pushUndoableAction('TASK_ADD');
+    if (choice === 'this') {
+      handleAddSubtaskThis(parentId, title);
+    } else if (choice === 'all') {
+      handleAddSubtaskAll(parentId, title, parentTask);
+    } else if (choice === 'from-today') {
+      handleAddSubtaskFromToday(parentId, title, parentTask);
+    }
+
+    setTimeout(() => {
+      const parentIndex = flatTasks.findIndex((ft) => ft.task.id === parentId);
+      if (parentIndex !== -1) {
+        setSelectedIndex(parentIndex + 1);
+      }
+      finishEdit();
+    }, 0);
+  };
+
+  const handleAddSubtaskThis = (parentId: string, title: string) => {
+    const existingTasks = tasks[dateStr] || [];
+    const taskExists = existingTasks.some((t) => t.id === parentId);
+
+    if (taskExists) {
+      setTasks(taskService.addSubtask(tasks, parentId, title));
+    } else {
+      const ephemeralParent = dayTasks.find((t) => t.id === parentId);
+      if (ephemeralParent?.isRecurringInstance) {
+        const newSubtask = taskService.createTask(title, dateStr);
+        const materializedTask: Task = {
+          ...ephemeralParent,
+          children: [...ephemeralParent.children, { ...newSubtask, parentId }],
+        };
+        setTasks({ ...tasks, [dateStr]: [...existingTasks, materializedTask] });
+      } else if (ephemeralParent) {
+        setTasks(taskService.addSubtask(tasks, parentId, title));
+      }
+    }
+  };
+
+  const handleAddSubtaskAll = (parentId: string, title: string, parentTask: Task) => {
+    const recurringParentId = parentTask.recurringParentId || parentId;
+    let updated = taskService.addSubtask(tasks, recurringParentId, title);
+
+    for (const taskList of Object.values(updated)) {
+      for (const task of taskList) {
+        if (task.isRecurringInstance && task.recurringParentId === recurringParentId) {
+          updated = taskService.addSubtask(updated, task.id, title);
+        }
+      }
+    }
+    setTasks(updated);
+  };
+
+  const handleAddSubtaskFromToday = (parentId: string, title: string, parentTask: Task) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const recurringParentId = parentTask.recurringParentId || parentId;
+    let updated = taskService.addSubtask(tasks, recurringParentId, title);
+
+    for (const [date, taskList] of Object.entries(updated)) {
+      const dateObj = new Date(date);
+      dateObj.setHours(0, 0, 0, 0);
+      if (dateObj >= today) {
+        for (const task of taskList) {
+          if (task.isRecurringInstance && task.recurringParentId === recurringParentId) {
+            updated = taskService.addSubtask(updated, task.id, title);
+          }
+        }
+      }
+    }
+    setTasks(updated);
+  };
+
+  const handleEditSubmit = (trimmed: string) => {
+    if (!editingTaskId) return;
+    const taskBeingEdited = flatTasks.find((ft) => ft.task.id === editingTaskId)?.task;
+
+    if (taskBeingEdited && hasRecurringAncestor(taskBeingEdited)) {
+      setRecurringEditConfig({
+        taskId: editingTaskId,
+        taskTitle: taskBeingEdited.title,
+        actionType: 'edit',
+        onConfirm: (choice) => onConfirmEditTask(choice, editingTaskId, trimmed, taskBeingEdited),
+      });
+      setShowRecurringEditDialog(true);
+    } else {
+      pushUndoableAction('TASK_UPDATE');
+      setTasks(taskService.updateTask(tasks, editingTaskId, { title: trimmed }));
+      finishEdit();
+    }
+  };
+
+  const onConfirmEditTask = (
+    choice: RecurringChoice,
+    taskId: string,
+    newTitle: string,
+    task: Task,
+  ) => {
+    pushUndoableAction('TASK_UPDATE');
+    const rootParent = findRootParent(task);
+
+    if (choice === 'this') {
+      setTasks(taskService.updateTask(tasks, taskId, { title: newTitle }));
+    } else if (choice === 'all' && rootParent) {
+      handleEditAll(taskId, newTitle, task, rootParent);
+    } else if (choice === 'from-today' && rootParent) {
+      handleEditFromToday(taskId, newTitle, task, rootParent);
+    }
+
+    setTimeout(() => finishEdit(), 0);
+  };
+
+  const handleEditAll = (taskId: string, newTitle: string, task: Task, rootParent: Task) => {
+    let updated = tasks;
+    if (task.parentId) {
+      updated = helpers.updateSubtaskInRootParent(updated, rootParent.id, taskId, newTitle);
+      updated = helpers.updateSubtaskInMaterializedInstances(
+        updated,
+        rootParent.id,
+        taskId,
+        newTitle,
+      );
+    } else {
+      updated = taskService.updateTask(tasks, taskId, { title: newTitle });
+    }
+    setTasks(updated);
+  };
+
+  const handleEditFromToday = (taskId: string, newTitle: string, task: Task, rootParent: Task) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let updated = tasks;
+
+    if (task.parentId) {
+      updated = helpers.updateSubtaskInRootParent(updated, rootParent.id, taskId, newTitle);
+      updated = helpers.updateSubtaskInMaterializedInstances(
+        updated,
+        rootParent.id,
+        taskId,
+        newTitle,
+        today,
+      );
+    } else {
+      updated = taskService.updateTask(tasks, taskId, { title: newTitle });
+      updated = helpers.updateMaterializedInstancesTitle(updated, taskId, newTitle, today);
+    }
+    setTasks(updated);
+  };
+
+  const finishEdit = () => {
+    setEditMode('none');
+    setEditValue('');
+    setParentTaskId(null);
+    setEditingTaskId(null);
+    setIsInputMode(false);
+  };
+
   const handleSubmitEdit = (value: string) => {
     const trimmed = value.trim();
     if (!trimmed) {
-      setEditMode('none');
-      setEditValue('');
-      setParentTaskId(null);
-      setEditingTaskId(null);
-      setIsInputMode(false);
+      finishEdit();
       return;
     }
 
     try {
       if (editMode === 'add') {
-        pushUndoableAction('TASK_ADD');
-        const newTask = taskService.createTask(trimmed, dateStr);
-        const newTasks = {
-          ...tasks,
-          [dateStr]: [...dayTasks, newTask],
-        };
-        setTasks(newTasks);
-        setSelectedIndex(flatTasks.length); // Select newly added task
-        // No timeline event for task creation - only track started/completed/etc
-        setEditMode('none');
-        setEditValue('');
-        setParentTaskId(null);
-        setEditingTaskId(null);
-        setIsInputMode(false);
-      } else if (editMode === 'addSubtask' && parentTaskId) {
-        // Check if the parent task is a recurring task
-        const parentTask = flatTasks.find((ft) => ft.task.id === parentTaskId)?.task;
-
-        if (parentTask && isRecurringTask(parentTask)) {
-          // Show dialog to ask "this or all"
-          const savedValue = trimmed;
-          const savedParentId = parentTaskId;
-          const savedIndex = selectedIndex;
-
-          setRecurringEditConfig({
-            taskId: savedParentId,
-            taskTitle: parentTask.title,
-            actionType: 'add-subtask',
-            onConfirm: (choice: 'this' | 'all' | 'from-today') => {
-              logger.log('Recurring subtask save confirmed', { choice, newSubtask: savedValue });
-
-              pushUndoableAction('TASK_ADD');
-
-              if (choice === 'this') {
-                // Add subtask to just this task (whether it's the parent or an instance)
-                // We need to check if this is an ephemeral recurring instance that needs to be materialized first
-
-                // Check if the parent task is materialized (exists in the tasks object)
-                const existingTasks = tasks[dateStr] || [];
-                const taskExists = existingTasks.some((t) => t.id === savedParentId);
-
-                if (taskExists) {
-                  // Task is already materialized - add subtask directly
-                  logger.log('Adding subtask to already materialized task (this only)', {
-                    parentId: savedParentId,
-                    subtaskTitle: savedValue,
-                  });
-                  const updated = taskService.addSubtask(tasks, savedParentId, savedValue);
-                  setTasks(updated);
-                } else {
-                  // This is an ephemeral recurring instance - we need to materialize it first
-                  // Find the parent task from the ephemeral dayTasks (which includes generated instances)
-                  const ephemeralParent = dayTasks.find((t) => t.id === savedParentId);
-
-                  if (ephemeralParent && ephemeralParent.isRecurringInstance) {
-                    logger.log(
-                      'Materializing ephemeral recurring instance for subtask addition (this only)',
-                      {
-                        parentId: savedParentId,
-                        recurringParentId: ephemeralParent.recurringParentId,
-                        subtaskTitle: savedValue,
-                      },
-                    );
-
-                    // Create the subtask
-                    const newSubtask = taskService.createTask(savedValue, dateStr);
-
-                    // Materialize the ephemeral instance with the new subtask
-                    const materializedTask: Task = {
-                      ...ephemeralParent,
-                      children: [
-                        ...ephemeralParent.children,
-                        { ...newSubtask, parentId: savedParentId },
-                      ],
-                    };
-
-                    // Add the materialized task to the tasks for this date
-                    const updated = {
-                      ...tasks,
-                      [dateStr]: [...existingTasks, materializedTask],
-                    };
-
-                    setTasks(updated);
-                  } else if (ephemeralParent) {
-                    // It's the original recurring parent task - add subtask to it (will affect all instances)
-                    // This shouldn't happen if the parent was a recurring task, but handle it gracefully
-                    logger.log(
-                      'Parent is original recurring task, adding subtask (this only - but will affect template)',
-                      {
-                        parentId: savedParentId,
-                        subtaskTitle: savedValue,
-                      },
-                    );
-                    const updated = taskService.addSubtask(tasks, savedParentId, savedValue);
-                    setTasks(updated);
-                  } else {
-                    logger.log('Parent task not found in ephemeral dayTasks', {
-                      parentId: savedParentId,
-                    });
-                  }
-                }
-              } else if (choice === 'all') {
-                // Add subtask to the parent task (all future occurrences will have it)
-                const recurringParentId = parentTask.recurringParentId || savedParentId;
-
-                // First, add to the parent recurring task
-                let updated = taskService.addSubtask(tasks, recurringParentId, savedValue);
-
-                // Then, also add to any materialized instances of this recurring task
-                logger.log('Adding subtask to parent and materialized instances', {
-                  recurringParentId,
-                  subtaskTitle: savedValue,
-                });
-
-                // Find all materialized instances (tasks with recurringParentId matching this parent)
-                for (const [date, taskList] of Object.entries(updated)) {
-                  for (let i = 0; i < taskList.length; i++) {
-                    const task = taskList[i];
-                    if (task.isRecurringInstance && task.recurringParentId === recurringParentId) {
-                      // This is a materialized instance - add the subtask to it too
-                      logger.log('Adding subtask to materialized instance', {
-                        instanceId: task.id,
-                        instanceDate: date,
-                        subtaskTitle: savedValue,
-                      });
-                      updated = taskService.addSubtask(updated, task.id, savedValue);
-                    }
-                  }
-                }
-
-                setTasks(updated);
-              } else if (choice === 'from-today') {
-                // Add subtask to the parent task and materialized instances from today onwards
-                const todayDateObj = new Date();
-                todayDateObj.setHours(0, 0, 0, 0);
-                const recurringParentId = parentTask.recurringParentId || savedParentId;
-
-                // First, add to the parent recurring task
-                let updated = taskService.addSubtask(tasks, recurringParentId, savedValue);
-
-                // Then, also add to materialized instances from today onwards
-                logger.log(
-                  'Adding subtask to parent and future materialized instances (from-today)',
-                  {
-                    recurringParentId,
-                    subtaskTitle: savedValue,
-                  },
-                );
-
-                // Find materialized instances from today onwards
-                for (const [date, taskList] of Object.entries(updated)) {
-                  const dateObj = new Date(date);
-                  dateObj.setHours(0, 0, 0, 0);
-
-                  if (dateObj >= todayDateObj) {
-                    for (let i = 0; i < taskList.length; i++) {
-                      const task = taskList[i];
-                      if (
-                        task.isRecurringInstance &&
-                        task.recurringParentId === recurringParentId
-                      ) {
-                        // This is a materialized instance from today onwards - add the subtask to it too
-                        logger.log('Adding subtask to materialized instance (from-today)', {
-                          instanceId: task.id,
-                          instanceDate: date,
-                          subtaskTitle: savedValue,
-                        });
-                        updated = taskService.addSubtask(updated, task.id, savedValue);
-                      }
-                    }
-                  }
-                }
-
-                setTasks(updated);
-              }
-
-              // Clean up edit state and select the newly added subtask
-              setTimeout(() => {
-                const parentIndex = flatTasks.findIndex((ft) => ft.task.id === savedParentId);
-                if (parentIndex !== -1) {
-                  setSelectedIndex(parentIndex + 1); // Select first child (newly added)
-                }
-                setEditMode('none');
-                setEditValue('');
-                setParentTaskId(null);
-                setEditingTaskId(null);
-                setIsInputMode(false);
-              }, 0);
-            },
-          });
-          setShowRecurringEditDialog(true);
-        } else {
-          // Non-recurring parent - add subtask normally
-          pushUndoableAction('TASK_ADD');
-          const updated = taskService.addSubtask(tasks, parentTaskId, trimmed);
-          setTasks(updated);
-          // Find and select the newly added subtask
-          const parentIndex = flatTasks.findIndex((ft) => ft.task.id === parentTaskId);
-          if (parentIndex !== -1) {
-            setSelectedIndex(parentIndex + 1); // Select first child (newly added)
-          }
-          // No timeline event for subtask creation
-          setEditMode('none');
-          setEditValue('');
-          setParentTaskId(null);
-          setEditingTaskId(null);
-          setIsInputMode(false);
-        }
-      } else if (editMode === 'edit' && editingTaskId) {
-        // Check if the task being edited or any of its ancestors is recurring
-        const taskBeingEdited = flatTasks.find((ft) => ft.task.id === editingTaskId)?.task;
-
-        if (taskBeingEdited && hasRecurringAncestor(taskBeingEdited)) {
-          // Show dialog to ask "this or all"
-          const savedValue = trimmed;
-          const savedTaskId = editingTaskId;
-          const savedIndex = selectedIndex;
-          const rootParent = findRootParent(taskBeingEdited);
-
-          setRecurringEditConfig({
-            taskId: savedTaskId,
-            taskTitle: taskBeingEdited.title,
-            actionType: 'edit',
-            onConfirm: (choice: 'this' | 'all' | 'from-today') => {
-              logger.log('Recurring edit save confirmed', { choice, newTitle: savedValue });
-
-              // Perform the actual edit
-              pushUndoableAction('TASK_UPDATE');
-
-              if (choice === 'this') {
-                // Edit just this instance (or just this subtask in this instance)
-                const updated = taskService.updateTask(tasks, savedTaskId, {
-                  title: savedValue,
-                });
-                setTasks(updated);
-              } else if (choice === 'all' && rootParent) {
-                // Edit in the root parent (all future occurrences will have this change)
-                let updated = { ...tasks };
-
-                if (taskBeingEdited.parentId) {
-                  // This is a subtask - update it in the root parent and all materialized instances
-                  const updateSubtaskInTree = (
-                    task: Task,
-                    targetId: string,
-                    newTitle: string,
-                  ): Task => {
-                    if (task.id === targetId) {
-                      return { ...task, title: newTitle, updatedAt: new Date() };
-                    }
-                    return {
-                      ...task,
-                      children: task.children.map((child) =>
-                        updateSubtaskInTree(child, targetId, newTitle),
-                      ),
-                    };
-                  };
-
-                  logger.log('Updating subtask in root parent and materialized instances', {
-                    subtaskId: savedTaskId,
-                    newTitle: savedValue,
-                    rootParentId: rootParent.id,
-                  });
-
-                  // Find the root parent in tasks and update the subtask
-                  for (const [date, taskList] of Object.entries(tasks)) {
-                    const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
-                    if (rootIndex !== -1) {
-                      const updatedRoot = updateSubtaskInTree(
-                        taskList[rootIndex],
-                        savedTaskId,
-                        savedValue,
-                      );
-                      updated[date] = [
-                        ...taskList.slice(0, rootIndex),
-                        updatedRoot,
-                        ...taskList.slice(rootIndex + 1),
-                      ];
-                      break;
-                    }
-                  }
-
-                  // Also update in all materialized instances
-                  for (const [date, taskList] of Object.entries(updated)) {
-                    let hasChanges = false;
-                    const updatedTaskList = taskList.map((task) => {
-                      if (task.isRecurringInstance && task.recurringParentId === rootParent.id) {
-                        // This is a materialized instance - update the subtask in it too
-                        logger.log('Updating subtask in materialized instance', {
-                          instanceId: task.id,
-                          instanceDate: date,
-                          subtaskId: savedTaskId,
-                          newTitle: savedValue,
-                        });
-                        hasChanges = true;
-                        return updateSubtaskInTree(task, savedTaskId, savedValue);
-                      }
-                      return task;
-                    });
-
-                    if (hasChanges) {
-                      updated[date] = updatedTaskList;
-                    }
-                  }
-
-                  setTasks(updated);
-                } else {
-                  // Root task itself - update it and all materialized instances
-                  const updated = taskService.updateTask(tasks, savedTaskId, {
-                    title: savedValue,
-                  });
-                  setTasks(updated);
-                }
-              } else if (choice === 'from-today' && rootParent) {
-                // Edit in the root parent and materialized instances from today onwards
-                const todayDateObj = new Date();
-                todayDateObj.setHours(0, 0, 0, 0);
-                let updated = { ...tasks };
-
-                if (taskBeingEdited.parentId) {
-                  // This is a subtask - update it in the root parent and future materialized instances
-                  const updateSubtaskInTree = (
-                    task: Task,
-                    targetId: string,
-                    newTitle: string,
-                  ): Task => {
-                    if (task.id === targetId) {
-                      return { ...task, title: newTitle, updatedAt: new Date() };
-                    }
-                    return {
-                      ...task,
-                      children: task.children.map((child) =>
-                        updateSubtaskInTree(child, targetId, newTitle),
-                      ),
-                    };
-                  };
-
-                  logger.log(
-                    'Updating subtask in root parent and future materialized instances (from-today)',
-                    {
-                      subtaskId: savedTaskId,
-                      newTitle: savedValue,
-                      rootParentId: rootParent.id,
-                    },
-                  );
-
-                  // Find the root parent in tasks and update the subtask
-                  for (const [date, taskList] of Object.entries(tasks)) {
-                    const rootIndex = taskList.findIndex((t) => t.id === rootParent.id);
-                    if (rootIndex !== -1) {
-                      const updatedRoot = updateSubtaskInTree(
-                        taskList[rootIndex],
-                        savedTaskId,
-                        savedValue,
-                      );
-                      updated[date] = [
-                        ...taskList.slice(0, rootIndex),
-                        updatedRoot,
-                        ...taskList.slice(rootIndex + 1),
-                      ];
-                      break;
-                    }
-                  }
-
-                  // Also update in materialized instances from today onwards
-                  for (const [date, taskList] of Object.entries(updated)) {
-                    const dateObj = new Date(date);
-                    dateObj.setHours(0, 0, 0, 0);
-
-                    if (dateObj >= todayDateObj) {
-                      let hasChanges = false;
-                      const updatedTaskList = taskList.map((task) => {
-                        if (task.isRecurringInstance && task.recurringParentId === rootParent.id) {
-                          // This is a materialized instance from today onwards - update the subtask in it too
-                          logger.log('Updating subtask in materialized instance (from-today)', {
-                            instanceId: task.id,
-                            instanceDate: date,
-                            subtaskId: savedTaskId,
-                            newTitle: savedValue,
-                          });
-                          hasChanges = true;
-                          return updateSubtaskInTree(task, savedTaskId, savedValue);
-                        }
-                        return task;
-                      });
-
-                      if (hasChanges) {
-                        updated[date] = updatedTaskList;
-                      }
-                    }
-                  }
-
-                  setTasks(updated);
-                } else {
-                  // Root task itself - update it and materialized instances from today onwards
-                  let updated = taskService.updateTask(tasks, savedTaskId, {
-                    title: savedValue,
-                  });
-
-                  // Update materialized instances from today onwards
-                  for (const [date, taskList] of Object.entries(updated)) {
-                    const dateObj = new Date(date);
-                    dateObj.setHours(0, 0, 0, 0);
-
-                    if (dateObj >= todayDateObj) {
-                      let hasChanges = false;
-                      const updatedTaskList = taskList.map((task) => {
-                        if (task.isRecurringInstance && task.recurringParentId === savedTaskId) {
-                          logger.log('Updating materialized instance (from-today)', {
-                            instanceId: task.id,
-                            instanceDate: date,
-                            newTitle: savedValue,
-                          });
-                          hasChanges = true;
-                          return { ...task, title: savedValue, updatedAt: new Date() };
-                        }
-                        return task;
-                      });
-
-                      if (hasChanges) {
-                        updated[date] = updatedTaskList;
-                      }
-                    }
-                  }
-
-                  setTasks(updated);
-                }
-              }
-
-              // Clean up edit state
-              setTimeout(() => {
-                setEditMode('none');
-                setEditValue('');
-                setEditingTaskId(null);
-                setIsInputMode(false);
-                setSelectedIndex(savedIndex);
-              }, 0);
-            },
-          });
-          setShowRecurringEditDialog(true);
-        } else {
-          // Non-recurring task - save normally
-          pushUndoableAction('TASK_UPDATE');
-          const updated = taskService.updateTask(tasks, editingTaskId, {
-            title: trimmed,
-          });
-          setTasks(updated);
-          setEditMode('none');
-          setEditValue('');
-          setEditingTaskId(null);
-          setIsInputMode(false);
-        }
+        handleAddSubmit(trimmed);
+      } else if (editMode === 'addSubtask') {
+        handleAddSubtaskSubmit(trimmed);
+      } else if (editMode === 'edit') {
+        handleEditSubmit(trimmed);
       }
     } catch (err) {
       console.error('Error saving task:', err);
@@ -1359,11 +747,7 @@ export const TasksPane: React.FC = () => {
   };
 
   const handleCancelEdit = () => {
-    setEditMode('none');
-    setEditValue('');
-    setParentTaskId(null);
-    setEditingTaskId(null);
-    setIsInputMode(false);
+    finishEdit();
   };
 
   const handleToggleExpand = () => {
@@ -1397,17 +781,8 @@ export const TasksPane: React.FC = () => {
   };
 
   const handleExpandAll = () => {
-    // Get all task IDs that have children
     const allParentIds = new Set<string>();
-    const collectParents = (taskList: Task[]) => {
-      for (const task of taskList) {
-        if (task.children.length > 0) {
-          allParentIds.add(task.id);
-          collectParents(task.children);
-        }
-      }
-    };
-    collectParents(dayTasks);
+    helpers.collectParentIds(dayTasks, allParentIds);
     setExpandedIds(allParentIds);
   };
 
@@ -1415,147 +790,155 @@ export const TasksPane: React.FC = () => {
     setExpandedIds(new Set());
   };
 
+  const handleGlobalKeys = (input: string, key: any) => {
+    // Expand/Collapse ALL with Cmd/Ctrl + arrow keys
+    if ((key.meta || key.ctrl) && (input === 'a' || key.leftArrow)) {
+      handleCollapseAll();
+      return true;
+    }
+    if ((key.meta || key.ctrl) && (input === 'e' || key.rightArrow)) {
+      handleExpandAll();
+      return true;
+    }
+    return false;
+  };
+
+  const handleNavigationKeys = (input: string, key: any) => {
+    if (input === 'j' || key.downArrow) {
+      setSelectedIndex((prev) => Math.min(prev + 1, flatTasks.length - 1));
+      return true;
+    }
+    if (input === 'k' || key.upArrow) {
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+      return true;
+    }
+    if (key.leftArrow && !key.meta && !key.ctrl) {
+      handleCollapse();
+      return true;
+    }
+    if (key.rightArrow && !key.meta && !key.ctrl) {
+      handleExpand();
+      return true;
+    }
+    return false;
+  };
+
+  const handleTaskActionKeys = (input: string, key: any) => {
+    // Handle 'a' key for adding tasks - works even when no task is selected
+    if (input === 'a' && !key.meta && !key.ctrl && !key.shift) {
+      handleAddTask();
+      return true;
+    }
+
+    // All other task actions require a selected task
+    if (!selectedTask) return false;
+
+    if (input === 'e' && !key.meta && !key.ctrl && !key.shift) {
+      handleEditTask();
+      return true;
+    }
+    if (input === 'd') {
+      handleDeleteTask();
+      return true;
+    }
+    if (input === ' ') {
+      handleToggleComplete();
+      return true;
+    }
+    if (input === 'D') {
+      handleChangeState('delegated');
+      return true;
+    }
+    if (input === 'x') {
+      toggleDelayedState();
+      return true;
+    }
+    return false;
+  };
+
+  const toggleDelayedState = () => {
+    if (!selectedTask) return;
+    if (selectedTask.state === 'delayed') {
+      handleChangeState('todo');
+    } else {
+      handleChangeState('delayed');
+    }
+  };
+
+  const handleAdditionalTaskKeys = (input: string, key: any) => {
+    if (!selectedTask) return false;
+
+    if (input === 's') {
+      handleStartTask();
+      return true;
+    }
+    if (input === 'r') {
+      handleRecurringTask();
+      return true;
+    }
+    if (key.return) {
+      handleToggleExpand();
+      return true;
+    }
+    if (key.tab) {
+      handleAddSubtask();
+      return true;
+    }
+    return false;
+  };
+
+  const handleStartTask = () => {
+    if (!selectedTask || !selectedTaskId) return;
+    try {
+      pushUndoableAction('TASK_UPDATE');
+      if (selectedTask.startTime && !selectedTask.endTime) {
+        setTasks(taskService.updateTask(tasks, selectedTaskId, { startTime: undefined }));
+        setTimeline(
+          timelineService.removeLastEventByType(
+            timeline,
+            selectedTaskId,
+            TimelineEventType.STARTED,
+          ),
+        );
+      } else {
+        setTasks(taskService.startTask(tasks, selectedTaskId));
+        if (isSelectedDateToday) {
+          const event = timelineService.createEvent(
+            selectedTaskId,
+            selectedTask.title,
+            TimelineEventType.STARTED,
+            new Date(),
+          );
+          setTimeline(timelineService.addEvent(timeline, event));
+        }
+      }
+    } catch (err) {
+      console.error('Error toggling task start:', err);
+    }
+  };
+
+  const handleRecurringTask = () => {
+    if (!selectedTask || !selectedTaskId) return;
+    if (selectedTask.parentId) {
+      logger.log('Cannot mark nested task as recurring', {
+        taskId: selectedTaskId,
+        parentId: selectedTask.parentId,
+      });
+      return;
+    }
+    setRecurringTaskId(selectedTaskId);
+    setShowRecurringTaskDialog(true);
+  };
+
   // Input handler for navigation/command mode
   useInput(
     (input, key) => {
-      // Expand/Collapse ALL with Cmd/Ctrl + arrow keys
-      // Note: On Mac terminals, Cmd+Left sends Ctrl+a and Cmd+Right sends Ctrl+e
-      if ((key.meta || key.ctrl) && (input === 'a' || key.leftArrow)) {
-        handleCollapseAll();
-        return;
-      }
-
-      if ((key.meta || key.ctrl) && (input === 'e' || key.rightArrow)) {
-        handleExpandAll();
-        return;
-      }
-
-      // Navigation
-      if (input === 'j' || key.downArrow) {
-        setSelectedIndex((prev) => Math.min(prev + 1, flatTasks.length - 1));
-        return;
-      }
-
-      if (input === 'k' || key.upArrow) {
-        setSelectedIndex((prev) => Math.max(prev - 1, 0));
-        return;
-      }
-
-      // Expand/Collapse current with arrow keys (no modifiers)
-      if (key.leftArrow && !key.meta && !key.ctrl) {
-        handleCollapse();
-        return;
-      }
-
-      if (key.rightArrow && !key.meta && !key.ctrl) {
-        handleExpand();
-        return;
-      }
-
-      // Task actions (only if no modifier keys are pressed)
-      if (input === 'a' && !key.meta && !key.ctrl && !key.shift) {
-        handleAddTask();
-        return;
-      }
-
-      if (input === 'e' && selectedTask && !key.meta && !key.ctrl && !key.shift) {
-        handleEditTask();
-        return;
-      }
-
-      if (input === 'd' && selectedTask) {
-        handleDeleteTask();
-        return;
-      }
-
-      if (input === ' ' && selectedTask) {
-        handleToggleComplete();
-        return;
-      }
-
-      if (input === 'D' && selectedTask) {
-        handleChangeState('delegated');
-        return;
-      }
-
-      if (input === 'x' && selectedTask) {
-        // Toggle delayed state
-        if (selectedTask.state === 'delayed') {
-          handleChangeState('todo');
-        } else {
-          handleChangeState('delayed');
-        }
-        return;
-      }
-
-      if (input === 's' && selectedTask) {
-        try {
-          pushUndoableAction('TASK_UPDATE');
-          // Toggle start - if already started (has startTime but no endTime), unstart it
-          if (selectedTask.startTime && !selectedTask.endTime) {
-            // Unstart: clear startTime and remove timeline event
-            const updated = taskService.updateTask(tasks, selectedTaskId!, {
-              startTime: undefined,
-            });
-            setTasks(updated);
-
-            // Remove the started event from timeline
-            const updatedTimeline = timelineService.removeLastEventByType(
-              timeline,
-              selectedTaskId!,
-              TimelineEventType.STARTED,
-            );
-            setTimeline(updatedTimeline);
-          } else {
-            // Start task
-            const updated = taskService.startTask(tasks, selectedTaskId!);
-            setTasks(updated);
-
-            // Only create timeline event for today's tasks
-            if (isSelectedDateToday) {
-              const event = timelineService.createEvent(
-                selectedTaskId!,
-                selectedTask.title,
-                TimelineEventType.STARTED,
-                new Date(),
-              );
-              const updatedTimeline = timelineService.addEvent(timeline, event);
-              setTimeline(updatedTimeline);
-            }
-          }
-        } catch (err) {
-          console.error('Error toggling task start:', err);
-        }
-        return;
-      }
-
-      if (input === 'r' && selectedTask) {
-        // Only root-level tasks can be marked as recurring
-        if (selectedTask.parentId) {
-          // This is a nested task - cannot be marked as recurring
-          logger.log('Cannot mark nested task as recurring', {
-            taskId: selectedTask.id,
-            parentId: selectedTask.parentId,
-          });
-          return;
-        }
-        // Open recurring task dialog for selected task
-        setRecurringTaskId(selectedTaskId!);
-        setShowRecurringTaskDialog(true);
-        return;
-      }
-
-      if (key.return && selectedTask) {
-        handleToggleExpand();
-        return;
-      }
-
-      if (key.tab && selectedTask) {
-        handleAddSubtask();
-        return;
-      }
+      if (handleGlobalKeys(input, key)) return;
+      if (handleNavigationKeys(input, key)) return;
+      if (handleTaskActionKeys(input, key)) return;
+      if (handleAdditionalTaskKeys(input, key)) return;
     },
-    { isActive: isFocused && editMode === 'none' },
+    { isActive: isFocused && !isInputMode },
   );
 
   return (
@@ -1578,6 +961,7 @@ export const TasksPane: React.FC = () => {
               color={theme.colors.foreground}
               placeholderColor={theme.colors.foreground}
               maxLength={60}
+              focus={inputFocusReady}
             />
           </Box>
         )}
@@ -1595,6 +979,7 @@ export const TasksPane: React.FC = () => {
               color={theme.colors.foreground}
               placeholderColor={theme.colors.foreground}
               maxLength={60}
+              focus={inputFocusReady}
             />
           </Box>
         )}
@@ -1635,6 +1020,7 @@ export const TasksPane: React.FC = () => {
                         color={theme.colors.foreground}
                         placeholderColor={theme.colors.foreground}
                         maxLength={60}
+                        focus={inputFocusReady}
                       />
                     </Box>
                   );
@@ -1730,26 +1116,3 @@ export const TasksPane: React.FC = () => {
     </Pane>
   );
 };
-
-function getCheckbox(state: string): string {
-  switch (state) {
-    case 'completed':
-      return '[✓]';
-    case 'delegated':
-      return '[→]';
-    case 'delayed':
-      return '[‖]';
-    default:
-      return '[ ]';
-  }
-}
-
-function getStateColor(state: string, theme: any): string | undefined {
-  const colors: Record<string, string | undefined> = {
-    todo: theme.colors.taskStateTodo,
-    completed: theme.colors.taskStateCompleted,
-    delegated: theme.colors.taskStateDelegated,
-    delayed: theme.colors.taskStateDelayed,
-  };
-  return colors[state] || theme.colors.foreground;
-}

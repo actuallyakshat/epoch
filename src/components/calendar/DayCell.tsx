@@ -18,18 +18,29 @@ export const DayCell: React.FC<DayCellProps> = ({ day }) => {
   }
 
   // Determine indicators - selected takes priority, then today
-  const isSelected = day.isSelected;
   const isToday = day.isToday && !day.isSelected;
 
-  if (isSelected) {
+  if (day.isSelected) {
     textColor = theme.colors.calendarSelected;
   } else if (day.isToday) {
     textColor = theme.colors.calendarToday;
   }
 
   const dayNum = day.date.day.toString().padStart(2, ' ');
-  const leftBracket = isSelected ? '[' : isToday ? '(' : ' ';
-  const rightBracket = isSelected ? ']' : isToday ? ')' : ' ';
+
+  let leftBracket = ' ';
+  if (day.isSelected) {
+    leftBracket = '[';
+  } else if (isToday) {
+    leftBracket = '(';
+  }
+
+  let rightBracket = ' ';
+  if (day.isSelected) {
+    rightBracket = ']';
+  } else if (isToday) {
+    rightBracket = ')';
+  }
 
   return (
     <Box width={4}>
