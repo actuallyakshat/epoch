@@ -70,7 +70,7 @@ export function createMockTaskWithChildren(childCount: number = 2): Task {
     createMockTask({
       title: `Subtask ${i + 1}`,
       parentId: task.id,
-    })
+    }),
   );
 
   return task;
@@ -92,10 +92,12 @@ export function createMockTimelineEvent(overrides: Partial<TimelineEvent> = {}):
   };
 }
 
-export function createMockTimeline(events: TimelineEvent[] = []): { [date: string]: TimelineEvent[] } {
+export function createMockTimeline(events: TimelineEvent[] = []): {
+  [date: string]: TimelineEvent[];
+} {
   const timeline: { [date: string]: TimelineEvent[] } = {};
 
-  events.forEach(event => {
+  events.forEach((event) => {
     const dateStr = event.timestamp.toISOString().split('T')[0];
     if (!timeline[dateStr]) {
       timeline[dateStr] = [];
@@ -119,7 +121,7 @@ export function createMockDate(year: number, month: number, day: number): Date {
 }
 
 export function wait(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export const TASK_STATES: TaskState[] = ['todo', 'completed', 'delegated', 'delayed'];

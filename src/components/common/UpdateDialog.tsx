@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Box, Text, useInput } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
-import { Modal } from "./Modal";
+import React, { useState } from 'react';
+import { Box, Text, useInput } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Modal } from './Modal';
 
 interface UpdateDialogProps {
   currentVersion: string;
@@ -20,8 +20,8 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
   const [selectedOption, setSelectedOption] = useState<0 | 1 | 2>(0);
 
   const options = [
-    { label: "Dismiss", action: onDismiss },
-    { label: "Skip this version", action: () => onSkipVersion(latestVersion) },
+    { label: 'Dismiss', action: onDismiss },
+    { label: 'Skip this version', action: () => onSkipVersion(latestVersion) },
   ];
 
   useInput((input, key) => {
@@ -30,13 +30,13 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
       return;
     }
 
-    if (key.upArrow || input === "k") {
-      setSelectedOption((prev) => (prev > 0 ? (prev - 1) as 0 | 1 : prev));
+    if (key.upArrow || input === 'k') {
+      setSelectedOption((prev) => (prev > 0 ? ((prev - 1) as 0 | 1) : prev));
       return;
     }
 
-    if (key.downArrow || input === "j") {
-      setSelectedOption((prev) => (prev < options.length - 1 ? (prev + 1) as 0 | 1 | 2 : prev));
+    if (key.downArrow || input === 'j') {
+      setSelectedOption((prev) => (prev < options.length - 1 ? ((prev + 1) as 0 | 1 | 2) : prev));
       return;
     }
 
@@ -56,25 +56,21 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
         paddingY={1}
         width={50}
         // @ts-ignore - backgroundColor is a valid Ink prop
-        backgroundColor={
-          theme.colors.modalBackground || theme.colors.background
-        }
+        backgroundColor={theme.colors.modalBackground || theme.colors.background}
       >
         <Text bold color={theme.colors.calendarHeader}>
           Update Available
         </Text>
 
         <Box marginTop={1} flexDirection="column">
-          <Text color={theme.colors.foreground}>
-            A new version of Epoch is available!
-          </Text>
+          <Text color={theme.colors.foreground}>A new version of Epoch is available!</Text>
           <Box marginTop={1}>
             <Text color={theme.colors.foreground} dimColor>
-              Current:{" "}
+              Current:{' '}
             </Text>
             <Text color={theme.colors.taskDelayed}>{currentVersion}</Text>
             <Text color={theme.colors.foreground} dimColor>
-              {"  →  "}
+              {'  →  '}
             </Text>
             <Text color={theme.colors.taskCompleted} bold>
               {latestVersion}
@@ -87,9 +83,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
             To update, run:
           </Text>
           <Box marginTop={0} paddingLeft={1}>
-            <Text color={theme.colors.timelineEventStarted}>
-              npm install -g epoch-tui@latest
-            </Text>
+            <Text color={theme.colors.timelineEventStarted}>npm install -g epoch-tui@latest</Text>
           </Box>
         </Box>
 
@@ -99,14 +93,10 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
             return (
               <Box key={option.label}>
                 <Text
-                  color={
-                    isSelected
-                      ? theme.colors.focusIndicator
-                      : theme.colors.foreground
-                  }
+                  color={isSelected ? theme.colors.focusIndicator : theme.colors.foreground}
                   bold={isSelected}
                 >
-                  {isSelected ? "➜ " : "  "}
+                  {isSelected ? '➜ ' : '  '}
                   {option.label}
                 </Text>
               </Box>

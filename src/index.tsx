@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import React from "react";
-import { render } from "ink";
-import App from "./App";
+import React from 'react';
+import { render } from 'ink';
+import App from './App';
 
 console.clear();
 const app = render(<App />, { exitOnCtrlC: false });

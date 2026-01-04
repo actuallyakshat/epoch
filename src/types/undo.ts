@@ -1,11 +1,7 @@
-import type { TaskTree } from "./task";
-import type { TimelineEvent } from "./timeline";
+import type { TaskTree } from './task';
+import type { TimelineEvent } from './timeline';
 
-export type UndoActionType =
-  | "TASK_ADD"
-  | "TASK_UPDATE"
-  | "TASK_DELETE"
-  | "TIMELINE_CLEAR";
+export type UndoActionType = 'TASK_ADD' | 'TASK_UPDATE' | 'TASK_DELETE' | 'TIMELINE_CLEAR';
 
 export interface UndoAction {
   type: UndoActionType;

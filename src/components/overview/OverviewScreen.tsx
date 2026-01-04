@@ -1,12 +1,12 @@
-import React, { useMemo } from "react";
-import { Box, Text, useInput } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
-import { useApp } from "../../contexts/AppContext";
-import { getDateString, formatDate } from "../../utils/date";
-import { flattenTasks } from "../../utils/tree";
-import type { Task } from "../../types/task";
-import { startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
-import { useTerminalSize } from "../../hooks/useTerminalSize";
+import React, { useMemo } from 'react';
+import { Box, Text, useInput } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useApp } from '../../contexts/AppContext';
+import { getDateString, formatDate } from '../../utils/date';
+import { flattenTasks } from '../../utils/tree';
+import type { Task } from '../../types/task';
+import { startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
+import { useTerminalSize } from '../../hooks/useTerminalSize';
 
 export const OverviewScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -21,9 +21,7 @@ export const OverviewScreen: React.FC = () => {
     return Math.max(2, Math.floor((terminalHeight - 9) / 3));
   }, [terminalHeight]);
   const monthDates = useMemo(() => {
-    const monthStart = startOfMonth(
-      new Date(overviewMonth.year, overviewMonth.month, 1)
-    );
+    const monthStart = startOfMonth(new Date(overviewMonth.year, overviewMonth.month, 1));
     const monthEnd = endOfMonth(monthStart);
     return eachDayOfInterval({ start: monthStart, end: monthEnd });
   }, [overviewMonth]);
@@ -68,33 +66,28 @@ export const OverviewScreen: React.FC = () => {
       return;
     }
 
-    if (input === "n" || key.rightArrow) {
+    if (input === 'n' || key.rightArrow) {
       handleNextMonth();
       return;
     }
 
-    if (input === "p" || key.leftArrow) {
+    if (input === 'p' || key.leftArrow) {
       handlePrevMonth();
       return;
     }
 
-    if (input === "j" || key.downArrow) {
-      setScrollOffset((prev) =>
-        Math.min(prev + 1, Math.max(0, rows - visibleRows))
-      );
+    if (input === 'j' || key.downArrow) {
+      setScrollOffset((prev) => Math.min(prev + 1, Math.max(0, rows - visibleRows)));
       return;
     }
 
-    if (input === "k" || key.upArrow) {
+    if (input === 'k' || key.upArrow) {
       setScrollOffset((prev) => Math.max(prev - 1, 0));
       return;
     }
   });
 
-  const monthName = formatDate(
-    new Date(overviewMonth.year, overviewMonth.month, 1),
-    "MMMM yyyy"
-  );
+  const monthName = formatDate(new Date(overviewMonth.year, overviewMonth.month, 1), 'MMMM yyyy');
 
   // Calculate grid layout - 4 columns
   const columns = 4;
@@ -102,7 +95,7 @@ export const OverviewScreen: React.FC = () => {
 
   const visibleRowData = Array.from({ length: rows }).slice(
     scrollOffset,
-    scrollOffset + visibleRows
+    scrollOffset + visibleRows,
   );
 
   const canScrollUp = scrollOffset > 0;
@@ -171,7 +164,7 @@ export const OverviewScreen: React.FC = () => {
                   >
                     {/* Date header */}
                     <Text bold color={theme.colors.calendarSelected}>
-                      {formatDate(date, "do MMM")}
+                      {formatDate(date, 'do MMM')}
                     </Text>
 
                     {/* Tasks */}
@@ -184,12 +177,7 @@ export const OverviewScreen: React.FC = () => {
                         flatTasksWithDepth
                           .slice(0, 10)
                           .map(({ task, depth }) => (
-                            <TaskItem
-                              key={task.id}
-                              task={task}
-                              theme={theme}
-                              depth={depth}
-                            />
+                            <TaskItem key={task.id} task={task} theme={theme} depth={depth} />
                           ))
                       )}
                       {flatTasksWithDepth.length > 10 && (
@@ -239,13 +227,13 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth }) => {
   return (
     <Box>
       <Text color={color}>{checkbox} </Text>
-      {depth > 0 && <Text>{"  ".repeat(depth)}</Text>}
+      {depth > 0 && <Text>{'  '.repeat(depth)}</Text>}
       <Text
         color={color}
-        strikethrough={task.state === "completed"}
-        dimColor={task.state === "delayed"}
+        strikethrough={task.state === 'completed'}
+        dimColor={task.state === 'delayed'}
       >
-        {task.title.length > 35 ? task.title.slice(0, 32) + "..." : task.title}
+        {task.title.length > 35 ? task.title.slice(0, 32) + '...' : task.title}
       </Text>
     </Box>
   );
@@ -253,14 +241,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, theme, depth }) => {
 
 function getCheckbox(state: string): string {
   switch (state) {
-    case "completed":
-      return "[✓]";
-    case "delegated":
-      return "[→]";
-    case "delayed":
-      return "[‖]";
+    case 'completed':
+      return '[✓]';
+    case 'delegated':
+      return '[→]';
+    case 'delayed':
+      return '[‖]';
     default:
-      return "[ ]";
+      return '[ ]';
   }
 }
 

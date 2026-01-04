@@ -3,11 +3,16 @@ import type { CalendarView, CalendarDay, CalendarDate } from '../types/calendar'
 import type { TaskTree } from '../types/task';
 
 export class CalendarService {
-  generateMonthView(year: number, month: number, selectedDate: CalendarDate, tasks: TaskTree): CalendarView {
+  generateMonthView(
+    year: number,
+    month: number,
+    selectedDate: CalendarDate,
+    tasks: TaskTree,
+  ): CalendarView {
     const weeks = generateMonthCalendar(year, month);
 
-    const calendarDays = weeks.map(week =>
-      week.map(date => this.createCalendarDay(date, selectedDate, tasks, month))
+    const calendarDays = weeks.map((week) =>
+      week.map((date) => this.createCalendarDay(date, selectedDate, tasks, month)),
     );
 
     return {
@@ -17,7 +22,12 @@ export class CalendarService {
     };
   }
 
-  private createCalendarDay(date: Date, selectedDate: CalendarDate, tasks: TaskTree, currentMonth: number): CalendarDay {
+  private createCalendarDay(
+    date: Date,
+    selectedDate: CalendarDate,
+    tasks: TaskTree,
+    currentMonth: number,
+  ): CalendarDay {
     const dateString = getDateString(date);
     const dayTasks = tasks[dateString] || [];
 
@@ -64,8 +74,18 @@ export class CalendarService {
 
   getMonthName(month: number): string {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return months[month];
   }

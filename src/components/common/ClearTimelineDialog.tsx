@@ -1,23 +1,18 @@
-import React from "react";
-import { Box, Text, useInput } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
-import { useApp } from "../../contexts/AppContext";
-import { Modal } from "./Modal";
-import { getDateString } from "../../utils/date";
-import { format } from "date-fns";
+import React from 'react';
+import { Box, Text, useInput } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useApp } from '../../contexts/AppContext';
+import { Modal } from './Modal';
+import { getDateString } from '../../utils/date';
+import { format } from 'date-fns';
 
 export const ClearTimelineDialog: React.FC = () => {
   const { theme } = useTheme();
-  const {
-    selectedDate,
-    timeline,
-    setShowClearTimelineDialog,
-    clearTimelineForDate,
-  } = useApp();
+  const { selectedDate, timeline, setShowClearTimelineDialog, clearTimelineForDate } = useApp();
 
   const date = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
   const dateStr = getDateString(date);
-  const formattedDate = format(date, "MMMM do, yyyy");
+  const formattedDate = format(date, 'MMMM do, yyyy');
   const eventCount = (timeline[dateStr] || []).length;
 
   const handleConfirm = () => {
@@ -30,9 +25,9 @@ export const ClearTimelineDialog: React.FC = () => {
   };
 
   useInput((input, key) => {
-    if (input.toLowerCase() === "y" || key.return) {
+    if (input.toLowerCase() === 'y' || key.return) {
       handleConfirm();
-    } else if (input.toLowerCase() === "n" || key.escape) {
+    } else if (input.toLowerCase() === 'n' || key.escape) {
       handleCancel();
     }
   });
@@ -55,9 +50,7 @@ export const ClearTimelineDialog: React.FC = () => {
         </Box>
 
         <Box flexDirection="column" marginY={1}>
-          <Text color={theme.colors.foreground}>
-            You are about to clear the timeline for
-          </Text>
+          <Text color={theme.colors.foreground}>You are about to clear the timeline for</Text>
           <Box justifyContent="center" marginY={1}>
             <Text bold color={theme.colors.calendarHeader}>
               {formattedDate}
@@ -65,7 +58,7 @@ export const ClearTimelineDialog: React.FC = () => {
           </Box>
           {eventCount > 0 ? (
             <Text color={theme.colors.keyboardHint}>
-              This will remove {eventCount} event{eventCount !== 1 ? "s" : ""} from the timeline.
+              This will remove {eventCount} event{eventCount !== 1 ? 's' : ''} from the timeline.
             </Text>
           ) : (
             <Text color={theme.colors.keyboardHint} dimColor>

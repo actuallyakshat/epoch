@@ -18,7 +18,14 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "sonar": "dotenv -e .env -- sonar-scanner",
+    "sonar:export": "node scripts/export-sonar-issues.js",
+    "sonar:export:json": "node scripts/export-sonar-issues.js --format=json --output=sonar-issues.json",
+    "sonar:export:md": "node scripts/export-sonar-issues.js --format=markdown --output=sonar-issues.md",
+    "prepare": "husky"
   },
   "keywords": [
     "tui",
@@ -28,6 +35,14 @@
   ],
   "author": "Akshat Dubey <akshatdubey0808@gmail.com>",
   "license": "MIT",
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
   "dependencies": {
     "@inkjs/ui": "^2.0.0",
     "chalk": "^5.6.2",
@@ -44,7 +59,12 @@
     "@types/uuid": "^11.0.0",
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
+    "dotenv-cli": "^11.0.0",
     "happy-dom": "^20.0.11",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
+    "sonar-scanner": "^3.1.0",
     "tsup": "^8.5.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",

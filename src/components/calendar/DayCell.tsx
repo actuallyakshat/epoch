@@ -1,8 +1,8 @@
-import React from "react";
-import { Box } from "ink";
-import { Text } from "../common/ThemedText";
-import { useTheme } from "../../contexts/ThemeContext";
-import type { CalendarDay } from "../../types/calendar";
+import React from 'react';
+import { Box } from 'ink';
+import { Text } from '../common/ThemedText';
+import { useTheme } from '../../contexts/ThemeContext';
+import type { CalendarDay } from '../../types/calendar';
 
 interface DayCellProps {
   day: CalendarDay;
@@ -14,9 +14,7 @@ export const DayCell: React.FC<DayCellProps> = ({ day }) => {
   let textColor = theme.colors.calendarDayOtherMonth;
 
   if (day.isCurrentMonth) {
-    textColor = day.hasTasks
-      ? theme.colors.calendarDayWithTasks
-      : theme.colors.foreground;
+    textColor = day.hasTasks ? theme.colors.calendarDayWithTasks : theme.colors.foreground;
   }
 
   // Determine indicators - selected takes priority, then today
@@ -29,9 +27,9 @@ export const DayCell: React.FC<DayCellProps> = ({ day }) => {
     textColor = theme.colors.calendarToday;
   }
 
-  const dayNum = day.date.day.toString().padStart(2, " ");
-  const leftBracket = isSelected ? "[" : isToday ? "(" : " ";
-  const rightBracket = isSelected ? "]" : isToday ? ")" : " ";
+  const dayNum = day.date.day.toString().padStart(2, ' ');
+  const leftBracket = isSelected ? '[' : isToday ? '(' : ' ';
+  const rightBracket = isSelected ? ']' : isToday ? ')' : ' ';
 
   return (
     <Box width={4}>

@@ -5,6 +5,7 @@ This document lists all the test cases implemented for the Epoch TUI application
 ## 1. Utilities Tests (`__tests__/utils.test.ts`)
 
 ### Date Utilities
+
 - **formatDate**
   - Formats dates correctly with default format
   - Formats dates correctly with custom format
@@ -43,6 +44,7 @@ This document lists all the test cases implemented for the Epoch TUI application
   - Returns false for different years
 
 ### Tree Utilities
+
 - **findTaskById**
   - Finds task at root level
   - Finds task nested in children
@@ -83,6 +85,7 @@ This document lists all the test cases implemented for the Epoch TUI application
   - Returns 0% when no tasks completed
 
 ### Validation Utilities
+
 - **validateTaskTitle**
   - Accepts valid title
   - Rejects empty string
@@ -105,6 +108,7 @@ This document lists all the test cases implemented for the Epoch TUI application
 ## 2. Services Tests (`__tests__/services.test.ts`)
 
 ### TaskService
+
 - **createTask**
   - Creates task with correct structure, UUID, timestamps
   - Throws error for invalid title
@@ -139,6 +143,7 @@ This document lists all the test cases implemented for the Epoch TUI application
   - Returns stats for specific date
 
 ### CalendarService
+
 - **generateMonthView**
   - Generates correct month structure
   - Includes task counts for each day
@@ -156,6 +161,7 @@ This document lists all the test cases implemented for the Epoch TUI application
 ## 3. Timeline & Storage Tests (`__tests__/timeline-storage.test.ts`)
 
 ### TimelineService
+
 - **createEvent**
   - Creates event with correct structure, UUID, timestamps
   - Handles optional previousState/newState
@@ -176,6 +182,7 @@ This document lists all the test cases implemented for the Epoch TUI application
   - Formats correctly without state changes
 
 ### StorageService
+
 - **load**
   - Returns default schema for non-existent file
   - Loads and hydrates dates correctly from JSON
@@ -198,6 +205,7 @@ This document lists all the test cases implemented for the Epoch TUI application
 ## 4. Logger Tests (`__tests__/logger.test.ts`)
 
 ### Logger
+
 - **initialization**
   - Creates log file on initialization
   - Clears existing log file if it exists

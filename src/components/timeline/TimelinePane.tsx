@@ -1,25 +1,18 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Box, Text, useInput } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
-import { useApp } from "../../contexts/AppContext";
-import { Pane } from "../layout/Pane";
-import { TimelineEntry } from "./TimelineEntry";
-import { KeyboardHints } from "../common/KeyboardHints";
-import { getDateString } from "../../utils/date";
-import { useTerminalSize } from "../../hooks/useTerminalSize";
+import React, { useState, useEffect, useMemo } from 'react';
+import { Box, Text, useInput } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useApp } from '../../contexts/AppContext';
+import { Pane } from '../layout/Pane';
+import { TimelineEntry } from './TimelineEntry';
+import { KeyboardHints } from '../common/KeyboardHints';
+import { getDateString } from '../../utils/date';
+import { useTerminalSize } from '../../hooks/useTerminalSize';
 
 export const TimelinePane: React.FC = () => {
   const { theme } = useTheme();
-  const {
-    selectedDate,
-    tasks,
-    timeline,
-    setTimeline,
-    activePane,
-    isModalOpen,
-    isInputMode,
-  } = useApp();
-  const isFocused = activePane === "timeline" && !isModalOpen;
+  const { selectedDate, tasks, timeline, setTimeline, activePane, isModalOpen, isInputMode } =
+    useApp();
+  const isFocused = activePane === 'timeline' && !isModalOpen;
 
   const [scrollOffset, setScrollOffset] = useState(0);
   const { height: terminalHeight } = useTerminalSize();
@@ -31,9 +24,7 @@ export const TimelinePane: React.FC = () => {
     return Math.max(3, Math.floor(availableHeight / 4));
   }, [terminalHeight]);
 
-  const dateStr = getDateString(
-    new Date(selectedDate.year, selectedDate.month, selectedDate.day)
-  );
+  const dateStr = getDateString(new Date(selectedDate.year, selectedDate.month, selectedDate.day));
   const dayEvents = timeline[dateStr] || [];
   const dayTasks = tasks[dateStr] || [];
 
@@ -42,7 +33,7 @@ export const TimelinePane: React.FC = () => {
     const map = new Map<string, string | undefined>();
 
     const traverse = (taskList: typeof dayTasks, parentId?: string) => {
-      taskList.forEach(task => {
+      taskList.forEach((task) => {
         map.set(task.id, parentId);
         traverse(task.children, task.id);
       });
@@ -114,7 +105,7 @@ export const TimelinePane: React.FC = () => {
         const earliestA = eventsA[0]?.timestamp.getTime() || 0;
         const earliestB = eventsB[0]?.timestamp.getTime() || 0;
         return earliestA - earliestB;
-      }
+      },
     );
 
     // Flatten back to a single array
@@ -131,36 +122,33 @@ export const TimelinePane: React.FC = () => {
     (input, key) => {
       if (!isFocused) return;
 
-      if (input === "j" || key.downArrow) {
+      if (input === 'j' || key.downArrow) {
         setScrollOffset((prev) =>
-          Math.min(prev + 1, Math.max(0, sortedEvents.length - visibleRows))
+          Math.min(prev + 1, Math.max(0, sortedEvents.length - visibleRows)),
         );
       }
 
-      if (input === "k" || key.upArrow) {
+      if (input === 'k' || key.upArrow) {
         setScrollOffset((prev) => Math.max(prev - 1, 0));
       }
 
       // Page down with Ctrl+D
-      if (input === "d" && key.ctrl) {
+      if (input === 'd' && key.ctrl) {
         setScrollOffset((prev) =>
           Math.min(
             prev + Math.floor(visibleRows / 2),
-            Math.max(0, sortedEvents.length - visibleRows)
-          )
+            Math.max(0, sortedEvents.length - visibleRows),
+          ),
         );
       }
 
       // Note: Ctrl+U is reserved for global undo, removed from here
     },
-    { isActive: isFocused && !isInputMode }
+    { isActive: isFocused && !isInputMode },
   );
 
   // Get visible events based on scroll
-  const visibleEvents = sortedEvents.slice(
-    scrollOffset,
-    scrollOffset + visibleRows
-  );
+  const visibleEvents = sortedEvents.slice(scrollOffset, scrollOffset + visibleRows);
 
   // Check if scrolling is possible
   const canScrollUp = scrollOffset > 0;
@@ -195,8 +183,7 @@ export const TimelinePane: React.FC = () => {
                 const globalIndex = scrollOffset + index;
                 const isLast = globalIndex === sortedEvents.length - 1;
                 const nextEvent = sortedEvents[globalIndex + 1];
-                const hasNextSameTask =
-                  nextEvent && nextEvent.taskId === event.taskId;
+                const hasNextSameTask = nextEvent && nextEvent.taskId === event.taskId;
 
                 return (
                   <TimelineEntry
@@ -223,8 +210,8 @@ export const TimelinePane: React.FC = () => {
         {/* Keyboard hints */}
         <KeyboardHints
           hints={[
-            { key: "j/k", description: "scroll" },
-            { key: "Shift+C", description: "clear" },
+            { key: 'j/k', description: 'scroll' },
+            { key: 'Shift+C', description: 'clear' },
           ]}
         />
       </Box>

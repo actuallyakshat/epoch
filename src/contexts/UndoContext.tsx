@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-import type { UndoAction, UndoActionType } from "../types/undo";
-import type { TaskTree } from "../types/task";
-import type { TimelineEvent } from "../types/timeline";
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import type { UndoAction, UndoActionType } from '../types/undo';
+import type { TaskTree } from '../types/task';
+import type { TimelineEvent } from '../types/timeline';
 
 interface UndoContextType {
   pushUndoAction: (
     type: UndoActionType,
     tasks: TaskTree,
-    timeline: { [date: string]: TimelineEvent[] }
+    timeline: { [date: string]: TimelineEvent[] },
   ) => void;
   undo: () => UndoAction | null;
   canUndo: boolean;
@@ -24,7 +24,7 @@ const MAX_UNDO_STACK_SIZE = 50;
 
 // Deep clone with Date object preservation
 function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== "object") {
+  if (obj === null || typeof obj !== 'object') {
     return obj;
   }
 
@@ -49,11 +49,7 @@ export const UndoProvider: React.FC<UndoProviderProps> = ({ children }) => {
   const [undoStack, setUndoStack] = useState<UndoAction[]>([]);
 
   const pushUndoAction = useCallback(
-    (
-      type: UndoActionType,
-      tasks: TaskTree,
-      timeline: { [date: string]: TimelineEvent[] }
-    ) => {
+    (type: UndoActionType, tasks: TaskTree, timeline: { [date: string]: TimelineEvent[] }) => {
       const action: UndoAction = {
         type,
         timestamp: new Date(),
@@ -69,7 +65,7 @@ export const UndoProvider: React.FC<UndoProviderProps> = ({ children }) => {
         return newStack;
       });
     },
-    []
+    [],
   );
 
   const undo = useCallback((): UndoAction | null => {
@@ -103,7 +99,7 @@ export const UndoProvider: React.FC<UndoProviderProps> = ({ children }) => {
 export const useUndo = (): UndoContextType => {
   const context = useContext(UndoContext);
   if (!context) {
-    throw new Error("useUndo must be used within UndoProvider");
+    throw new Error('useUndo must be used within UndoProvider');
   }
   return context;
 };

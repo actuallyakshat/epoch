@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Text } from "ink";
+import React from 'react';
+import { Box, Text } from 'ink';
 
 interface BorderedBoxProps {
   children: React.ReactNode;
@@ -28,23 +28,19 @@ export const BorderedBox: React.FC<BorderedBoxProps> = ({
   titleColor,
 }) => {
   // Double border characters
-  const topLeft = "╔";
-  const topRight = "╗";
-  const bottomLeft = "╚";
-  const bottomRight = "╝";
-  const horizontal = "═";
-  const vertical = "║";
+  const topLeft = '╔';
+  const topRight = '╗';
+  const bottomLeft = '╚';
+  const bottomRight = '╝';
+  const horizontal = '═';
+  const vertical = '║';
 
   // Calculate inner width (content area)
   // If width is specified, calculate inner width; otherwise use auto
   const innerWidth = width ? width - 2 : undefined; // -2 for left and right borders
 
   // Create horizontal border line
-  const createHorizontalBorder = (
-    left: string,
-    right: string,
-    fill: string
-  ) => {
+  const createHorizontalBorder = (left: string, right: string, fill: string) => {
     if (innerWidth) {
       const fillCount = innerWidth;
       return (

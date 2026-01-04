@@ -1,5 +1,5 @@
-export const CURRENT_VERSION = "0.1.8";
-export const PACKAGE_NAME = "epoch-tui";
+export const CURRENT_VERSION = '0.1.8';
+export const PACKAGE_NAME = 'epoch-tui';
 
 export interface UpdateInfo {
   hasUpdate: boolean;
@@ -9,9 +9,7 @@ export interface UpdateInfo {
 
 export async function checkForUpdate(): Promise<UpdateInfo> {
   try {
-    const res = await fetch(
-      `https://registry.npmjs.org/${PACKAGE_NAME}/latest`
-    );
+    const res = await fetch(`https://registry.npmjs.org/${PACKAGE_NAME}/latest`);
     const data = await res.json();
     const latestVersion = data.version;
 

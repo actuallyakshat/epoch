@@ -141,27 +141,21 @@ describe('Date Utilities', () => {
     it('generates correct week structure for a month with 31 days', () => {
       const weeks = generateMonthCalendar(2024, 0);
       const flatDates = weeks.flat();
-      const januaryDates = flatDates.filter(
-        (d) => d.getFullYear() === 2024 && d.getMonth() === 0
-      );
+      const januaryDates = flatDates.filter((d) => d.getFullYear() === 2024 && d.getMonth() === 0);
       expect(januaryDates).toHaveLength(31);
     });
 
     it('generates correct week structure for February in leap year', () => {
       const weeks = generateMonthCalendar(2024, 1);
       const flatDates = weeks.flat();
-      const februaryDates = flatDates.filter(
-        (d) => d.getFullYear() === 2024 && d.getMonth() === 1
-      );
+      const februaryDates = flatDates.filter((d) => d.getFullYear() === 2024 && d.getMonth() === 1);
       expect(februaryDates).toHaveLength(29);
     });
 
     it('generates correct week structure for February in non-leap year', () => {
       const weeks = generateMonthCalendar(2023, 1);
       const flatDates = weeks.flat();
-      const februaryDates = flatDates.filter(
-        (d) => d.getFullYear() === 2023 && d.getMonth() === 1
-      );
+      const februaryDates = flatDates.filter((d) => d.getFullYear() === 2023 && d.getMonth() === 1);
       expect(februaryDates).toHaveLength(28);
     });
 
@@ -170,12 +164,8 @@ describe('Date Utilities', () => {
       const firstWeek = weeks[0];
       const lastWeek = weeks[weeks.length - 1];
 
-      const firstWeekContainsJanuaryDates = firstWeek.some(
-        (d) => d.getMonth() === 0
-      );
-      const lastWeekContainsJanuaryDates = lastWeek.some(
-        (d) => d.getMonth() === 0
-      );
+      const firstWeekContainsJanuaryDates = firstWeek.some((d) => d.getMonth() === 0);
+      const lastWeekContainsJanuaryDates = lastWeek.some((d) => d.getMonth() === 0);
 
       expect(firstWeekContainsJanuaryDates).toBe(true);
       expect(lastWeekContainsJanuaryDates).toBe(true);
@@ -183,7 +173,7 @@ describe('Date Utilities', () => {
   });
 
   describe('isToday', () => {
-    it('correctly identifies today\'s date', () => {
+    it("correctly identifies today's date", () => {
       const today = new Date();
       expect(isToday(today)).toBe(true);
     });
@@ -504,13 +494,7 @@ describe('Tree Utilities', () => {
 
     it('includes all tasks in correct order', () => {
       const flat = flattenTasks(mockNestedTasks);
-      expect(flat.map((t) => t.id)).toEqual([
-        '1',
-        '1-1',
-        '1-2',
-        '1-2-1',
-        '2',
-      ]);
+      expect(flat.map((t) => t.id)).toEqual(['1', '1-1', '1-2', '1-2-1', '2']);
     });
 
     it('handles empty task list', () => {
@@ -555,11 +539,7 @@ describe('Tree Utilities', () => {
     });
 
     it('rounds percentage correctly', () => {
-      const threeTasks = [
-        { ...mockTasks[0] },
-        { ...mockTasks[1] },
-        { ...mockTasks[0] },
-      ];
+      const threeTasks = [{ ...mockTasks[0] }, { ...mockTasks[1] }, { ...mockTasks[0] }];
       const stats = getTaskStats(threeTasks);
       expect(stats.percentage).toBe(33);
     });

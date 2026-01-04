@@ -8,13 +8,8 @@ export default defineConfig({
     setupFiles: ['./__tests__/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        '__tests__/',
-        'dist/',
-        '*.config.ts',
-      ],
+      reporter: ['text', 'json', 'html', 'lcov'],
+      exclude: ['node_modules/', '__tests__/', 'dist/', '*.config.ts'],
     },
     globals: true,
     testTimeout: 10000,

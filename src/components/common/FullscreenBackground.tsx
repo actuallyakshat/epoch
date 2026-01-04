@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, useStdout } from "ink";
+import React from 'react';
+import { Box, useStdout } from 'ink';
 
 interface FullscreenBackgroundProps {
   children: React.ReactNode;
@@ -19,12 +19,7 @@ export const FullscreenBackground: React.FC<FullscreenBackgroundProps> = ({
   const height = stdout?.rows || 30;
 
   return (
-    <Box
-      flexDirection="column"
-      width={width}
-      height={height}
-      backgroundColor={backgroundColor}
-    >
+    <Box flexDirection="column" width={width} height={height} backgroundColor={backgroundColor}>
       {children}
     </Box>
   );

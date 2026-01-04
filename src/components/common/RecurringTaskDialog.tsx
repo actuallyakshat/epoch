@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Box, Text, useInput } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
-import { Modal } from "./Modal";
-import type { RecurrencePattern, RecurrenceFrequency } from "../../types/task";
-import { logger } from "../../utils/logger";
+import React, { useState } from 'react';
+import { Box, Text, useInput } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Modal } from './Modal';
+import type { RecurrencePattern, RecurrenceFrequency } from '../../types/task';
+import { logger } from '../../utils/logger';
 
 interface RecurringTaskDialogProps {
   onConfirm: (pattern: RecurrencePattern) => void;
@@ -17,11 +17,11 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
   const { theme } = useTheme();
 
   const frequencies: { value: RecurrenceFrequency; label: string }[] = [
-    { value: "daily", label: "Daily" },
-    { value: "weekdays", label: "Weekdays (Mon-Fri)" },
-    { value: "weekly", label: "Weekly" },
-    { value: "monthly", label: "Monthly" },
-    { value: "yearly", label: "Yearly" },
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekdays', label: 'Weekdays (Mon-Fri)' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' },
   ];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -30,23 +30,19 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
     (input, key) => {
       // Escape cancels
       if (key.escape) {
-        logger.log("Cancelling recurring task dialog");
+        logger.log('Cancelling recurring task dialog');
         onCancel();
         return;
       }
 
       // Navigate frequencies
-      if (key.upArrow || input === "k") {
-        setSelectedIndex((prev) =>
-          prev > 0 ? prev - 1 : frequencies.length - 1
-        );
+      if (key.upArrow || input === 'k') {
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : frequencies.length - 1));
         return;
       }
 
-      if (key.downArrow || input === "j") {
-        setSelectedIndex((prev) =>
-          prev < frequencies.length - 1 ? prev + 1 : 0
-        );
+      if (key.downArrow || input === 'j') {
+        setSelectedIndex((prev) => (prev < frequencies.length - 1 ? prev + 1 : 0));
         return;
       }
 
@@ -57,12 +53,12 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
           frequency: selectedFrequency,
         };
 
-        logger.log("Setting task recurrence", { frequency: selectedFrequency });
+        logger.log('Setting task recurrence', { frequency: selectedFrequency });
         onConfirm(pattern);
         return;
       }
     },
-    { isActive: true }
+    { isActive: true },
   );
 
   return (
@@ -75,9 +71,7 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
         paddingY={1}
         width={44}
         // @ts-ignore - backgroundColor is a valid Ink prop
-        backgroundColor={
-          theme.colors.modalBackground || theme.colors.background
-        }
+        backgroundColor={theme.colors.modalBackground || theme.colors.background}
       >
         <Text bold color={theme.colors.calendarHeader} underline>
           Make Task Recurring
@@ -89,14 +83,10 @@ export const RecurringTaskDialog: React.FC<RecurringTaskDialogProps> = ({
             return (
               <Box key={freq.value} marginY={0}>
                 <Text
-                  color={
-                    isSelected
-                      ? theme.colors.focusIndicator
-                      : theme.colors.foreground
-                  }
+                  color={isSelected ? theme.colors.focusIndicator : theme.colors.foreground}
                   bold={isSelected}
                 >
-                  {isSelected ? "➜ " : "  "}
+                  {isSelected ? '➜ ' : '  '}
                   {freq.label}
                 </Text>
               </Box>

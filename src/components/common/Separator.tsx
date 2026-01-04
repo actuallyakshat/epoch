@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Text } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
+import React from 'react';
+import { Box, Text } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SeparatorProps {
   vertical?: boolean;
@@ -8,11 +8,7 @@ interface SeparatorProps {
   width?: number;
 }
 
-export const Separator: React.FC<SeparatorProps> = ({
-  vertical = true,
-  height,
-  width = 1,
-}) => {
+export const Separator: React.FC<SeparatorProps> = ({ vertical = true, height, width = 1 }) => {
   const { theme } = useTheme();
 
   if (vertical) {

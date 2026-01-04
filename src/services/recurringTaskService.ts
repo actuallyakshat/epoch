@@ -1,6 +1,15 @@
 import type { Task, RecurrencePattern, RecurrenceFrequency } from '../types/task';
 import { getDateString, parseDateString } from '../utils/date';
-import { addDays, addWeeks, addMonths, addYears, isWeekend, isBefore, isAfter, isSameDay } from 'date-fns';
+import {
+  addDays,
+  addWeeks,
+  addMonths,
+  addYears,
+  isWeekend,
+  isBefore,
+  isAfter,
+  isSameDay,
+} from 'date-fns';
 import { v4 as uuid } from 'uuid';
 import { logger } from '../utils/logger';
 
@@ -11,11 +20,7 @@ export class RecurringTaskService {
   /**
    * Check if a date matches the recurrence pattern
    */
-  shouldGenerateOnDate(
-    pattern: RecurrencePattern,
-    baseDate: Date,
-    targetDate: Date
-  ): boolean {
+  shouldGenerateOnDate(pattern: RecurrencePattern, baseDate: Date, targetDate: Date): boolean {
     const targetDateStr = getDateString(targetDate);
 
     // Check excluded dates
@@ -47,7 +52,7 @@ export class RecurringTaskService {
 
       case 'weekly': {
         const daysDiff = Math.floor(
-          (targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24)
+          (targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24),
         );
         return daysDiff % 7 === 0;
       }
@@ -73,7 +78,7 @@ export class RecurringTaskService {
         if (pattern.interval) {
           // Custom interval in days
           const daysDiff = Math.floor(
-            (targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24)
+            (targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24),
           );
           return daysDiff % pattern.interval === 0;
         }
@@ -89,7 +94,7 @@ export class RecurringTaskService {
    * Clone children tasks recursively for recurring instances
    */
   private cloneChildren(children: Task[], targetDateStr: string): Task[] {
-    return children.map(child => ({
+    return children.map((child) => ({
       ...child,
       id: uuid(),
       date: targetDateStr,
@@ -106,20 +111,17 @@ export class RecurringTaskService {
   /**
    * Generate recurring task instance for a specific date
    */
-  generateRecurringInstance(
-    parentTask: Task,
-    targetDate: Date
-  ): Task {
+  generateRecurringInstance(parentTask: Task, targetDate: Date): Task {
     const targetDateStr = getDateString(targetDate);
     const parentDateStr = parentTask.date;
 
-    logger.log("Generating recurring instance", {
+    logger.log('Generating recurring instance', {
       parentTaskId: parentTask.id,
       parentTaskTitle: parentTask.title,
       parentDate: parentDateStr,
       targetDate: targetDateStr,
       recurrence: parentTask.recurrence,
-      childrenCount: parentTask.children.length
+      childrenCount: parentTask.children.length,
     });
 
     return {
@@ -141,10 +143,7 @@ export class RecurringTaskService {
   /**
    * Get the next occurrence date for a recurring task
    */
-  getNextOccurrence(
-    pattern: RecurrencePattern,
-    baseDate: Date
-  ): Date | null {
+  getNextOccurrence(pattern: RecurrencePattern, baseDate: Date): Date | null {
     let nextDate = new Date(baseDate);
 
     switch (pattern.frequency) {
@@ -221,7 +220,7 @@ export class RecurringTaskService {
       case 'custom': {
         if (pattern.daysOfWeek && pattern.daysOfWeek.length > 0) {
           const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-          const days = pattern.daysOfWeek.map(d => dayNames[d]).join(', ');
+          const days = pattern.daysOfWeek.map((d) => dayNames[d]).join(', ');
           return `Custom (${days})`;
         }
         if (pattern.interval) {
@@ -245,12 +244,12 @@ export class RecurringTaskService {
     const baseDate = parseDateString(task.date);
     const shouldGenerate = this.shouldGenerateOnDate(task.recurrence, baseDate, targetDate);
 
-    logger.log("Checking if task should generate for date", {
+    logger.log('Checking if task should generate for date', {
       taskId: task.id,
       taskTitle: task.title,
       targetDate: getDateString(targetDate),
       recurrence: task.recurrence,
-      shouldGenerate
+      shouldGenerate,
     });
 
     return shouldGenerate;

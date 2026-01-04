@@ -1,9 +1,9 @@
-import React from "react";
-import { Box } from "ink";
-import { Text } from "../common/ThemedText";
-import { useTheme } from "../../contexts/ThemeContext";
-import { DayCell } from "./DayCell";
-import type { CalendarView } from "../../types/calendar";
+import React from 'react';
+import { Box } from 'ink';
+import { Text } from '../common/ThemedText';
+import { useTheme } from '../../contexts/ThemeContext';
+import { DayCell } from './DayCell';
+import type { CalendarView } from '../../types/calendar';
 
 interface MonthViewProps {
   calendarView: CalendarView;
@@ -11,7 +11,7 @@ interface MonthViewProps {
 
 export const MonthView: React.FC<MonthViewProps> = ({ calendarView }) => {
   const { theme } = useTheme();
-  const dayHeaders = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+  const dayHeaders = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   return (
     <Box flexDirection="column">

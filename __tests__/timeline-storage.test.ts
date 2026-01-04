@@ -36,7 +36,7 @@ describe('TimelineService', () => {
         'task-1',
         'My Task',
         TimelineEventType.CREATED,
-        mockDate
+        mockDate,
       );
 
       expect(event).toMatchObject({
@@ -58,7 +58,7 @@ describe('TimelineService', () => {
         TimelineEventType.UPDATED,
         mockDate,
         'todo',
-        'completed'
+        'completed',
       );
 
       expect(event.previousState).toBe('todo');
@@ -73,8 +73,8 @@ describe('TimelineService', () => {
         taskId: 't1',
         taskTitle: 'Task 1',
         type: TimelineEventType.CREATED,
-        timestamp: mockDate
-      }
+        timestamp: mockDate,
+      },
     ];
     const timeline = { '2024-01-01': events };
 
@@ -96,16 +96,16 @@ describe('TimelineService', () => {
         taskId: 't1',
         taskTitle: 'Existing',
         type: TimelineEventType.CREATED,
-        timestamp: mockDate
+        timestamp: mockDate,
       };
       const timeline = { '2024-01-01': [existingEvent] };
-      
+
       const newEvent = {
         id: '2',
         taskId: 't2',
         taskTitle: 'New',
         type: TimelineEventType.STARTED,
-        timestamp: new Date('2024-01-01T11:00:00.000Z')
+        timestamp: new Date('2024-01-01T11:00:00.000Z'),
       };
 
       const result = timelineService.addEvent(timeline, newEvent);
@@ -120,7 +120,7 @@ describe('TimelineService', () => {
         taskId: 't1',
         taskTitle: 'Task',
         type: TimelineEventType.CREATED,
-        timestamp: mockDate
+        timestamp: mockDate,
       };
 
       const result = timelineService.addEvent(timeline, newEvent);
@@ -133,16 +133,34 @@ describe('TimelineService', () => {
     it('removes all events for a task across all dates', () => {
       const timeline = {
         '2024-01-01': [
-          { id: '1', taskId: 't1', taskTitle: 'Task 1', type: TimelineEventType.CREATED, timestamp: mockDate },
-          { id: '2', taskId: 't2', taskTitle: 'Task 2', type: TimelineEventType.CREATED, timestamp: mockDate }
+          {
+            id: '1',
+            taskId: 't1',
+            taskTitle: 'Task 1',
+            type: TimelineEventType.CREATED,
+            timestamp: mockDate,
+          },
+          {
+            id: '2',
+            taskId: 't2',
+            taskTitle: 'Task 2',
+            type: TimelineEventType.CREATED,
+            timestamp: mockDate,
+          },
         ],
         '2024-01-02': [
-          { id: '3', taskId: 't1', taskTitle: 'Task 1', type: TimelineEventType.COMPLETED, timestamp: mockDate }
-        ]
+          {
+            id: '3',
+            taskId: 't1',
+            taskTitle: 'Task 1',
+            type: TimelineEventType.COMPLETED,
+            timestamp: mockDate,
+          },
+        ],
       };
 
       const result = timelineService.removeEventsByTaskId(timeline, 't1');
-      
+
       expect(result['2024-01-01']).toHaveLength(1);
       expect(result['2024-01-01'][0].taskId).toBe('t2');
       expect(result['2024-01-02']).toBeUndefined();
@@ -151,8 +169,14 @@ describe('TimelineService', () => {
     it('preserves events for other tasks', () => {
       const timeline = {
         '2024-01-01': [
-          { id: '1', taskId: 't2', taskTitle: 'Task 2', type: TimelineEventType.CREATED, timestamp: mockDate }
-        ]
+          {
+            id: '1',
+            taskId: 't2',
+            taskTitle: 'Task 2',
+            type: TimelineEventType.CREATED,
+            timestamp: mockDate,
+          },
+        ],
       };
 
       const result = timelineService.removeEventsByTaskId(timeline, 't1');
@@ -166,13 +190,29 @@ describe('TimelineService', () => {
       const t2 = new Date('2024-01-01T11:00:00.000Z');
       const timeline = {
         '2024-01-01': [
-          { id: '1', taskId: 't1', taskTitle: 'Task 1', type: TimelineEventType.STARTED, timestamp: t1 },
-          { id: '2', taskId: 't1', taskTitle: 'Task 1', type: TimelineEventType.STARTED, timestamp: t2 }
-        ]
+          {
+            id: '1',
+            taskId: 't1',
+            taskTitle: 'Task 1',
+            type: TimelineEventType.STARTED,
+            timestamp: t1,
+          },
+          {
+            id: '2',
+            taskId: 't1',
+            taskTitle: 'Task 1',
+            type: TimelineEventType.STARTED,
+            timestamp: t2,
+          },
+        ],
       };
 
-      const result = timelineService.removeLastEventByType(timeline, 't1', TimelineEventType.STARTED);
-      
+      const result = timelineService.removeLastEventByType(
+        timeline,
+        't1',
+        TimelineEventType.STARTED,
+      );
+
       expect(result['2024-01-01']).toHaveLength(1);
       expect(result['2024-01-01'][0].timestamp).toBe(t1);
     });
@@ -181,21 +221,31 @@ describe('TimelineService', () => {
       const t1 = new Date('2024-01-01');
       const t2 = new Date('2024-01-02');
       const t3 = new Date('2024-01-03');
-      
+
       const timeline = {
-        '2024-01-03': [{ id: '3', taskId: 't1', taskTitle: 'T', type: TimelineEventType.CREATED, timestamp: t3 }],
-        '2024-01-02': [{ id: '2', taskId: 't1', taskTitle: 'T', type: TimelineEventType.STARTED, timestamp: t2 }],
-        '2024-01-01': [{ id: '1', taskId: 't1', taskTitle: 'T', type: TimelineEventType.STARTED, timestamp: t1 }]
+        '2024-01-03': [
+          { id: '3', taskId: 't1', taskTitle: 'T', type: TimelineEventType.CREATED, timestamp: t3 },
+        ],
+        '2024-01-02': [
+          { id: '2', taskId: 't1', taskTitle: 'T', type: TimelineEventType.STARTED, timestamp: t2 },
+        ],
+        '2024-01-01': [
+          { id: '1', taskId: 't1', taskTitle: 'T', type: TimelineEventType.STARTED, timestamp: t1 },
+        ],
       };
 
-      const result = timelineService.removeLastEventByType(timeline, 't1', TimelineEventType.STARTED);
-      
+      const result = timelineService.removeLastEventByType(
+        timeline,
+        't1',
+        TimelineEventType.STARTED,
+      );
+
       // Latest date (03): No match, unchanged
       expect(result['2024-01-03']).toHaveLength(1);
-      
+
       // Middle date (02): Match found and removed
       expect(result['2024-01-02']).toBeUndefined(); // Empty array is not added to result in removeLastEventByType
-      
+
       // Earliest date (01): Match exists but already removed one, so unchanged
       expect(result['2024-01-01']).toHaveLength(1);
     });
@@ -210,16 +260,16 @@ describe('TimelineService', () => {
         type: TimelineEventType.UPDATED,
         timestamp: new Date('2024-01-01T13:30:00.000Z'),
         previousState: 'todo' as const,
-        newState: 'completed' as const
+        newState: 'completed' as const,
       };
-      
+
       const desc = timelineService.formatEventDescription(event);
       const expectedTime = event.timestamp.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
       });
-      
+
       expect(desc).toContain(expectedTime);
       expect(desc).toContain('Updated: My Task');
       expect(desc).toContain('(todo -> completed)');
@@ -231,16 +281,16 @@ describe('TimelineService', () => {
         taskId: 't1',
         taskTitle: 'My Task',
         type: TimelineEventType.CREATED,
-        timestamp: new Date('2024-01-01T09:00:00.000Z')
+        timestamp: new Date('2024-01-01T09:00:00.000Z'),
       };
-      
+
       const desc = timelineService.formatEventDescription(event);
       const expectedTime = event.timestamp.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
       });
-      
+
       expect(desc).toContain(expectedTime);
       expect(desc).toContain('Created: My Task');
       expect(desc).not.toContain('->');
@@ -265,12 +315,12 @@ describe('StorageService', () => {
       (fs.readFile as any).mockRejectedValue(error);
 
       const data = await storageService.load();
-      
+
       expect(data).toMatchObject({
         version: '1.0.0',
         tasks: {},
         timeline: {},
-        settings: expect.any(Object)
+        settings: expect.any(Object),
       });
     });
 
@@ -278,49 +328,53 @@ describe('StorageService', () => {
       const mockJson = JSON.stringify({
         version: '1.0.0',
         tasks: {
-          '2024-01-01': [{
-            id: '1',
-            title: 'Task',
-            state: 'todo',
-            createdAt: '2024-01-01T10:00:00.000Z',
-            updatedAt: '2024-01-01T10:00:00.000Z',
-            children: []
-          }]
+          '2024-01-01': [
+            {
+              id: '1',
+              title: 'Task',
+              state: 'todo',
+              createdAt: '2024-01-01T10:00:00.000Z',
+              updatedAt: '2024-01-01T10:00:00.000Z',
+              children: [],
+            },
+          ],
         },
         timeline: {
-          '2024-01-01': [{
-            id: 'e1',
-            taskId: '1',
-            taskTitle: 'Task',
-            type: 'created',
-            timestamp: '2024-01-01T10:00:00.000Z'
-          }]
+          '2024-01-01': [
+            {
+              id: 'e1',
+              taskId: '1',
+              taskTitle: 'Task',
+              type: 'created',
+              timestamp: '2024-01-01T10:00:00.000Z',
+            },
+          ],
         },
-        settings: { theme: 'dark' }
+        settings: { theme: 'dark' },
       });
 
       (fs.readFile as any).mockResolvedValue(mockJson);
 
       const data = await storageService.load();
-      
+
       expect(data.tasks['2024-01-01'][0].createdAt).toBeInstanceOf(Date);
       expect(data.timeline['2024-01-01'][0].timestamp).toBeInstanceOf(Date);
     });
 
     it('handles corrupted JSON gracefully', async () => {
       (fs.readFile as any).mockResolvedValue('invalid json');
-      
+
       // Spy on console.error to suppress output during test
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       const data = await storageService.load();
-      
+
       expect(data).toMatchObject({
         version: '1.0.0',
         tasks: {},
-        timeline: {}
+        timeline: {},
       });
-      
+
       consoleSpy.mockRestore();
     });
   });
@@ -336,12 +390,12 @@ describe('StorageService', () => {
           defaultStartTime: 'now' as const,
           dateFormat: 'MMMM do, yyyy',
           timeFormat: '12h' as const,
-          autoMoveUnfinishedTasks: true
-        }
+          autoMoveUnfinishedTasks: true,
+        },
       };
 
       await storageService.save(data);
-      
+
       expect(fs.mkdir).toHaveBeenCalledWith(path.dirname(mockPath), { recursive: true });
     });
 
@@ -350,39 +404,43 @@ describe('StorageService', () => {
       const data = {
         version: '1.0.0',
         tasks: {
-          '2024-01-01': [{
-            id: '1',
-            title: 'Task',
-            state: 'todo' as const,
-            createdAt: date,
-            updatedAt: date,
-            children: [],
-            date: '2024-01-01'
-          }]
+          '2024-01-01': [
+            {
+              id: '1',
+              title: 'Task',
+              state: 'todo' as const,
+              createdAt: date,
+              updatedAt: date,
+              children: [],
+              date: '2024-01-01',
+            },
+          ],
         },
         timeline: {
-          '2024-01-01': [{
-            id: 'e1',
-            taskId: '1',
-            taskTitle: 'Task',
-            type: TimelineEventType.CREATED,
-            timestamp: date
-          }]
+          '2024-01-01': [
+            {
+              id: 'e1',
+              taskId: '1',
+              taskTitle: 'Task',
+              type: TimelineEventType.CREATED,
+              timestamp: date,
+            },
+          ],
         },
         settings: {
           theme: 'dark',
           defaultStartTime: 'now' as const,
           dateFormat: 'MMMM do, yyyy',
           timeFormat: '12h' as const,
-          autoMoveUnfinishedTasks: true
-        }
+          autoMoveUnfinishedTasks: true,
+        },
       };
 
       await storageService.save(data);
-      
+
       const writeCall = (fs.writeFile as any).mock.calls[0];
       const writtenContent = JSON.parse(writeCall[1]);
-      
+
       expect(writtenContent.tasks['2024-01-01'][0].createdAt).toBe(date.toISOString());
       expect(writtenContent.timeline['2024-01-01'][0].timestamp).toBe(date.toISOString());
     });
@@ -391,10 +449,10 @@ describe('StorageService', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const error = new Error('Write failed');
       (fs.writeFile as any).mockRejectedValue(error);
-      
+
       const data = { version: '1.0.0', tasks: {}, timeline: {}, settings: {} } as any;
       await storageService.save(data);
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to save storage:', error);
       consoleSpy.mockRestore();
     });
@@ -404,14 +462,14 @@ describe('StorageService', () => {
     it('creates backup file with timestamp', async () => {
       const mockContent = '{"version":"1.0.0"}';
       (fs.readFile as any).mockResolvedValue(mockContent);
-      
+
       await storageService.backup();
-      
+
       expect(fs.readFile).toHaveBeenCalledWith(mockPath, 'utf-8');
       expect(fs.writeFile).toHaveBeenCalledWith(
         expect.stringMatching(/\.backup-\d{4}-\d{2}-\d{2}T/),
         mockContent,
-        'utf-8'
+        'utf-8',
       );
     });
 
@@ -419,9 +477,9 @@ describe('StorageService', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const error = new Error('Backup failed');
       (fs.readFile as any).mockRejectedValue(error);
-      
+
       await storageService.backup();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to backup storage:', error);
       consoleSpy.mockRestore();
     });
@@ -434,23 +492,27 @@ describe('StorageService', () => {
       const originalData = {
         version: '1.0.0',
         tasks: {
-          '2024-01-01': [{
-            id: '1',
-            title: 'Parent',
-            state: 'todo' as const,
-            createdAt: date,
-            updatedAt: date,
-            date: '2024-01-01',
-            children: [{
-              id: '2',
-              title: 'Child',
+          '2024-01-01': [
+            {
+              id: '1',
+              title: 'Parent',
               state: 'todo' as const,
               createdAt: date,
               updatedAt: date,
               date: '2024-01-01',
-              children: []
-            }]
-          }]
+              children: [
+                {
+                  id: '2',
+                  title: 'Child',
+                  state: 'todo' as const,
+                  createdAt: date,
+                  updatedAt: date,
+                  date: '2024-01-01',
+                  children: [],
+                },
+              ],
+            },
+          ],
         },
         timeline: {},
         settings: {
@@ -458,8 +520,8 @@ describe('StorageService', () => {
           defaultStartTime: 'now' as const,
           dateFormat: 'MMMM do, yyyy',
           timeFormat: '12h' as const,
-          autoMoveUnfinishedTasks: true
-        }
+          autoMoveUnfinishedTasks: true,
+        },
       };
 
       // Mock implementation of writeFile and readFile to simulate storage
@@ -489,7 +551,7 @@ describe('StorageService', () => {
     it('returns correct path for current platform', () => {
       // Since we mocked the path in constructor, it should return that
       expect(storageService.getStoragePath()).toBe(mockPath);
-      
+
       // Test default path logic by instantiating without path
       // We need to check against process.platform but it's constant during run.
       // We can just verify it returns a non-empty string that looks like a path.
@@ -501,11 +563,11 @@ describe('StorageService', () => {
     it('returns correct path for Linux', () => {
       const originalPlatform = process.platform;
       Object.defineProperty(process, 'platform', { value: 'linux' });
-      
+
       const home = process.env.HOME || homedir();
       const service = new StorageService();
       expect(service.getStoragePath()).toBe(`${home}/.config/epoch/data.json`);
-      
+
       Object.defineProperty(process, 'platform', { value: originalPlatform });
     });
 
@@ -513,10 +575,10 @@ describe('StorageService', () => {
       const originalPlatform = process.platform;
       Object.defineProperty(process, 'platform', { value: 'win32' });
       process.env.APPDATA = 'C:\\Users\\Test\\AppData\\Roaming';
-      
+
       const service = new StorageService();
       expect(service.getStoragePath()).toBe(`C:\\Users\\Test\\AppData\\Roaming\\epoch\\data.json`);
-      
+
       Object.defineProperty(process, 'platform', { value: originalPlatform });
       delete process.env.APPDATA;
     });
@@ -524,22 +586,22 @@ describe('StorageService', () => {
     it('returns correct path for macOS', () => {
       const originalPlatform = process.platform;
       Object.defineProperty(process, 'platform', { value: 'darwin' });
-      
+
       const home = process.env.HOME || homedir();
       const service = new StorageService();
       expect(service.getStoragePath()).toBe(`${home}/Library/Application Support/epoch/data.json`);
-      
+
       Object.defineProperty(process, 'platform', { value: originalPlatform });
     });
 
     it('returns default path for unknown platform', () => {
       const originalPlatform = process.platform;
       Object.defineProperty(process, 'platform', { value: 'sunos' });
-      
+
       const home = process.env.HOME || homedir();
       const service = new StorageService();
       expect(service.getStoragePath()).toBe(`${home}/.epoch/data.json`);
-      
+
       Object.defineProperty(process, 'platform', { value: originalPlatform });
     });
   });

@@ -11,7 +11,7 @@ export class TaskMoveService {
    */
   getUnfinishedTasks(tasks: Task[]): Task[] {
     const unfinished: Task[] = [];
-    
+
     const traverse = (taskList: Task[]) => {
       for (const task of taskList) {
         if (task.state === 'todo') {
@@ -22,7 +22,7 @@ export class TaskMoveService {
         }
       }
     };
-    
+
     traverse(tasks);
     return unfinished;
   }
@@ -30,11 +30,7 @@ export class TaskMoveService {
   /**
    * Move unfinished tasks from a previous date to a new date
    */
-  moveUnfinishedTasksToDate(
-    tasks: TaskTree,
-    fromDate: string,
-    toDate: string
-  ): TaskTree {
+  moveUnfinishedTasksToDate(tasks: TaskTree, fromDate: string, toDate: string): TaskTree {
     const sourceTasks = tasks[fromDate] || [];
     const unfinishedTasks = this.getUnfinishedTasks(sourceTasks);
 
@@ -44,12 +40,12 @@ export class TaskMoveService {
     }
 
     logger.log(`Moving ${unfinishedTasks.length} tasks from ${fromDate} to ${toDate}`, {
-      taskIds: unfinishedTasks.map(t => t.id),
-      taskTitles: unfinishedTasks.map(t => t.title)
+      taskIds: unfinishedTasks.map((t) => t.id),
+      taskTitles: unfinishedTasks.map((t) => t.title),
     });
 
     // Create new task instances with updated date and reset times
-    const movedTasks = unfinishedTasks.map(task => ({
+    const movedTasks = unfinishedTasks.map((task) => ({
       ...task,
       date: toDate,
       startTime: undefined,
@@ -63,7 +59,7 @@ export class TaskMoveService {
 
     // Remove moved tasks from source date (only top-level unfinished tasks)
     const newSourceTasks = sourceTasks.filter(
-      task => !unfinishedTasks.some(ut => ut.id === task.id)
+      (task) => !unfinishedTasks.some((ut) => ut.id === task.id),
     );
 
     return {
@@ -103,25 +99,21 @@ export class TaskMoveService {
     const todayStr = getDateString(today);
     const datesWithUnfinished = this.getDatesWithUnfinishedTasks(tasks, today);
 
-    logger.log("Starting auto-move of unfinished tasks", {
+    logger.log('Starting auto-move of unfinished tasks', {
       today: todayStr,
-      datesWithUnfinished
+      datesWithUnfinished,
     });
 
     let updatedTasks = { ...tasks };
 
     for (const dateStr of datesWithUnfinished) {
-      updatedTasks = this.moveUnfinishedTasksToDate(
-        updatedTasks,
-        dateStr,
-        todayStr
-      );
+      updatedTasks = this.moveUnfinishedTasksToDate(updatedTasks, dateStr, todayStr);
       logger.log(`Moved tasks from ${dateStr} to ${todayStr}`);
     }
 
-    logger.log("Auto-move completed", {
+    logger.log('Auto-move completed', {
       tasksMoved: datesWithUnfinished.length,
-      fromDates: datesWithUnfinished
+      fromDates: datesWithUnfinished,
     });
 
     return updatedTasks;
