@@ -2,5 +2,5 @@ projectKey=epoch-local
 serverUrl=http://localhost:9000
 serverVersion=25.12.0.117093
 dashboardUrl=http://localhost:9000/dashboard?id=epoch-local
-ceTaskId=123a9cf6-cba6-40b5-ace5-8c6ee524581a
-ceTaskUrl=http://localhost:9000/api/ce/task?id=123a9cf6-cba6-40b5-ace5-8c6ee524581a
+ceTaskId=c4d0a334-2f62-4736-b256-c29fa03b323d
+ceTaskUrl=http://localhost:9000/api/ce/task?id=c4d0a334-2f62-4736-b256-c29fa03b323d

@@ -83,7 +83,7 @@ export class StorageService {
     return this.filePath;
   }
 
-  private hydrateDates(data: any): StorageSchema {
+  public hydrateDates(data: any): StorageSchema {
     if (data.tasks) {
       Object.keys(data.tasks).forEach((date) => {
         data.tasks[date] = data.tasks[date].map((task: any) => this.hydrateTask(task));

@@ -1,0 +1,2445 @@
+{
+  "version": "1.0.0",
+  "tasks": {
+    "2026-01-04": [
+      {
+        "id": "61f7588b-f2c9-4c5c-be41-24537d10bc5b",
+        "title": "Daily standup notes",
+        "state": "todo",
+        "createdAt": "2026-01-05T02:30:00.000Z",
+        "updatedAt": "2026-01-05T02:30:00.000Z",
+        "children": [],
+        "date": "2026-01-04",
+        "recurrence": {
+          "frequency": "weekdays"
+        }
+      },
+      {
+        "id": "64c8dc74-852f-4b9f-8d88-db8caea11946",
+        "title": "Write post-mortem for incident",
+        "state": "todo",
+        "createdAt": "2026-01-05T03:37:00.000Z",
+        "updatedAt": "2026-01-05T07:48:00.000Z",
+        "children": [],
+        "date": "2026-01-04"
+      },
+      {
+        "id": "2429c6f2-b318-4748-ae62-ac8290ffa642",
+        "title": "Draft RFC for websocket notification system",
+        "state": "todo",
+        "createdAt": "2026-01-05T05:00:00.000Z",
+        "updatedAt": "2026-01-05T12:47:00.000Z",
+        "children": [
+          {
+            "id": "a27936f3-5fa8-4a70-8a50-899953e6e710",
+            "title": "Update dependencies",
+            "state": "completed",
+            "createdAt": "2026-01-04T11:18:00.000Z",
+            "updatedAt": "2026-01-04T11:18:00.000Z",
+            "children": [],
+            "parentId": "2429c6f2-b318-4748-ae62-ac8290ffa642",
+            "date": "2026-01-04",
+            "endTime": "2026-01-04T11:07:00.000Z"
+          },
+          {
+            "id": "f58116ef-7e79-4308-bc16-09bf74082709",
+            "title": "Performance testing",
+            "state": "todo",
+            "createdAt": "2026-01-04T09:19:00.000Z",
+            "updatedAt": "2026-01-04T09:19:00.000Z",
+            "children": [
+              {
+                "id": "ac73fb82-f67e-411f-bdd2-ffa62fd30c50",
+                "title": "Update unit tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T11:30:00.000Z",
+                "updatedAt": "2026-01-04T11:30:00.000Z",
+                "children": [],
+                "parentId": "f58116ef-7e79-4308-bc16-09bf74082709",
+                "date": "2026-01-04",
+                "endTime": "2026-01-04T12:53:00.000Z"
+              },
+              {
+                "id": "339783a4-ed30-402f-9b88-95d98c13cde1",
+                "title": "Write integration tests",
+                "state": "todo",
+                "createdAt": "2026-01-04T05:53:00.000Z",
+                "updatedAt": "2026-01-04T05:53:00.000Z",
+                "children": [],
+                "parentId": "f58116ef-7e79-4308-bc16-09bf74082709",
+                "date": "2026-01-04"
+              }
+            ],
+            "parentId": "2429c6f2-b318-4748-ae62-ac8290ffa642",
+            "date": "2026-01-04"
+          },
+          {
+            "id": "e13fd64c-b1a7-4578-8e29-cc86adb48fcc",
+            "title": "Add type definitions",
+            "state": "completed",
+            "createdAt": "2026-01-04T11:35:00.000Z",
+            "updatedAt": "2026-01-04T11:35:00.000Z",
+            "children": [],
+            "parentId": "2429c6f2-b318-4748-ae62-ac8290ffa642",
+            "date": "2026-01-04",
+            "endTime": "2026-01-04T10:41:00.000Z"
+          }
+        ],
+        "date": "2026-01-04"
+      },
+      {
+        "id": "8ce96f96-dee4-44c4-ac9c-22ed1bfd932d",
+        "title": "Setup Prometheus alerts for disk-usage-spike",
+        "state": "todo",
+        "createdAt": "2026-01-05T03:58:00.000Z",
+        "updatedAt": "2026-01-05T07:08:00.000Z",
+        "children": [],
+        "date": "2026-01-04"
+      },
+      {
+        "id": "1be93e92-3b6b-4c77-9a78-247677a72296",
+        "title": "Cleanup dead-code in legacy-admin panel",
+        "state": "todo",
+        "createdAt": "2026-01-05T02:50:00.000Z",
+        "updatedAt": "2026-01-05T11:30:00.000Z",
+        "children": [],
+        "date": "2026-01-04"
+      },
+      {
+        "id": "2097ef33-cbd2-48fa-a019-3a6a1f0b8ae7",
+        "title": "Implement retry logic for payment-svc",
+        "state": "todo",
+        "createdAt": "2026-01-02T03:07:00.000Z",
+        "updatedAt": "2026-01-04T11:40:18.239Z",
+        "children": [],
+        "date": "2026-01-04"
+      }
+    ],
+    "2025-12-31": [
+      {
+        "id": "abb18008-4fa3-49e6-95b3-cf28b64b5b52",
+        "title": "Fix race condition in AuthProvider sync",
+        "state": "completed",
+        "createdAt": "2026-01-01T02:47:00.000Z",
+        "updatedAt": "2026-01-01T08:44:00.000Z",
+        "children": [
+          {
+            "id": "de74b319-ca9f-4f54-9386-8bb77554ad00",
+            "title": "Performance testing",
+            "state": "completed",
+            "createdAt": "2026-01-04T03:36:00.000Z",
+            "updatedAt": "2026-01-04T03:36:00.000Z",
+            "children": [],
+            "parentId": "abb18008-4fa3-49e6-95b3-cf28b64b5b52",
+            "date": "2025-12-31",
+            "endTime": "2026-01-04T08:43:00.000Z"
+          }
+        ],
+        "date": "2025-12-31",
+        "endTime": "2026-01-01T11:32:00.000Z",
+        "startTime": "2026-01-01T03:33:00.000Z"
+      },
+      {
+        "id": "11d8abd6-6da3-491d-bf63-d115989b9162",
+        "title": "Refactor Redis connection pooling logic",
+        "state": "delayed",
+        "createdAt": "2026-01-01T03:25:00.000Z",
+        "updatedAt": "2026-01-01T11:27:00.000Z",
+        "children": [],
+        "date": "2025-12-31",
+        "endTime": "2026-01-01T13:04:00.000Z",
+        "startTime": "2026-01-01T03:57:00.000Z"
+      },
+      {
+        "id": "83d9b7cc-8a4c-4103-a003-7e582238f212",
+        "title": "Optimize Postgres query for user-history node",
+        "state": "delayed",
+        "createdAt": "2026-01-01T05:04:00.000Z",
+        "updatedAt": "2026-01-01T12:14:00.000Z",
+        "children": [],
+        "date": "2025-12-31",
+        "endTime": "2026-01-01T12:03:00.000Z",
+        "startTime": "2026-01-01T05:07:00.000Z"
+      }
+    ],
+    "2026-01-05": [
+      {
+        "id": "6034d57a-6255-44c9-902e-3b4309e6c14a",
+        "title": "Team sync meeting",
+        "state": "todo",
+        "createdAt": "2026-01-06T02:30:00.000Z",
+        "updatedAt": "2026-01-06T02:30:00.000Z",
+        "children": [
+          {
+            "id": "7f38d0de-6b4f-41b1-8223-ce6f6b3b88d2",
+            "title": "Deploy to staging",
+            "state": "completed",
+            "createdAt": "2026-01-04T05:32:00.000Z",
+            "updatedAt": "2026-01-04T05:32:00.000Z",
+            "children": [],
+            "parentId": "6034d57a-6255-44c9-902e-3b4309e6c14a",
+            "date": "2026-01-05",
+            "endTime": "2026-01-04T12:47:00.000Z"
+          },
+          {
+            "id": "af93f105-668d-43e1-8033-7b78f492600a",
+            "title": "Refactor code",
+            "state": "todo",
+            "createdAt": "2026-01-04T04:36:00.000Z",
+            "updatedAt": "2026-01-04T04:36:00.000Z",
+            "children": [
+              {
+                "id": "7c82739c-04ac-4d3a-8d69-8689bc0d2ec9",
+                "title": "Update unit tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T05:03:00.000Z",
+                "updatedAt": "2026-01-04T05:03:00.000Z",
+                "children": [],
+                "parentId": "af93f105-668d-43e1-8033-7b78f492600a",
+                "date": "2026-01-05",
+                "endTime": "2026-01-04T11:57:00.000Z"
+              },
+              {
+                "id": "56a0def0-b30a-4e13-99cc-f3f15a6852d8",
+                "title": "Write integration tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T08:06:00.000Z",
+                "updatedAt": "2026-01-04T08:06:00.000Z",
+                "children": [],
+                "parentId": "af93f105-668d-43e1-8033-7b78f492600a",
+                "date": "2026-01-05",
+                "endTime": "2026-01-04T10:57:00.000Z"
+              }
+            ],
+            "parentId": "6034d57a-6255-44c9-902e-3b4309e6c14a",
+            "date": "2026-01-05"
+          }
+        ],
+        "date": "2026-01-05",
+        "recurrence": {
+          "frequency": "weekly"
+        }
+      },
+      {
+        "id": "f0349d36-6b90-4652-8b7d-d290d2cf1ab7",
+        "title": "Upgrade React from 18.2 to 18.3 in webapp",
+        "state": "todo",
+        "createdAt": "2026-01-06T04:39:00.000Z",
+        "updatedAt": "2026-01-06T05:16:00.000Z",
+        "children": [],
+        "date": "2026-01-05"
+      },
+      {
+        "id": "19b262ed-66d8-47dd-8260-6ecc334b0806",
+        "title": "Fix CSS layout shifts in dashboard-v4",
+        "state": "todo",
+        "createdAt": "2026-01-06T03:47:00.000Z",
+        "updatedAt": "2026-01-06T10:59:00.000Z",
+        "children": [
+          {
+            "id": "b16408ed-52ad-4b5f-a727-869a873d582e",
+            "title": "Add metrics",
+            "state": "completed",
+            "createdAt": "2026-01-04T08:10:00.000Z",
+            "updatedAt": "2026-01-04T08:10:00.000Z",
+            "children": [],
+            "parentId": "19b262ed-66d8-47dd-8260-6ecc334b0806",
+            "date": "2026-01-05",
+            "endTime": "2026-01-04T11:22:00.000Z"
+          }
+        ],
+        "date": "2026-01-05"
+      },
+      {
+        "id": "fb70fe82-7126-45dc-8b90-beb1872e8257",
+        "title": "POC for gRPC bridge in inventory-service",
+        "state": "todo",
+        "createdAt": "2026-01-06T04:14:00.000Z",
+        "updatedAt": "2026-01-06T10:03:00.000Z",
+        "children": [],
+        "date": "2026-01-05"
+      },
+      {
+        "id": "9c931ca0-ca62-4879-aa71-d7c7e4d37878",
+        "title": "Verify bugfix on staging-v2-alpha",
+        "state": "todo",
+        "createdAt": "2026-01-06T04:34:00.000Z",
+        "updatedAt": "2026-01-06T07:24:00.000Z",
+        "children": [],
+        "date": "2026-01-05"
+      }
+    ],
+    "2026-01-14": [
+      {
+        "id": "bd817efa-3029-4c6c-b378-4f38474ea50b",
+        "title": "Monthly security audit",
+        "state": "todo",
+        "createdAt": "2026-01-15T02:30:00.000Z",
+        "updatedAt": "2026-01-15T02:30:00.000Z",
+        "children": [
+          {
+            "id": "b13bddd5-c9ed-48ed-a204-e454186598dd",
+            "title": "Refactor code",
+            "state": "completed",
+            "createdAt": "2026-01-04T03:41:00.000Z",
+            "updatedAt": "2026-01-04T03:41:00.000Z",
+            "children": [
+              {
+                "id": "24ecd844-aab4-42c3-8d8f-e32779015564",
+                "title": "Update unit tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T06:05:00.000Z",
+                "updatedAt": "2026-01-04T06:05:00.000Z",
+                "children": [],
+                "parentId": "b13bddd5-c9ed-48ed-a204-e454186598dd",
+                "date": "2026-01-14",
+                "endTime": "2026-01-04T10:17:00.000Z"
+              },
+              {
+                "id": "a4b0b6fd-470a-4f0f-8352-00d6ba9fcbf3",
+                "title": "Deploy to staging",
+                "state": "completed",
+                "createdAt": "2026-01-04T05:54:00.000Z",
+                "updatedAt": "2026-01-04T05:54:00.000Z",
+                "children": [],
+                "parentId": "b13bddd5-c9ed-48ed-a204-e454186598dd",
+                "date": "2026-01-14",
+                "endTime": "2026-01-04T13:06:00.000Z"
+              }
+            ],
+            "parentId": "bd817efa-3029-4c6c-b378-4f38474ea50b",
+            "date": "2026-01-14",
+            "endTime": "2026-01-04T11:15:00.000Z"
+          },
+          {
+            "id": "746fb15f-c64f-49ad-9b64-d960548c7718",
+            "title": "Deploy to staging",
+            "state": "todo",
+            "createdAt": "2026-01-04T12:09:00.000Z",
+            "updatedAt": "2026-01-04T12:09:00.000Z",
+            "children": [
+              {
+                "id": "14db033b-7e92-46d0-95df-ee88c11b7e77",
+                "title": "Verify on production",
+                "state": "todo",
+                "createdAt": "2026-01-04T06:43:00.000Z",
+                "updatedAt": "2026-01-04T06:43:00.000Z",
+                "children": [],
+                "parentId": "746fb15f-c64f-49ad-9b64-d960548c7718",
+                "date": "2026-01-14"
+              },
+              {
+                "id": "67c86b43-df88-450d-8c85-62f4e96ed1c1",
+                "title": "Update unit tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T13:19:00.000Z",
+                "updatedAt": "2026-01-04T13:19:00.000Z",
+                "children": [],
+                "parentId": "746fb15f-c64f-49ad-9b64-d960548c7718",
+                "date": "2026-01-14",
+                "endTime": "2026-01-04T09:15:00.000Z"
+              }
+            ],
+            "parentId": "bd817efa-3029-4c6c-b378-4f38474ea50b",
+            "date": "2026-01-14"
+          }
+        ],
+        "date": "2026-01-14",
+        "recurrence": {
+          "frequency": "monthly"
+        }
+      },
+      {
+        "id": "1ec3f3ee-56e3-4c25-8a22-e150d24f3d04",
+        "title": "Review infra-as-code for VPC-peering",
+        "state": "todo",
+        "createdAt": "2026-01-15T04:40:00.000Z",
+        "updatedAt": "2026-01-15T13:07:00.000Z",
+        "children": [],
+        "date": "2026-01-14"
+      },
+      {
+        "id": "3e0e08d3-7c6d-4ea0-9428-c7936a921ef5",
+        "title": "Conduct technical-interview for SE-II role",
+        "state": "todo",
+        "createdAt": "2026-01-15T02:49:00.000Z",
+        "updatedAt": "2026-01-15T06:17:00.000Z",
+        "children": [
+          {
+            "id": "2045bdc3-4a40-4422-8204-335ee03d2216",
+            "title": "Add metrics",
+            "state": "todo",
+            "createdAt": "2026-01-04T09:20:00.000Z",
+            "updatedAt": "2026-01-04T09:20:00.000Z",
+            "children": [],
+            "parentId": "3e0e08d3-7c6d-4ea0-9428-c7936a921ef5",
+            "date": "2026-01-14"
+          },
+          {
+            "id": "fb80f835-5ec4-4808-a9e8-b5ee1d938760",
+            "title": "Add error handling",
+            "state": "todo",
+            "createdAt": "2026-01-04T06:24:00.000Z",
+            "updatedAt": "2026-01-04T06:24:00.000Z",
+            "children": [],
+            "parentId": "3e0e08d3-7c6d-4ea0-9428-c7936a921ef5",
+            "date": "2026-01-14"
+          }
+        ],
+        "date": "2026-01-14"
+      },
+      {
+        "id": "d76be9f9-2c17-43d4-a782-c09edc3b5328",
+        "title": "Setup Grafana dashboard for API-throughput",
+        "state": "todo",
+        "createdAt": "2026-01-15T04:43:00.000Z",
+        "updatedAt": "2026-01-15T11:29:00.000Z",
+        "children": [],
+        "date": "2026-01-14"
+      },
+      {
+        "id": "33a573cf-2361-45a8-9755-6c53329f3c70",
+        "title": "Fix broken images in email-templates",
+        "state": "todo",
+        "createdAt": "2026-01-15T04:09:00.000Z",
+        "updatedAt": "2026-01-15T09:37:00.000Z",
+        "children": [],
+        "date": "2026-01-14"
+      }
+    ],
+    "2026-01-09": [
+      {
+        "id": "8ab5ae1b-483c-43f1-a67a-9c8411d5cad0",
+        "title": "Weekly team retrospective",
+        "state": "todo",
+        "createdAt": "2026-01-10T02:30:00.000Z",
+        "updatedAt": "2026-01-10T02:30:00.000Z",
+        "children": [],
+        "date": "2026-01-09",
+        "recurrence": {
+          "frequency": "weekly"
+        }
+      },
+      {
+        "id": "bd7b4cb9-e242-4eca-9c39-bc509fec9758",
+        "title": "Optimize LCP for mobile-home-screen",
+        "state": "todo",
+        "createdAt": "2026-01-10T04:36:00.000Z",
+        "updatedAt": "2026-01-10T04:32:00.000Z",
+        "children": [],
+        "date": "2026-01-09"
+      }
+    ],
+    "2026-01-01": [
+      {
+        "id": "68bf449b-e673-4cb3-9e85-43acdd5dadd0",
+        "title": "Update Swagger docs for /v2/orders endpoint",
+        "state": "completed",
+        "createdAt": "2026-01-02T02:40:00.000Z",
+        "updatedAt": "2026-01-02T10:08:00.000Z",
+        "children": [
+          {
+            "id": "e4a421db-83b4-4e1b-bdb6-7458a9edee5e",
+            "title": "Update CI/CD",
+            "state": "completed",
+            "createdAt": "2026-01-04T09:55:00.000Z",
+            "updatedAt": "2026-01-04T09:55:00.000Z",
+            "children": [],
+            "parentId": "68bf449b-e673-4cb3-9e85-43acdd5dadd0",
+            "date": "2026-01-01",
+            "endTime": "2026-01-04T11:12:00.000Z"
+          },
+          {
+            "id": "c9abc5e9-d833-4ae3-98ac-5baf36ca031a",
+            "title": "Update documentation",
+            "state": "completed",
+            "createdAt": "2026-01-04T11:14:00.000Z",
+            "updatedAt": "2026-01-04T11:14:00.000Z",
+            "children": [],
+            "parentId": "68bf449b-e673-4cb3-9e85-43acdd5dadd0",
+            "date": "2026-01-01",
+            "endTime": "2026-01-04T09:41:00.000Z"
+          }
+        ],
+        "date": "2026-01-01",
+        "endTime": "2026-01-02T09:28:00.000Z",
+        "startTime": "2026-01-02T05:17:00.000Z"
+      },
+      {
+        "id": "0e72ff2d-3b76-4f99-96f6-0379beda0b9d",
+        "title": "Investigate memory leak on staging-cluster-3",
+        "state": "completed",
+        "createdAt": "2026-01-02T04:44:00.000Z",
+        "updatedAt": "2026-01-02T11:11:00.000Z",
+        "children": [],
+        "date": "2026-01-01",
+        "endTime": "2026-01-02T13:04:00.000Z",
+        "startTime": "2026-01-02T06:24:00.000Z"
+      },
+      {
+        "id": "ebe2cc39-b9e5-481a-abb6-e6d3408349fa",
+        "title": "Migrate legacy S3 buckets to standard IA",
+        "state": "completed",
+        "createdAt": "2026-01-02T04:01:00.000Z",
+        "updatedAt": "2026-01-02T12:25:00.000Z",
+        "children": [],
+        "date": "2026-01-01",
+        "endTime": "2026-01-02T09:32:00.000Z",
+        "startTime": "2026-01-02T05:34:00.000Z"
+      }
+    ],
+    "2026-01-02": [
+      {
+        "id": "2e83e92d-d7b4-4e84-b670-8f71e486c2a4",
+        "title": "Update Dockerfile for multi-stage builds",
+        "state": "completed",
+        "createdAt": "2026-01-03T02:49:00.000Z",
+        "updatedAt": "2026-01-03T05:00:00.000Z",
+        "children": [],
+        "date": "2026-01-02",
+        "endTime": "2026-01-03T11:39:00.000Z",
+        "startTime": "2026-01-03T05:03:00.000Z"
+      },
+      {
+        "id": "553f4fb6-399c-4d14-98c6-7a6b6b00a525",
+        "title": "Patch CVE-2024 security vuln in jwt-lib",
+        "state": "completed",
+        "createdAt": "2026-01-03T04:58:00.000Z",
+        "updatedAt": "2026-01-03T07:11:00.000Z",
+        "children": [],
+        "date": "2026-01-02",
+        "endTime": "2026-01-03T10:39:00.000Z",
+        "startTime": "2026-01-03T03:59:00.000Z"
+      }
+    ],
+    "2026-01-03": [
+      {
+        "id": "a6f96a43-6644-492c-a7c2-9eab364df651",
+        "title": "Review prod-launch-blue branch",
+        "state": "completed",
+        "createdAt": "2026-01-04T04:53:00.000Z",
+        "updatedAt": "2026-01-04T12:10:00.000Z",
+        "children": [],
+        "date": "2026-01-03",
+        "endTime": "2026-01-04T11:06:00.000Z",
+        "startTime": "2026-01-04T04:48:00.000Z"
+      }
+    ],
+    "2026-01-06": [
+      {
+        "id": "e5794075-0046-4821-b9be-2451e596a628",
+        "title": "Update k8s helm chart for redis-cluster",
+        "state": "todo",
+        "createdAt": "2026-01-07T03:56:00.000Z",
+        "updatedAt": "2026-01-07T09:54:00.000Z",
+        "children": [
+          {
+            "id": "4218765e-424d-455d-9fa8-cadff836723e",
+            "title": "Update dependencies",
+            "state": "completed",
+            "createdAt": "2026-01-04T09:23:00.000Z",
+            "updatedAt": "2026-01-04T09:23:00.000Z",
+            "children": [],
+            "parentId": "e5794075-0046-4821-b9be-2451e596a628",
+            "date": "2026-01-06",
+            "endTime": "2026-01-04T10:23:00.000Z"
+          },
+          {
+            "id": "b182fc4a-d3bf-45a8-b339-16c327dc3b78",
+            "title": "Add type definitions",
+            "state": "todo",
+            "createdAt": "2026-01-04T04:15:00.000Z",
+            "updatedAt": "2026-01-04T04:15:00.000Z",
+            "children": [],
+            "parentId": "e5794075-0046-4821-b9be-2451e596a628",
+            "date": "2026-01-06"
+          },
+          {
+            "id": "de46c278-80e9-48aa-8683-9cba0a22d2f9",
+            "title": "Update changelog",
+            "state": "completed",
+            "createdAt": "2026-01-04T04:07:00.000Z",
+            "updatedAt": "2026-01-04T04:07:00.000Z",
+            "children": [],
+            "parentId": "e5794075-0046-4821-b9be-2451e596a628",
+            "date": "2026-01-06",
+            "endTime": "2026-01-04T08:48:00.000Z"
+          }
+        ],
+        "date": "2026-01-06"
+      },
+      {
+        "id": "cd3c46c7-6953-41dd-b610-f0463454144c",
+        "title": "Benchmark latency for geo-spatial queries",
+        "state": "todo",
+        "createdAt": "2026-01-07T05:26:00.000Z",
+        "updatedAt": "2026-01-07T08:04:00.000Z",
+        "children": [],
+        "date": "2026-01-06"
+      },
+      {
+        "id": "35d5d574-27ba-4278-8082-ffc4737e7aaf",
+        "title": "Automate database-schema backup script",
+        "state": "todo",
+        "createdAt": "2026-01-07T02:52:00.000Z",
+        "updatedAt": "2026-01-07T09:15:00.000Z",
+        "children": [
+          {
+            "id": "5d5973cb-eb8a-4511-89d5-280997c36685",
+            "title": "Update documentation",
+            "state": "completed",
+            "createdAt": "2026-01-04T12:24:00.000Z",
+            "updatedAt": "2026-01-04T12:24:00.000Z",
+            "children": [],
+            "parentId": "35d5d574-27ba-4278-8082-ffc4737e7aaf",
+            "date": "2026-01-06",
+            "endTime": "2026-01-04T10:26:00.000Z"
+          }
+        ],
+        "date": "2026-01-06"
+      },
+      {
+        "id": "c93ecbc9-476f-4883-bd95-66acc8970059",
+        "title": "Review PR for worker-thread-impl",
+        "state": "todo",
+        "createdAt": "2026-01-07T05:05:00.000Z",
+        "updatedAt": "2026-01-07T12:29:00.000Z",
+        "children": [
+          {
+            "id": "4fe39441-2a76-4bb7-8caf-9b243155057e",
+            "title": "Code review",
+            "state": "todo",
+            "createdAt": "2026-01-04T07:08:00.000Z",
+            "updatedAt": "2026-01-04T07:08:00.000Z",
+            "children": [],
+            "parentId": "c93ecbc9-476f-4883-bd95-66acc8970059",
+            "date": "2026-01-06"
+          },
+          {
+            "id": "a71a95e9-fe80-488b-9922-d906962792d3",
+            "title": "Update unit tests",
+            "state": "todo",
+            "createdAt": "2026-01-04T13:12:00.000Z",
+            "updatedAt": "2026-01-04T13:12:00.000Z",
+            "children": [],
+            "parentId": "c93ecbc9-476f-4883-bd95-66acc8970059",
+            "date": "2026-01-06"
+          },
+          {
+            "id": "b7362206-e0df-4680-9e01-96abab063acb",
+            "title": "Configure monitoring",
+            "state": "completed",
+            "createdAt": "2026-01-04T03:35:00.000Z",
+            "updatedAt": "2026-01-04T03:35:00.000Z",
+            "children": [],
+            "parentId": "c93ecbc9-476f-4883-bd95-66acc8970059",
+            "date": "2026-01-06",
+            "endTime": "2026-01-04T11:39:00.000Z"
+          }
+        ],
+        "date": "2026-01-06"
+      }
+    ],
+    "2026-01-07": [
+      {
+        "id": "7237dd38-4782-4cfa-a711-1c3257ba9426",
+        "title": "Implement rate-limiting for auth-endpoints",
+        "state": "todo",
+        "createdAt": "2026-01-08T04:12:00.000Z",
+        "updatedAt": "2026-01-08T10:44:00.000Z",
+        "children": [],
+        "date": "2026-01-07"
+      },
+      {
+        "id": "f49a4fcb-efc6-466d-8a49-0415fd9ae04e",
+        "title": "Fix hydration error in SSR-landing-page",
+        "state": "todo",
+        "createdAt": "2026-01-08T02:30:00.000Z",
+        "updatedAt": "2026-01-08T11:23:00.000Z",
+        "children": [],
+        "date": "2026-01-07"
+      },
+      {
+        "id": "9b266e9d-2cbd-4aa6-867f-aa0a62e38789",
+        "title": "Update CI configuration for parallel tests",
+        "state": "todo",
+        "createdAt": "2026-01-08T04:06:00.000Z",
+        "updatedAt": "2026-01-08T13:11:00.000Z",
+        "children": [],
+        "date": "2026-01-07"
+      },
+      {
+        "id": "f6709b32-4cfa-49b2-905f-8769e56d1f56",
+        "title": "Profile CPU usage for image-processing node",
+        "state": "todo",
+        "createdAt": "2026-01-08T02:47:00.000Z",
+        "updatedAt": "2026-01-08T10:10:00.000Z",
+        "children": [],
+        "date": "2026-01-07"
+      }
+    ],
+    "2026-01-08": [
+      {
+        "id": "519f2538-d54f-4820-ae57-a52c08720291",
+        "title": "Configure Sentry alerts for 5xx-surge",
+        "state": "todo",
+        "createdAt": "2026-01-09T04:28:00.000Z",
+        "updatedAt": "2026-01-09T07:29:00.000Z",
+        "children": [
+          {
+            "id": "53f5a43e-f747-4681-a1a7-91cda737353c",
+            "title": "Code review",
+            "state": "completed",
+            "createdAt": "2026-01-04T03:53:00.000Z",
+            "updatedAt": "2026-01-04T03:53:00.000Z",
+            "children": [],
+            "parentId": "519f2538-d54f-4820-ae57-a52c08720291",
+            "date": "2026-01-08",
+            "endTime": "2026-01-04T10:39:00.000Z"
+          },
+          {
+            "id": "997cc9d1-25eb-400b-aa90-8920680ad9f7",
+            "title": "Notify team",
+            "state": "completed",
+            "createdAt": "2026-01-04T11:34:00.000Z",
+            "updatedAt": "2026-01-04T11:34:00.000Z",
+            "children": [
+              {
+                "id": "b64505cb-50b5-4c7d-b4f9-7fb144775695",
+                "title": "Performance testing",
+                "state": "todo",
+                "createdAt": "2026-01-04T03:31:00.000Z",
+                "updatedAt": "2026-01-04T03:31:00.000Z",
+                "children": [],
+                "parentId": "997cc9d1-25eb-400b-aa90-8920680ad9f7",
+                "date": "2026-01-08"
+              }
+            ],
+            "parentId": "519f2538-d54f-4820-ae57-a52c08720291",
+            "date": "2026-01-08",
+            "endTime": "2026-01-04T11:01:00.000Z"
+          }
+        ],
+        "date": "2026-01-08"
+      },
+      {
+        "id": "3f29d329-269b-4bd1-9393-424f88a9010b",
+        "title": "Document internal-api for partner-onboarding",
+        "state": "todo",
+        "createdAt": "2026-01-09T02:52:00.000Z",
+        "updatedAt": "2026-01-09T09:25:00.000Z",
+        "children": [],
+        "date": "2026-01-08"
+      },
+      {
+        "id": "471a3e21-98e1-47e0-85cc-3ccd9828f873",
+        "title": "Remove hardcoded credentials from dev-config",
+        "state": "todo",
+        "createdAt": "2026-01-09T04:20:00.000Z",
+        "updatedAt": "2026-01-09T10:52:00.000Z",
+        "children": [],
+        "date": "2026-01-08"
+      },
+      {
+        "id": "7c5f4461-68e4-494f-915b-712d72936379",
+        "title": "Implement health-check endpoint for crawler",
+        "state": "todo",
+        "createdAt": "2026-01-09T03:25:00.000Z",
+        "updatedAt": "2026-01-09T07:43:00.000Z",
+        "children": [
+          {
+            "id": "16b5b46f-7d6e-4db6-a33e-98860bb79712",
+            "title": "Update documentation",
+            "state": "completed",
+            "createdAt": "2026-01-04T03:40:00.000Z",
+            "updatedAt": "2026-01-04T03:40:00.000Z",
+            "children": [],
+            "parentId": "7c5f4461-68e4-494f-915b-712d72936379",
+            "date": "2026-01-08",
+            "endTime": "2026-01-04T10:38:00.000Z"
+          },
+          {
+            "id": "391755b8-96a8-40f6-8a82-8e5d2f0b7d0f",
+            "title": "Notify team",
+            "state": "todo",
+            "createdAt": "2026-01-04T05:19:00.000Z",
+            "updatedAt": "2026-01-04T05:19:00.000Z",
+            "children": [
+              {
+                "id": "efc5a967-7f87-4296-bf6b-84f56d54ecd2",
+                "title": "Deploy to staging",
+                "state": "todo",
+                "createdAt": "2026-01-04T03:52:00.000Z",
+                "updatedAt": "2026-01-04T03:52:00.000Z",
+                "children": [],
+                "parentId": "391755b8-96a8-40f6-8a82-8e5d2f0b7d0f",
+                "date": "2026-01-08"
+              },
+              {
+                "id": "129860d0-fae8-4a82-8658-f696ecf1383b",
+                "title": "Code review",
+                "state": "completed",
+                "createdAt": "2026-01-04T10:51:00.000Z",
+                "updatedAt": "2026-01-04T10:51:00.000Z",
+                "children": [],
+                "parentId": "391755b8-96a8-40f6-8a82-8e5d2f0b7d0f",
+                "date": "2026-01-08",
+                "endTime": "2026-01-04T11:46:00.000Z"
+              }
+            ],
+            "parentId": "7c5f4461-68e4-494f-915b-712d72936379",
+            "date": "2026-01-08"
+          },
+          {
+            "id": "e3eb9bb7-11b6-4a9d-95e5-4e504b657bee",
+            "title": "Add metrics",
+            "state": "completed",
+            "createdAt": "2026-01-04T08:46:00.000Z",
+            "updatedAt": "2026-01-04T08:46:00.000Z",
+            "children": [
+              {
+                "id": "b797749e-7ae3-44a2-a4be-194ae3802a5e",
+                "title": "Update unit tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T07:18:00.000Z",
+                "updatedAt": "2026-01-04T07:18:00.000Z",
+                "children": [],
+                "parentId": "e3eb9bb7-11b6-4a9d-95e5-4e504b657bee",
+                "date": "2026-01-08",
+                "endTime": "2026-01-04T13:12:00.000Z"
+              },
+              {
+                "id": "b2227068-b7c6-4b98-a959-293ad56d3809",
+                "title": "Write integration tests",
+                "state": "todo",
+                "createdAt": "2026-01-04T02:48:00.000Z",
+                "updatedAt": "2026-01-04T02:48:00.000Z",
+                "children": [],
+                "parentId": "e3eb9bb7-11b6-4a9d-95e5-4e504b657bee",
+                "date": "2026-01-08"
+              }
+            ],
+            "parentId": "7c5f4461-68e4-494f-915b-712d72936379",
+            "date": "2026-01-08",
+            "endTime": "2026-01-04T12:30:00.000Z"
+          }
+        ],
+        "date": "2026-01-08"
+      }
+    ],
+    "2026-01-10": [
+      {
+        "id": "a66824cf-04d1-45f6-957f-853242a5ba22",
+        "title": "Refactor middleware for RBAC-v2",
+        "state": "todo",
+        "createdAt": "2026-01-11T05:23:00.000Z",
+        "updatedAt": "2026-01-11T08:17:00.000Z",
+        "children": [
+          {
+            "id": "f285af9e-9ee1-48e7-b012-ebfeb99a155c",
+            "title": "Write integration tests",
+            "state": "completed",
+            "createdAt": "2026-01-04T02:46:00.000Z",
+            "updatedAt": "2026-01-04T02:46:00.000Z",
+            "children": [],
+            "parentId": "a66824cf-04d1-45f6-957f-853242a5ba22",
+            "date": "2026-01-10",
+            "endTime": "2026-01-04T10:00:00.000Z"
+          }
+        ],
+        "date": "2026-01-10"
+      },
+      {
+        "id": "0953ed89-86a0-4458-acda-df3e197464c6",
+        "title": "Analyze slow-queries on main-read-replica",
+        "state": "todo",
+        "createdAt": "2026-01-11T05:10:00.000Z",
+        "updatedAt": "2026-01-11T11:57:00.000Z",
+        "children": [
+          {
+            "id": "97416b58-8d77-4bd9-9ad2-bac87cbf7b0a",
+            "title": "Update unit tests",
+            "state": "todo",
+            "createdAt": "2026-01-04T07:05:00.000Z",
+            "updatedAt": "2026-01-04T07:05:00.000Z",
+            "children": [
+              {
+                "id": "8b9addd5-78ba-41f7-9ca3-6605bd6bfa72",
+                "title": "Performance testing",
+                "state": "todo",
+                "createdAt": "2026-01-04T03:37:00.000Z",
+                "updatedAt": "2026-01-04T03:37:00.000Z",
+                "children": [],
+                "parentId": "97416b58-8d77-4bd9-9ad2-bac87cbf7b0a",
+                "date": "2026-01-10"
+              }
+            ],
+            "parentId": "0953ed89-86a0-4458-acda-df3e197464c6",
+            "date": "2026-01-10"
+          },
+          {
+            "id": "3bfdbdd6-efdb-46b7-a224-ea7543821fa1",
+            "title": "Add error handling",
+            "state": "completed",
+            "createdAt": "2026-01-04T11:32:00.000Z",
+            "updatedAt": "2026-01-04T11:32:00.000Z",
+            "children": [
+              {
+                "id": "ae1446fb-5202-4a04-9859-d18868ca3bce",
+                "title": "Verify on production",
+                "state": "completed",
+                "createdAt": "2026-01-04T04:02:00.000Z",
+                "updatedAt": "2026-01-04T04:02:00.000Z",
+                "children": [],
+                "parentId": "3bfdbdd6-efdb-46b7-a224-ea7543821fa1",
+                "date": "2026-01-10",
+                "endTime": "2026-01-04T10:25:00.000Z"
+              },
+              {
+                "id": "dca2b4d5-6d10-4cc5-b31b-f649b9345586",
+                "title": "Create Jira ticket",
+                "state": "completed",
+                "createdAt": "2026-01-04T03:56:00.000Z",
+                "updatedAt": "2026-01-04T03:56:00.000Z",
+                "children": [],
+                "parentId": "3bfdbdd6-efdb-46b7-a224-ea7543821fa1",
+                "date": "2026-01-10",
+                "endTime": "2026-01-04T12:27:00.000Z"
+              }
+            ],
+            "parentId": "0953ed89-86a0-4458-acda-df3e197464c6",
+            "date": "2026-01-10",
+            "endTime": "2026-01-04T09:47:00.000Z"
+          },
+          {
+            "id": "e83b909b-0a21-4b7c-85dc-75cdcc7e8428",
+            "title": "Update dependencies",
+            "state": "completed",
+            "createdAt": "2026-01-04T08:56:00.000Z",
+            "updatedAt": "2026-01-04T08:56:00.000Z",
+            "children": [
+              {
+                "id": "997e3111-b3d8-4b1b-96e0-c44a1c1b5b18",
+                "title": "Update documentation",
+                "state": "completed",
+                "createdAt": "2026-01-04T04:44:00.000Z",
+                "updatedAt": "2026-01-04T04:44:00.000Z",
+                "children": [],
+                "parentId": "e83b909b-0a21-4b7c-85dc-75cdcc7e8428",
+                "date": "2026-01-10",
+                "endTime": "2026-01-04T13:09:00.000Z"
+              }
+            ],
+            "parentId": "0953ed89-86a0-4458-acda-df3e197464c6",
+            "date": "2026-01-10",
+            "endTime": "2026-01-04T09:31:00.000Z"
+          }
+        ],
+        "date": "2026-01-10"
+      }
+    ],
+    "2026-01-11": [
+      {
+        "id": "58d95510-0b01-41c1-b798-5512ed0c9955",
+        "title": "Setup GH-actions for auto-labeling-PRs",
+        "state": "todo",
+        "createdAt": "2026-01-12T02:43:00.000Z",
+        "updatedAt": "2026-01-12T11:39:00.000Z",
+        "children": [],
+        "date": "2026-01-11"
+      },
+      {
+        "id": "55bfea7c-9973-4e06-8ca4-4b2f95150bab",
+        "title": "Fix flaky E2E tests in checkout-flow",
+        "state": "todo",
+        "createdAt": "2026-01-12T04:13:00.000Z",
+        "updatedAt": "2026-01-12T05:04:00.000Z",
+        "children": [],
+        "date": "2026-01-11"
+      },
+      {
+        "id": "e32b81c4-0ebd-4d69-8e34-8817250cbda7",
+        "title": "Verify SSL certificate renewal on production",
+        "state": "todo",
+        "createdAt": "2026-01-12T05:08:00.000Z",
+        "updatedAt": "2026-01-12T08:30:00.000Z",
+        "children": [],
+        "date": "2026-01-11"
+      },
+      {
+        "id": "f7884452-6d9c-4725-b7c7-d5e29f9da3dd",
+        "title": "Audit IAM permissions for developer-group",
+        "state": "todo",
+        "createdAt": "2026-01-12T05:17:00.000Z",
+        "updatedAt": "2026-01-12T05:59:00.000Z",
+        "children": [],
+        "date": "2026-01-11"
+      }
+    ],
+    "2026-01-12": [
+      {
+        "id": "3b885b2f-7948-4338-9f61-24de58085f54",
+        "title": "Update README for local-setup instructions",
+        "state": "todo",
+        "createdAt": "2026-01-13T05:04:00.000Z",
+        "updatedAt": "2026-01-13T12:35:00.000Z",
+        "children": [],
+        "date": "2026-01-12"
+      },
+      {
+        "id": "73b3261d-1095-441f-a963-2cb015886e43",
+        "title": "Implement soft-delete for user-profiles",
+        "state": "todo",
+        "createdAt": "2026-01-13T03:35:00.000Z",
+        "updatedAt": "2026-01-13T10:34:00.000Z",
+        "children": [],
+        "date": "2026-01-12"
+      },
+      {
+        "id": "19a8067e-e99d-44ec-bee5-9ae2c0143ce8",
+        "title": "Add logging for failed-webhook-callbacks",
+        "state": "todo",
+        "createdAt": "2026-01-13T03:47:00.000Z",
+        "updatedAt": "2026-01-13T12:45:00.000Z",
+        "children": [],
+        "date": "2026-01-12"
+      }
+    ],
+    "2026-01-13": [
+      {
+        "id": "2092808a-c587-4aaa-9d67-983604981d33",
+        "title": "Refactor event-emitter for better TS types",
+        "state": "todo",
+        "createdAt": "2026-01-14T03:05:00.000Z",
+        "updatedAt": "2026-01-14T06:54:00.000Z",
+        "children": [],
+        "date": "2026-01-13"
+      },
+      {
+        "id": "3d0f59aa-8270-43fe-9514-49f8b7a96b75",
+        "title": "Upgrade Node.js to v20 in CI/CD pipeline",
+        "state": "todo",
+        "createdAt": "2026-01-14T03:45:00.000Z",
+        "updatedAt": "2026-01-14T11:29:00.000Z",
+        "children": [],
+        "date": "2026-01-13"
+      },
+      {
+        "id": "dd153372-1515-4a42-ade9-8c4f873e72cd",
+        "title": "Fix z-index issues in global-modal",
+        "state": "todo",
+        "createdAt": "2026-01-14T04:25:00.000Z",
+        "updatedAt": "2026-01-14T06:58:00.000Z",
+        "children": [],
+        "date": "2026-01-13"
+      },
+      {
+        "id": "3503ad26-209b-4f75-bd80-737359264aa3",
+        "title": "Implement cache-bursting for asset-delivery",
+        "state": "todo",
+        "createdAt": "2026-01-14T04:29:00.000Z",
+        "updatedAt": "2026-01-14T12:36:00.000Z",
+        "children": [],
+        "date": "2026-01-13"
+      }
+    ],
+    "2026-01-15": [
+      {
+        "id": "80d9e0f3-714b-4ca2-aa5f-78d5c51adfe8",
+        "title": "Implement dark-mode toggle for dashboard",
+        "state": "todo",
+        "createdAt": "2026-01-16T03:34:00.000Z",
+        "updatedAt": "2026-01-16T05:57:00.000Z",
+        "children": [],
+        "date": "2026-01-15"
+      },
+      {
+        "id": "a7ff0ecf-4baf-42ad-8b8e-9900b9eeffc2",
+        "title": "Review logs for failed-sync in stripe-int",
+        "state": "todo",
+        "createdAt": "2026-01-16T02:55:00.000Z",
+        "updatedAt": "2026-01-16T06:15:00.000Z",
+        "children": [],
+        "date": "2026-01-15"
+      },
+      {
+        "id": "18dd95f2-d5d8-478a-941b-96733d32cc25",
+        "title": "Cleanup unused NPM dependencies",
+        "state": "todo",
+        "createdAt": "2026-01-16T02:36:00.000Z",
+        "updatedAt": "2026-01-16T11:14:00.000Z",
+        "children": [],
+        "date": "2026-01-15"
+      },
+      {
+        "id": "7cbe5597-836b-4d35-b5d4-7a95afac555e",
+        "title": "Implement deep-linking for mobile-app v2",
+        "state": "todo",
+        "createdAt": "2026-01-16T02:38:00.000Z",
+        "updatedAt": "2026-01-16T10:04:00.000Z",
+        "children": [],
+        "date": "2026-01-15"
+      },
+      {
+        "id": "254ebd25-7950-41b8-9724-4072a81c797d",
+        "title": "Fix memory-leak in WebSocket-handler",
+        "state": "todo",
+        "createdAt": "2026-01-16T04:05:00.000Z",
+        "updatedAt": "2026-01-16T08:40:00.000Z",
+        "children": [],
+        "date": "2026-01-15"
+      }
+    ],
+    "2026-01-16": [
+      {
+        "id": "ee00dac1-d496-4b54-b8c1-c06059ff744d",
+        "title": "Update terraform-scripts for db-migration",
+        "state": "todo",
+        "createdAt": "2026-01-17T03:55:00.000Z",
+        "updatedAt": "2026-01-17T09:06:00.000Z",
+        "children": [
+          {
+            "id": "fba032b2-7ffe-49fc-8e61-d97190e02be6",
+            "title": "Add error handling",
+            "state": "todo",
+            "createdAt": "2026-01-04T03:21:00.000Z",
+            "updatedAt": "2026-01-04T03:21:00.000Z",
+            "children": [],
+            "parentId": "ee00dac1-d496-4b54-b8c1-c06059ff744d",
+            "date": "2026-01-16"
+          },
+          {
+            "id": "6bfc5ace-27d8-4e45-8c25-8bef5123a511",
+            "title": "Add type definitions",
+            "state": "todo",
+            "createdAt": "2026-01-04T06:15:00.000Z",
+            "updatedAt": "2026-01-04T06:15:00.000Z",
+            "children": [],
+            "parentId": "ee00dac1-d496-4b54-b8c1-c06059ff744d",
+            "date": "2026-01-16"
+          }
+        ],
+        "date": "2026-01-16"
+      }
+    ],
+    "2026-01-17": [
+      {
+        "id": "604d30a8-c9f9-4603-bbf9-3a54493da4ce",
+        "title": "Refactor legacy-utils to ES-modules",
+        "state": "todo",
+        "createdAt": "2026-01-18T02:38:00.000Z",
+        "updatedAt": "2026-01-18T09:54:00.000Z",
+        "children": [],
+        "date": "2026-01-17"
+      }
+    ],
+    "2026-01-18": [
+      {
+        "id": "6f53dfa4-e4db-446f-817f-874d64bb9b88",
+        "title": "Patch OpenSSL vulnerability on build-server",
+        "state": "todo",
+        "createdAt": "2026-01-19T04:01:00.000Z",
+        "updatedAt": "2026-01-19T11:36:00.000Z",
+        "children": [],
+        "date": "2026-01-18"
+      },
+      {
+        "id": "d52048ea-b46f-4090-bac6-ecb90de23888",
+        "title": "Audit API-keys usage across services",
+        "state": "todo",
+        "createdAt": "2026-01-19T04:11:00.000Z",
+        "updatedAt": "2026-01-19T12:54:00.000Z",
+        "children": [],
+        "date": "2026-01-18"
+      },
+      {
+        "id": "fd0604bd-8286-44ca-813f-69e36c3d5132",
+        "title": "Implement circuit-breaker for external-API",
+        "state": "todo",
+        "createdAt": "2026-01-19T03:15:00.000Z",
+        "updatedAt": "2026-01-19T07:58:00.000Z",
+        "children": [],
+        "date": "2026-01-18"
+      },
+      {
+        "id": "d2090fe7-977d-45d8-8bdb-07b79aec6833",
+        "title": "Optimize bundle-size for marketing-site",
+        "state": "todo",
+        "createdAt": "2026-01-19T02:57:00.000Z",
+        "updatedAt": "2026-01-19T05:53:00.000Z",
+        "children": [],
+        "date": "2026-01-18"
+      }
+    ],
+    "2026-01-19": [
+      {
+        "id": "7523c902-a517-432e-8aaa-d0e1502f2865",
+        "title": "Fix cross-browser bugs in IE11 fallback",
+        "state": "todo",
+        "createdAt": "2026-01-20T03:53:00.000Z",
+        "updatedAt": "2026-01-20T11:50:00.000Z",
+        "children": [],
+        "date": "2026-01-19"
+      },
+      {
+        "id": "45bc18be-52ef-4370-b749-b6009fcc640c",
+        "title": "Draft quarterly performance-review",
+        "state": "todo",
+        "createdAt": "2026-01-20T02:59:00.000Z",
+        "updatedAt": "2026-01-20T09:01:00.000Z",
+        "children": [],
+        "date": "2026-01-19"
+      },
+      {
+        "id": "1f591e93-78e0-4aa2-983b-8dcbcac9099a",
+        "title": "Update error-handling in file-upload-svc",
+        "state": "todo",
+        "createdAt": "2026-01-20T04:59:00.000Z",
+        "updatedAt": "2026-01-20T07:17:00.000Z",
+        "children": [],
+        "date": "2026-01-19"
+      },
+      {
+        "id": "dc71c352-22d1-4f77-86b8-c10bbd9a9586",
+        "title": "Implement search-indexing for blog-posts",
+        "state": "todo",
+        "createdAt": "2026-01-20T02:53:00.000Z",
+        "updatedAt": "2026-01-20T08:15:00.000Z",
+        "children": [],
+        "date": "2026-01-19"
+      },
+      {
+        "id": "d438fc41-b067-46e6-8576-e21666e0e6cc",
+        "title": "Secure Redis instance with ACLs",
+        "state": "todo",
+        "createdAt": "2026-01-20T04:22:00.000Z",
+        "updatedAt": "2026-01-20T05:32:00.000Z",
+        "children": [],
+        "date": "2026-01-19"
+      }
+    ],
+    "2026-01-20": [
+      {
+        "id": "d649fd4c-c1b2-4b38-b825-d2bf51d0260e",
+        "title": "Debug failing cron-job for daily-reports",
+        "state": "todo",
+        "createdAt": "2026-01-21T04:58:00.000Z",
+        "updatedAt": "2026-01-21T09:31:00.000Z",
+        "children": [],
+        "date": "2026-01-20"
+      },
+      {
+        "id": "8eee7cf4-5e38-4fa4-bfa6-45b69ba56c56",
+        "title": "Setup staging-environment for feature-X",
+        "state": "todo",
+        "createdAt": "2026-01-21T04:01:00.000Z",
+        "updatedAt": "2026-01-21T09:40:00.000Z",
+        "children": [],
+        "date": "2026-01-20"
+      },
+      {
+        "id": "b2dc78f5-4a26-4546-9900-4d6392d4b4c7",
+        "title": "Implement multi-tenant auth in gateway",
+        "state": "todo",
+        "createdAt": "2026-01-21T04:24:00.000Z",
+        "updatedAt": "2026-01-21T04:48:00.000Z",
+        "children": [],
+        "date": "2026-01-20"
+      },
+      {
+        "id": "9a1a0a94-15c5-4054-8b7b-d7134ac4a2e2",
+        "title": "Fix race-condition in state-manager",
+        "state": "todo",
+        "createdAt": "2026-01-21T03:03:00.000Z",
+        "updatedAt": "2026-01-21T12:08:00.000Z",
+        "children": [],
+        "date": "2026-01-20"
+      }
+    ],
+    "2026-01-21": [
+      {
+        "id": "28b87507-df68-420f-a459-175cfba41dd6",
+        "title": "Optimize SVG assets for performance",
+        "state": "todo",
+        "createdAt": "2026-01-22T03:23:00.000Z",
+        "updatedAt": "2026-01-22T12:18:00.000Z",
+        "children": [],
+        "date": "2026-01-21"
+      },
+      {
+        "id": "97dbb3ea-9848-47a5-bd24-8e36b038a477",
+        "title": "Update CSP headers for security-audit",
+        "state": "todo",
+        "createdAt": "2026-01-22T02:54:00.000Z",
+        "updatedAt": "2026-01-22T11:26:00.000Z",
+        "children": [
+          {
+            "id": "ae51d748-1169-4431-82f4-7106014bc9d7",
+            "title": "Update unit tests",
+            "state": "todo",
+            "createdAt": "2026-01-04T12:40:00.000Z",
+            "updatedAt": "2026-01-04T12:40:00.000Z",
+            "children": [],
+            "parentId": "97dbb3ea-9848-47a5-bd24-8e36b038a477",
+            "date": "2026-01-21"
+          }
+        ],
+        "date": "2026-01-21"
+      },
+      {
+        "id": "3c5365c5-61a1-423a-a4a0-ca0da86fcd23",
+        "title": "Implement feature-flag for new-UI",
+        "state": "todo",
+        "createdAt": "2026-01-22T03:36:00.000Z",
+        "updatedAt": "2026-01-22T10:26:00.000Z",
+        "children": [],
+        "date": "2026-01-21"
+      }
+    ],
+    "2026-01-22": [
+      {
+        "id": "3b4d6199-28f2-423c-9d4e-a954204d401f",
+        "title": "Fix broken-links in API-documentation",
+        "state": "todo",
+        "createdAt": "2026-01-23T04:16:00.000Z",
+        "updatedAt": "2026-01-23T10:38:00.000Z",
+        "children": [],
+        "date": "2026-01-22"
+      },
+      {
+        "id": "0ccdd87a-6801-407b-97f6-1b1631a22c5b",
+        "title": "Refactor shared-components for reusability",
+        "state": "todo",
+        "createdAt": "2026-01-23T03:48:00.000Z",
+        "updatedAt": "2026-01-23T09:32:00.000Z",
+        "children": [
+          {
+            "id": "5e8757f7-c883-4fd9-b73b-e6d5c586717e",
+            "title": "Update documentation",
+            "state": "completed",
+            "createdAt": "2026-01-04T12:06:00.000Z",
+            "updatedAt": "2026-01-04T12:06:00.000Z",
+            "children": [
+              {
+                "id": "aab9e9ed-2c92-466a-bbd5-587cff5e340c",
+                "title": "Code review",
+                "state": "todo",
+                "createdAt": "2026-01-04T05:25:00.000Z",
+                "updatedAt": "2026-01-04T05:25:00.000Z",
+                "children": [],
+                "parentId": "5e8757f7-c883-4fd9-b73b-e6d5c586717e",
+                "date": "2026-01-22"
+              }
+            ],
+            "parentId": "0ccdd87a-6801-407b-97f6-1b1631a22c5b",
+            "date": "2026-01-22",
+            "endTime": "2026-01-04T09:07:00.000Z"
+          },
+          {
+            "id": "6ca75a86-ff8c-48d7-a139-ff405ab126a8",
+            "title": "Write integration tests",
+            "state": "completed",
+            "createdAt": "2026-01-04T05:53:00.000Z",
+            "updatedAt": "2026-01-04T05:53:00.000Z",
+            "children": [],
+            "parentId": "0ccdd87a-6801-407b-97f6-1b1631a22c5b",
+            "date": "2026-01-22",
+            "endTime": "2026-01-04T13:21:00.000Z"
+          }
+        ],
+        "date": "2026-01-22"
+      },
+      {
+        "id": "ad2f7cca-01e0-469a-97dc-ac7bba2bbedb",
+        "title": "Audit resource-limits for k8s-pods",
+        "state": "todo",
+        "createdAt": "2026-01-23T03:54:00.000Z",
+        "updatedAt": "2026-01-23T08:24:00.000Z",
+        "children": [],
+        "date": "2026-01-22"
+      },
+      {
+        "id": "78d2cf88-45e3-41e5-8d04-e5f89dd02029",
+        "title": "Implement request-tracing for microservices",
+        "state": "todo",
+        "createdAt": "2026-01-23T03:35:00.000Z",
+        "updatedAt": "2026-01-23T08:05:00.000Z",
+        "children": [],
+        "date": "2026-01-22"
+      },
+      {
+        "id": "6875ad0a-72c2-44d3-9554-c4f99595c4a8",
+        "title": "Update E2E test-data generation script",
+        "state": "todo",
+        "createdAt": "2026-01-23T04:15:00.000Z",
+        "updatedAt": "2026-01-23T08:11:00.000Z",
+        "children": [
+          {
+            "id": "4d7d83c3-9f08-4313-a396-8bcccf193215",
+            "title": "Update documentation",
+            "state": "completed",
+            "createdAt": "2026-01-04T10:49:00.000Z",
+            "updatedAt": "2026-01-04T10:49:00.000Z",
+            "children": [],
+            "parentId": "6875ad0a-72c2-44d3-9554-c4f99595c4a8",
+            "date": "2026-01-22",
+            "endTime": "2026-01-04T13:09:00.000Z"
+          },
+          {
+            "id": "2ee76da8-c0cd-49c3-a515-78d2d6f7fe8d",
+            "title": "Performance testing",
+            "state": "completed",
+            "createdAt": "2026-01-04T05:36:00.000Z",
+            "updatedAt": "2026-01-04T05:36:00.000Z",
+            "children": [
+              {
+                "id": "04d69f95-cf13-42f5-b9c5-1214cbf8d634",
+                "title": "Add type definitions",
+                "state": "completed",
+                "createdAt": "2026-01-04T08:03:00.000Z",
+                "updatedAt": "2026-01-04T08:03:00.000Z",
+                "children": [],
+                "parentId": "2ee76da8-c0cd-49c3-a515-78d2d6f7fe8d",
+                "date": "2026-01-22",
+                "endTime": "2026-01-04T10:36:00.000Z"
+              }
+            ],
+            "parentId": "6875ad0a-72c2-44d3-9554-c4f99595c4a8",
+            "date": "2026-01-22",
+            "endTime": "2026-01-04T11:38:00.000Z"
+          }
+        ],
+        "date": "2026-01-22"
+      }
+    ],
+    "2026-01-23": [
+      {
+        "id": "452d8af8-2820-42b5-9785-b8aef37de9bf",
+        "title": "Patch security issue in node-fetch",
+        "state": "todo",
+        "createdAt": "2026-01-24T04:40:00.000Z",
+        "updatedAt": "2026-01-24T04:53:00.000Z",
+        "children": [],
+        "date": "2026-01-23"
+      },
+      {
+        "id": "77f93e6b-4353-401d-871b-56facf271d45",
+        "title": "Verify data-consistency after migration",
+        "state": "todo",
+        "createdAt": "2026-01-24T03:17:00.000Z",
+        "updatedAt": "2026-01-24T06:26:00.000Z",
+        "children": [],
+        "date": "2026-01-23"
+      }
+    ],
+    "2026-01-24": [
+      {
+        "id": "e3b8e677-7454-45ab-b55b-7ebc1845d38d",
+        "title": "Implement pagination for search-results",
+        "state": "todo",
+        "createdAt": "2026-01-25T02:33:00.000Z",
+        "updatedAt": "2026-01-25T08:24:00.000Z",
+        "children": [],
+        "date": "2026-01-24"
+      },
+      {
+        "id": "2d32d7b5-5127-4827-8288-cc985c8e4746",
+        "title": "Optimize database-indexing for large-tables",
+        "state": "todo",
+        "createdAt": "2026-01-25T05:11:00.000Z",
+        "updatedAt": "2026-01-25T06:31:00.000Z",
+        "children": [
+          {
+            "id": "4d944452-0bdc-4029-9384-8036aed0c813",
+            "title": "Update unit tests",
+            "state": "completed",
+            "createdAt": "2026-01-04T06:02:00.000Z",
+            "updatedAt": "2026-01-04T06:02:00.000Z",
+            "children": [
+              {
+                "id": "9b66e416-59b4-4e89-95f5-675457187df5",
+                "title": "Create Jira ticket",
+                "state": "completed",
+                "createdAt": "2026-01-04T07:04:00.000Z",
+                "updatedAt": "2026-01-04T07:04:00.000Z",
+                "children": [],
+                "parentId": "4d944452-0bdc-4029-9384-8036aed0c813",
+                "date": "2026-01-24",
+                "endTime": "2026-01-04T12:48:00.000Z"
+              },
+              {
+                "id": "d836ae02-b7ae-4ce8-88ec-35c693e6f4bf",
+                "title": "Update unit tests",
+                "state": "todo",
+                "createdAt": "2026-01-04T07:36:00.000Z",
+                "updatedAt": "2026-01-04T07:36:00.000Z",
+                "children": [],
+                "parentId": "4d944452-0bdc-4029-9384-8036aed0c813",
+                "date": "2026-01-24"
+              }
+            ],
+            "parentId": "2d32d7b5-5127-4827-8288-cc985c8e4746",
+            "date": "2026-01-24",
+            "endTime": "2026-01-04T10:54:00.000Z"
+          },
+          {
+            "id": "0d6d7d01-54b4-43dd-a511-a206f69917a0",
+            "title": "Update dependencies",
+            "state": "todo",
+            "createdAt": "2026-01-04T06:11:00.000Z",
+            "updatedAt": "2026-01-04T06:11:00.000Z",
+            "children": [],
+            "parentId": "2d32d7b5-5127-4827-8288-cc985c8e4746",
+            "date": "2026-01-24"
+          },
+          {
+            "id": "85527374-ab5c-4ba5-b017-9bc1d2fc6906",
+            "title": "Update CI/CD",
+            "state": "completed",
+            "createdAt": "2026-01-04T08:51:00.000Z",
+            "updatedAt": "2026-01-04T08:51:00.000Z",
+            "children": [
+              {
+                "id": "3bfa4c92-5eb9-42ba-83ad-6c27bcf10bc8",
+                "title": "Add metrics",
+                "state": "completed",
+                "createdAt": "2026-01-04T11:28:00.000Z",
+                "updatedAt": "2026-01-04T11:28:00.000Z",
+                "children": [],
+                "parentId": "85527374-ab5c-4ba5-b017-9bc1d2fc6906",
+                "date": "2026-01-24",
+                "endTime": "2026-01-04T10:07:00.000Z"
+              },
+              {
+                "id": "ee11a17d-eb8e-44ee-a9c8-ccef029aba31",
+                "title": "Add error handling",
+                "state": "completed",
+                "createdAt": "2026-01-04T09:04:00.000Z",
+                "updatedAt": "2026-01-04T09:04:00.000Z",
+                "children": [],
+                "parentId": "85527374-ab5c-4ba5-b017-9bc1d2fc6906",
+                "date": "2026-01-24",
+                "endTime": "2026-01-04T09:39:00.000Z"
+              }
+            ],
+            "parentId": "2d32d7b5-5127-4827-8288-cc985c8e4746",
+            "date": "2026-01-24",
+            "endTime": "2026-01-04T13:27:00.000Z"
+          }
+        ],
+        "date": "2026-01-24"
+      }
+    ],
+    "2026-01-25": [
+      {
+        "id": "0aeef413-daa6-492b-964f-b1cd6dede5c3",
+        "title": "Fix visual-regressions in navbar-update",
+        "state": "todo",
+        "createdAt": "2026-01-26T05:01:00.000Z",
+        "updatedAt": "2026-01-26T09:46:00.000Z",
+        "children": [],
+        "date": "2026-01-25"
+      },
+      {
+        "id": "2fe0c541-ff5b-44d3-b44f-28e06784578c",
+        "title": "Update dependency-graph for yarn-v4",
+        "state": "todo",
+        "createdAt": "2026-01-26T04:32:00.000Z",
+        "updatedAt": "2026-01-26T07:37:00.000Z",
+        "children": [],
+        "date": "2026-01-25"
+      },
+      {
+        "id": "b162cfdf-560e-4659-9c70-6842dac64a12",
+        "title": "Implement logging for authentication-audit",
+        "state": "todo",
+        "createdAt": "2026-01-26T04:27:00.000Z",
+        "updatedAt": "2026-01-26T06:09:00.000Z",
+        "children": [],
+        "date": "2026-01-25"
+      }
+    ],
+    "2026-01-26": [
+      {
+        "id": "11530273-a4a5-430c-a7d1-4716622065d7",
+        "title": "Fix broken unit-tests for auth-logic",
+        "state": "todo",
+        "createdAt": "2026-01-27T04:42:00.000Z",
+        "updatedAt": "2026-01-27T04:36:00.000Z",
+        "children": [
+          {
+            "id": "b93e8923-a02d-4666-91a4-7d953ffa101d",
+            "title": "Update changelog",
+            "state": "completed",
+            "createdAt": "2026-01-04T09:49:00.000Z",
+            "updatedAt": "2026-01-04T09:49:00.000Z",
+            "children": [
+              {
+                "id": "d1eb71fe-63e4-4240-8d13-9aa659fd5ba3",
+                "title": "Update unit tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T09:39:00.000Z",
+                "updatedAt": "2026-01-04T09:39:00.000Z",
+                "children": [],
+                "parentId": "b93e8923-a02d-4666-91a4-7d953ffa101d",
+                "date": "2026-01-26",
+                "endTime": "2026-01-04T08:51:00.000Z"
+              }
+            ],
+            "parentId": "11530273-a4a5-430c-a7d1-4716622065d7",
+            "date": "2026-01-26",
+            "endTime": "2026-01-04T09:08:00.000Z"
+          }
+        ],
+        "date": "2026-01-26"
+      },
+      {
+        "id": "ca60e99a-d9d9-4d36-9c2a-d3b2919159d7",
+        "title": "Implement request-validation for API-v1",
+        "state": "todo",
+        "createdAt": "2026-01-27T03:03:00.000Z",
+        "updatedAt": "2026-01-27T10:36:00.000Z",
+        "children": [],
+        "date": "2026-01-26"
+      },
+      {
+        "id": "781bdc70-28d7-4429-8186-4ec0ddff188d",
+        "title": "Update infra-docs for new-VPC architecture",
+        "state": "todo",
+        "createdAt": "2026-01-27T02:55:00.000Z",
+        "updatedAt": "2026-01-27T05:01:00.000Z",
+        "children": [
+          {
+            "id": "850801ec-d0ca-46d3-b172-fae590fe5b23",
+            "title": "Update dependencies",
+            "state": "completed",
+            "createdAt": "2026-01-04T09:07:00.000Z",
+            "updatedAt": "2026-01-04T09:07:00.000Z",
+            "children": [],
+            "parentId": "781bdc70-28d7-4429-8186-4ec0ddff188d",
+            "date": "2026-01-26",
+            "endTime": "2026-01-04T08:51:00.000Z"
+          },
+          {
+            "id": "2c433e7d-0502-4b11-8922-94fa64927838",
+            "title": "Verify on production",
+            "state": "todo",
+            "createdAt": "2026-01-04T08:05:00.000Z",
+            "updatedAt": "2026-01-04T08:05:00.000Z",
+            "children": [],
+            "parentId": "781bdc70-28d7-4429-8186-4ec0ddff188d",
+            "date": "2026-01-26"
+          }
+        ],
+        "date": "2026-01-26"
+      },
+      {
+        "id": "75753fb9-58de-481f-af91-5b301b8dfc9a",
+        "title": "Analyze performance-bottleneck in PDF-gen",
+        "state": "todo",
+        "createdAt": "2026-01-27T03:37:00.000Z",
+        "updatedAt": "2026-01-27T05:13:00.000Z",
+        "children": [],
+        "date": "2026-01-26"
+      }
+    ],
+    "2026-01-27": [
+      {
+        "id": "839404cc-8f3b-4063-b0d9-06339a50ed41",
+        "title": "Fix layout-issue in mobile-responsive-view",
+        "state": "todo",
+        "createdAt": "2026-01-28T05:18:00.000Z",
+        "updatedAt": "2026-01-28T07:31:00.000Z",
+        "children": [],
+        "date": "2026-01-27"
+      },
+      {
+        "id": "dae8a166-5fee-4347-a58c-5b6f55bddc7a",
+        "title": "Implement retry-policy for message-queue",
+        "state": "todo",
+        "createdAt": "2026-01-28T04:46:00.000Z",
+        "updatedAt": "2026-01-28T11:16:00.000Z",
+        "children": [],
+        "date": "2026-01-27"
+      },
+      {
+        "id": "d538e8c7-6149-490c-b9bc-a480145142ea",
+        "title": "Update staging-data from production-sanitized",
+        "state": "todo",
+        "createdAt": "2026-01-28T05:00:00.000Z",
+        "updatedAt": "2026-01-28T12:43:00.000Z",
+        "children": [
+          {
+            "id": "8d0e8664-6f93-4885-ac9e-8a0b172e88d2",
+            "title": "Update documentation",
+            "state": "completed",
+            "createdAt": "2026-01-04T04:04:00.000Z",
+            "updatedAt": "2026-01-04T04:04:00.000Z",
+            "children": [],
+            "parentId": "d538e8c7-6149-490c-b9bc-a480145142ea",
+            "date": "2026-01-27",
+            "endTime": "2026-01-04T11:35:00.000Z"
+          }
+        ],
+        "date": "2026-01-27"
+      },
+      {
+        "id": "a950fccb-8edc-40a7-a178-be860bea69e7",
+        "title": "Fix bug in date-picker component",
+        "state": "todo",
+        "createdAt": "2026-01-28T04:14:00.000Z",
+        "updatedAt": "2026-01-28T05:03:00.000Z",
+        "children": [],
+        "date": "2026-01-27"
+      }
+    ],
+    "2026-01-28": [
+      {
+        "id": "c40784bc-f8e4-4087-bed6-cd23a3bc8175",
+        "title": "Optimize image-loading for gallery-view",
+        "state": "todo",
+        "createdAt": "2026-01-29T03:31:00.000Z",
+        "updatedAt": "2026-01-29T09:38:00.000Z",
+        "children": [],
+        "date": "2026-01-28"
+      },
+      {
+        "id": "ef87cd9a-8fe6-440a-aebd-91a4d777aef2",
+        "title": "Implement auth-guards for admin-dashboard",
+        "state": "todo",
+        "createdAt": "2026-01-29T05:06:00.000Z",
+        "updatedAt": "2026-01-29T13:15:00.000Z",
+        "children": [],
+        "date": "2026-01-28"
+      },
+      {
+        "id": "107a9ae8-44e0-4dcd-8066-964a1b54fd5b",
+        "title": "Update project-dependencies to latest",
+        "state": "todo",
+        "createdAt": "2026-01-29T05:02:00.000Z",
+        "updatedAt": "2026-01-29T12:47:00.000Z",
+        "children": [
+          {
+            "id": "173d0844-be75-4e8d-9999-750d1f1f5bfd",
+            "title": "Fix linting errors",
+            "state": "todo",
+            "createdAt": "2026-01-04T07:53:00.000Z",
+            "updatedAt": "2026-01-04T07:53:00.000Z",
+            "children": [],
+            "parentId": "107a9ae8-44e0-4dcd-8066-964a1b54fd5b",
+            "date": "2026-01-28"
+          },
+          {
+            "id": "02cf3752-7158-47cc-ab8e-468bbedfd1ef",
+            "title": "Code review",
+            "state": "completed",
+            "createdAt": "2026-01-04T07:11:00.000Z",
+            "updatedAt": "2026-01-04T07:11:00.000Z",
+            "children": [],
+            "parentId": "107a9ae8-44e0-4dcd-8066-964a1b54fd5b",
+            "date": "2026-01-28",
+            "endTime": "2026-01-04T12:11:00.000Z"
+          }
+        ],
+        "date": "2026-01-28"
+      }
+    ],
+    "2026-01-29": [
+      {
+        "id": "68cf3d0e-6710-4884-9077-fb0b8df9ace1",
+        "title": "Fix memory-usage peak in batch-processing",
+        "state": "todo",
+        "createdAt": "2026-01-30T04:46:00.000Z",
+        "updatedAt": "2026-01-30T06:10:00.000Z",
+        "children": [
+          {
+            "id": "496c56dc-12ad-41d1-9a1a-c1827c017054",
+            "title": "Update unit tests",
+            "state": "completed",
+            "createdAt": "2026-01-04T04:43:00.000Z",
+            "updatedAt": "2026-01-04T04:43:00.000Z",
+            "children": [
+              {
+                "id": "45b7f220-ed25-400b-a63f-d7afa5e2f853",
+                "title": "Write integration tests",
+                "state": "completed",
+                "createdAt": "2026-01-04T04:57:00.000Z",
+                "updatedAt": "2026-01-04T04:57:00.000Z",
+                "children": [],
+                "parentId": "496c56dc-12ad-41d1-9a1a-c1827c017054",
+                "date": "2026-01-29",
+                "endTime": "2026-01-04T11:12:00.000Z"
+              },
+              {
+                "id": "9c826954-4abb-44dd-9202-44654af5d18c",
+                "title": "Verify on production",
+                "state": "completed",
+                "createdAt": "2026-01-04T12:24:00.000Z",
+                "updatedAt": "2026-01-04T12:24:00.000Z",
+                "children": [],
+                "parentId": "496c56dc-12ad-41d1-9a1a-c1827c017054",
+                "date": "2026-01-29",
+                "endTime": "2026-01-04T11:07:00.000Z"
+              }
+            ],
+            "parentId": "68cf3d0e-6710-4884-9077-fb0b8df9ace1",
+            "date": "2026-01-29",
+            "endTime": "2026-01-04T08:31:00.000Z"
+          },
+          {
+            "id": "44470390-4856-41e2-8a80-b9dc374f5318",
+            "title": "Performance testing",
+            "state": "completed",
+            "createdAt": "2026-01-04T03:56:00.000Z",
+            "updatedAt": "2026-01-04T03:56:00.000Z",
+            "children": [],
+            "parentId": "68cf3d0e-6710-4884-9077-fb0b8df9ace1",
+            "date": "2026-01-29",
+            "endTime": "2026-01-04T08:35:00.000Z"
+          },
+          {
+            "id": "7e17731c-ed4c-4193-b20d-18bd72f2ceb2",
+            "title": "Write integration tests",
+            "state": "todo",
+            "createdAt": "2026-01-04T10:16:00.000Z",
+            "updatedAt": "2026-01-04T10:16:00.000Z",
+            "children": [],
+            "parentId": "68cf3d0e-6710-4884-9077-fb0b8df9ace1",
+            "date": "2026-01-29"
+          }
+        ],
+        "date": "2026-01-29"
+      },
+      {
+        "id": "2b678619-cf9f-4c76-b7ed-8b87d4ba52e9",
+        "title": "Implement audit-trail for critical-actions",
+        "state": "todo",
+        "createdAt": "2026-01-30T03:14:00.000Z",
+        "updatedAt": "2026-01-30T11:08:00.000Z",
+        "children": [],
+        "date": "2026-01-29"
+      },
+      {
+        "id": "f4b074c2-18a3-4e8c-864c-889dba8566c8",
+        "title": "Update deployment-scripts for blue-green",
+        "state": "todo",
+        "createdAt": "2026-01-30T05:25:00.000Z",
+        "updatedAt": "2026-01-30T11:02:00.000Z",
+        "children": [],
+        "date": "2026-01-29"
+      }
+    ],
+    "2026-01-30": [
+      {
+        "id": "5b7a4023-931f-4acc-af4c-dd34abd6fe92",
+        "title": "Improve error-messages for user-onboarding",
+        "state": "todo",
+        "createdAt": "2026-01-31T04:57:00.000Z",
+        "updatedAt": "2026-01-31T06:17:00.000Z",
+        "children": [
+          {
+            "id": "761ca865-35ca-4ada-9ec0-0fd13a523b88",
+            "title": "Deploy to staging",
+            "state": "completed",
+            "createdAt": "2026-01-04T08:42:00.000Z",
+            "updatedAt": "2026-01-04T08:42:00.000Z",
+            "children": [],
+            "parentId": "5b7a4023-931f-4acc-af4c-dd34abd6fe92",
+            "date": "2026-01-30",
+            "endTime": "2026-01-04T10:36:00.000Z"
+          }
+        ],
+        "date": "2026-01-30"
+      },
+      {
+        "id": "c325a11d-3099-4b0c-a0be-bb0db35fb9f6",
+        "title": "Fix CSS-specificity in component-library",
+        "state": "todo",
+        "createdAt": "2026-01-31T03:22:00.000Z",
+        "updatedAt": "2026-01-31T06:15:00.000Z",
+        "children": [],
+        "date": "2026-01-30"
+      }
+    ]
+  },
+  "timeline": {
+    "2026-01-04": [
+      {
+        "id": "f280429a-c853-48ef-8344-20eb364aff45",
+        "taskId": "e13fd64c-b1a7-4578-8e29-cc86adb48fcc",
+        "taskTitle": "Add type definitions",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:41:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "3631ceb5-2e30-426c-af22-a70d20e7c61b",
+        "taskId": "a27936f3-5fa8-4a70-8a50-899953e6e710",
+        "taskTitle": "Update dependencies",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:07:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "f7145440-df6d-4b3b-b619-72083873a93c",
+        "taskId": "ac73fb82-f67e-411f-bdd2-ffa62fd30c50",
+        "taskTitle": "Update unit tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T12:53:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2025-12-31": [
+      {
+        "id": "ca069e08-1d23-4cfd-a4d5-42c73ba3a6e7",
+        "taskId": "abb18008-4fa3-49e6-95b3-cf28b64b5b52",
+        "taskTitle": "Fix race condition in AuthProvider sync",
+        "type": "started",
+        "timestamp": "2026-01-01T03:33:00.000Z"
+      },
+      {
+        "id": "60dace06-248f-4dbf-b31e-5a072bca9c8c",
+        "taskId": "11d8abd6-6da3-491d-bf63-d115989b9162",
+        "taskTitle": "Refactor Redis connection pooling logic",
+        "type": "started",
+        "timestamp": "2026-01-01T03:57:00.000Z"
+      },
+      {
+        "id": "1c276c5a-ec2b-4bda-ba21-922869a7ddf0",
+        "taskId": "83d9b7cc-8a4c-4103-a003-7e582238f212",
+        "taskTitle": "Optimize Postgres query for user-history node",
+        "type": "started",
+        "timestamp": "2026-01-01T05:07:00.000Z"
+      },
+      {
+        "id": "82e7a60a-45e6-431e-874b-a29706633e74",
+        "taskId": "abb18008-4fa3-49e6-95b3-cf28b64b5b52",
+        "taskTitle": "Fix race condition in AuthProvider sync",
+        "type": "completed",
+        "timestamp": "2026-01-01T11:32:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "161430d0-5625-4b54-a68a-abd100bd9fb0",
+        "taskId": "66f4d18b-9031-4aa2-b857-2fe5c4ac75e6",
+        "taskTitle": "Check production alerts",
+        "type": "completed",
+        "timestamp": "2026-01-01T11:39:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "8c23af98-f252-40c7-9207-6e3ead827b1c",
+        "taskId": "83d9b7cc-8a4c-4103-a003-7e582238f212",
+        "taskTitle": "Optimize Postgres query for user-history node",
+        "type": "delayed",
+        "timestamp": "2026-01-01T12:03:00.000Z",
+        "previousState": "todo",
+        "newState": "delayed"
+      },
+      {
+        "id": "6188b3a8-4b97-46eb-9f9a-a5d6faf8ac05",
+        "taskId": "11d8abd6-6da3-491d-bf63-d115989b9162",
+        "taskTitle": "Refactor Redis connection pooling logic",
+        "type": "delayed",
+        "timestamp": "2026-01-01T13:04:00.000Z",
+        "previousState": "todo",
+        "newState": "delayed"
+      },
+      {
+        "id": "367c8792-0efc-449f-8ba6-aa99ca3d179a",
+        "taskId": "de74b319-ca9f-4f54-9386-8bb77554ad00",
+        "taskTitle": "Performance testing",
+        "type": "completed",
+        "timestamp": "2026-01-04T08:43:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-05": [
+      {
+        "id": "03087d8b-ee8b-4e95-98bf-393b2e70f618",
+        "taskId": "b16408ed-52ad-4b5f-a727-869a873d582e",
+        "taskTitle": "Add metrics",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:22:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-01": [
+      {
+        "id": "2d5564af-459e-47b0-9c42-2d9595955033",
+        "taskId": "68bf449b-e673-4cb3-9e85-43acdd5dadd0",
+        "taskTitle": "Update Swagger docs for /v2/orders endpoint",
+        "type": "started",
+        "timestamp": "2026-01-02T05:17:00.000Z"
+      },
+      {
+        "id": "190fa057-2565-4b76-b48b-eea6e7e71801",
+        "taskId": "ebe2cc39-b9e5-481a-abb6-e6d3408349fa",
+        "taskTitle": "Migrate legacy S3 buckets to standard IA",
+        "type": "started",
+        "timestamp": "2026-01-02T05:34:00.000Z"
+      },
+      {
+        "id": "80ec4a88-622a-4c7c-aa6c-309323e9b991",
+        "taskId": "0e72ff2d-3b76-4f99-96f6-0379beda0b9d",
+        "taskTitle": "Investigate memory leak on staging-cluster-3",
+        "type": "started",
+        "timestamp": "2026-01-02T06:24:00.000Z"
+      },
+      {
+        "id": "b1852284-42fb-4e59-8f02-aeb8d9e41cbd",
+        "taskId": "68bf449b-e673-4cb3-9e85-43acdd5dadd0",
+        "taskTitle": "Update Swagger docs for /v2/orders endpoint",
+        "type": "completed",
+        "timestamp": "2026-01-02T09:28:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "e5bf13ae-cdce-41f6-8036-2df02c4474b9",
+        "taskId": "ebe2cc39-b9e5-481a-abb6-e6d3408349fa",
+        "taskTitle": "Migrate legacy S3 buckets to standard IA",
+        "type": "completed",
+        "timestamp": "2026-01-02T09:32:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "2f425cc4-317b-42ed-9ffe-560fb640812b",
+        "taskId": "0e72ff2d-3b76-4f99-96f6-0379beda0b9d",
+        "taskTitle": "Investigate memory leak on staging-cluster-3",
+        "type": "completed",
+        "timestamp": "2026-01-02T13:04:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "2e0497ce-2647-4e40-8cc9-094a8eb607b8",
+        "taskId": "c9abc5e9-d833-4ae3-98ac-5baf36ca031a",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T09:41:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "34ba5780-6ba7-4166-93a0-45a1d8d4ce76",
+        "taskId": "e4a421db-83b4-4e1b-bdb6-7458a9edee5e",
+        "taskTitle": "Update CI/CD",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:12:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-02": [
+      {
+        "id": "aa1d4f32-a337-47bb-b182-6f57da47ce72",
+        "taskId": "553f4fb6-399c-4d14-98c6-7a6b6b00a525",
+        "taskTitle": "Patch CVE-2024 security vuln in jwt-lib",
+        "type": "started",
+        "timestamp": "2026-01-03T03:59:00.000Z"
+      },
+      {
+        "id": "7c5c308c-9ff4-4776-b727-2d7760a0b618",
+        "taskId": "2e83e92d-d7b4-4e84-b670-8f71e486c2a4",
+        "taskTitle": "Update Dockerfile for multi-stage builds",
+        "type": "started",
+        "timestamp": "2026-01-03T05:03:00.000Z"
+      },
+      {
+        "id": "536f7178-4646-41f2-969f-40412a5a2277",
+        "taskId": "553f4fb6-399c-4d14-98c6-7a6b6b00a525",
+        "taskTitle": "Patch CVE-2024 security vuln in jwt-lib",
+        "type": "completed",
+        "timestamp": "2026-01-03T10:39:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "cd30ad02-413f-4488-8e87-2c52710725bf",
+        "taskId": "2e83e92d-d7b4-4e84-b670-8f71e486c2a4",
+        "taskTitle": "Update Dockerfile for multi-stage builds",
+        "type": "completed",
+        "timestamp": "2026-01-03T11:39:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-03": [
+      {
+        "id": "7d731a25-6f13-475e-a81c-9fafac9d2f59",
+        "taskId": "a6f96a43-6644-492c-a7c2-9eab364df651",
+        "taskTitle": "Review prod-launch-blue branch",
+        "type": "started",
+        "timestamp": "2026-01-04T04:48:00.000Z"
+      },
+      {
+        "id": "21820fe8-ea6d-47f3-9821-6a5d89047c71",
+        "taskId": "a6f96a43-6644-492c-a7c2-9eab364df651",
+        "taskTitle": "Review prod-launch-blue branch",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:06:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-06": [
+      {
+        "id": "3be04f91-4d88-4e30-ab65-9fa5fdf2e5e0",
+        "taskId": "de46c278-80e9-48aa-8683-9cba0a22d2f9",
+        "taskTitle": "Update changelog",
+        "type": "completed",
+        "timestamp": "2026-01-04T08:48:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "0e00b453-e6c5-4c70-9072-5df35bf903bb",
+        "taskId": "4218765e-424d-455d-9fa8-cadff836723e",
+        "taskTitle": "Update dependencies",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:23:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "ca2633d3-f722-47b0-b38f-f950a4bb26cc",
+        "taskId": "5d5973cb-eb8a-4511-89d5-280997c36685",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:26:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "bda4cf1b-6d77-41f2-b3b3-e79d09d963c6",
+        "taskId": "b7362206-e0df-4680-9e01-96abab063acb",
+        "taskTitle": "Configure monitoring",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:39:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-08": [
+      {
+        "id": "fe2e0c3c-c24e-438e-996d-d29feb0229bf",
+        "taskId": "16b5b46f-7d6e-4db6-a33e-98860bb79712",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:38:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "a11eb2d0-5662-4012-a62f-47bf7bfbd548",
+        "taskId": "53f5a43e-f747-4681-a1a7-91cda737353c",
+        "taskTitle": "Code review",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:39:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "d01a486c-b44c-4231-b0fe-22ebcd23af8b",
+        "taskId": "997cc9d1-25eb-400b-aa90-8920680ad9f7",
+        "taskTitle": "Notify team",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:01:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "50e452ce-8246-4f26-864e-de10256cb46a",
+        "taskId": "129860d0-fae8-4a82-8658-f696ecf1383b",
+        "taskTitle": "Code review",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:46:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "aa6ca486-79a9-4c62-883d-67c9187c5600",
+        "taskId": "e3eb9bb7-11b6-4a9d-95e5-4e504b657bee",
+        "taskTitle": "Add metrics",
+        "type": "completed",
+        "timestamp": "2026-01-04T12:30:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "70f9683b-c971-49ea-a9cd-da2766957705",
+        "taskId": "b797749e-7ae3-44a2-a4be-194ae3802a5e",
+        "taskTitle": "Update unit tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T13:12:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-10": [
+      {
+        "id": "5f9622ed-0110-4b93-a3d3-7da182b4f97e",
+        "taskId": "e83b909b-0a21-4b7c-85dc-75cdcc7e8428",
+        "taskTitle": "Update dependencies",
+        "type": "completed",
+        "timestamp": "2026-01-04T09:31:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "3bdd6902-5ff0-48b0-a41f-e4ef228617d8",
+        "taskId": "3bfdbdd6-efdb-46b7-a224-ea7543821fa1",
+        "taskTitle": "Add error handling",
+        "type": "completed",
+        "timestamp": "2026-01-04T09:47:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "32624fde-17e1-4631-a9d0-e8b87978e10d",
+        "taskId": "f285af9e-9ee1-48e7-b012-ebfeb99a155c",
+        "taskTitle": "Write integration tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:00:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "df6661fe-f353-4b82-8b7a-b51a717b27d4",
+        "taskId": "ae1446fb-5202-4a04-9859-d18868ca3bce",
+        "taskTitle": "Verify on production",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:25:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "9cccd315-a366-46d7-a173-4df81f47636c",
+        "taskId": "dca2b4d5-6d10-4cc5-b31b-f649b9345586",
+        "taskTitle": "Create Jira ticket",
+        "type": "completed",
+        "timestamp": "2026-01-04T12:27:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "ec4d8b1e-e755-457a-9ec1-8c0d98798821",
+        "taskId": "997e3111-b3d8-4b1b-96e0-c44a1c1b5b18",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T13:09:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-22": [
+      {
+        "id": "d5bd48d4-7e07-435f-8974-c3efd074236d",
+        "taskId": "5e8757f7-c883-4fd9-b73b-e6d5c586717e",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T09:07:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "8a1f5bc4-86f5-4eca-b8fe-98b8ce9b0c7b",
+        "taskId": "04d69f95-cf13-42f5-b9c5-1214cbf8d634",
+        "taskTitle": "Add type definitions",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:36:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "dd933c9f-4ec5-446f-a1e9-4bef4729c2ac",
+        "taskId": "2ee76da8-c0cd-49c3-a515-78d2d6f7fe8d",
+        "taskTitle": "Performance testing",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:38:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "5c73bbd9-e48c-4c11-bbf0-f1d3dca6f685",
+        "taskId": "4d7d83c3-9f08-4313-a396-8bcccf193215",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T13:09:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "370f2a9b-3e9e-4e02-91cf-0f9a90778f89",
+        "taskId": "6ca75a86-ff8c-48d7-a139-ff405ab126a8",
+        "taskTitle": "Write integration tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T13:21:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-24": [
+      {
+        "id": "ab84fb18-082c-443e-a2c9-4fa6a4514789",
+        "taskId": "ee11a17d-eb8e-44ee-a9c8-ccef029aba31",
+        "taskTitle": "Add error handling",
+        "type": "completed",
+        "timestamp": "2026-01-04T09:39:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "0e284c55-a87b-40bf-8892-89a0c5a88db8",
+        "taskId": "3bfa4c92-5eb9-42ba-83ad-6c27bcf10bc8",
+        "taskTitle": "Add metrics",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:07:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "91db8950-1146-4240-a736-b7a464855c2f",
+        "taskId": "4d944452-0bdc-4029-9384-8036aed0c813",
+        "taskTitle": "Update unit tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:54:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "fcac59fb-b38d-4d97-96c9-190ae4c4e090",
+        "taskId": "9b66e416-59b4-4e89-95f5-675457187df5",
+        "taskTitle": "Create Jira ticket",
+        "type": "completed",
+        "timestamp": "2026-01-04T12:48:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "8e0fb706-1d81-4112-8e6a-0ab7e9aeb6ca",
+        "taskId": "85527374-ab5c-4ba5-b017-9bc1d2fc6906",
+        "taskTitle": "Update CI/CD",
+        "type": "completed",
+        "timestamp": "2026-01-04T13:27:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-26": [
+      {
+        "id": "83c4df74-c933-434b-9d4d-a6f4be0b0fec",
+        "taskId": "d1eb71fe-63e4-4240-8d13-9aa659fd5ba3",
+        "taskTitle": "Update unit tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T08:51:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "3fcd101f-5eb9-4056-aa7b-744456c5c0db",
+        "taskId": "850801ec-d0ca-46d3-b172-fae590fe5b23",
+        "taskTitle": "Update dependencies",
+        "type": "completed",
+        "timestamp": "2026-01-04T08:51:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "d2cc30c7-1dcf-4363-b1cb-83477394a657",
+        "taskId": "b93e8923-a02d-4666-91a4-7d953ffa101d",
+        "taskTitle": "Update changelog",
+        "type": "completed",
+        "timestamp": "2026-01-04T09:08:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-27": [
+      {
+        "id": "9fa48228-55c9-4889-b0ae-248c88170fa1",
+        "taskId": "8d0e8664-6f93-4885-ac9e-8a0b172e88d2",
+        "taskTitle": "Update documentation",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:35:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-28": [
+      {
+        "id": "2ff87fb5-588a-4ff3-9ab1-3d4be51ac532",
+        "taskId": "02cf3752-7158-47cc-ab8e-468bbedfd1ef",
+        "taskTitle": "Code review",
+        "type": "completed",
+        "timestamp": "2026-01-04T12:11:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-29": [
+      {
+        "id": "99c997a8-7d8f-4897-a64e-c5bf33d27381",
+        "taskId": "496c56dc-12ad-41d1-9a1a-c1827c017054",
+        "taskTitle": "Update unit tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T08:31:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "600133d7-5c84-4d23-b7d4-19bfca2561d2",
+        "taskId": "44470390-4856-41e2-8a80-b9dc374f5318",
+        "taskTitle": "Performance testing",
+        "type": "completed",
+        "timestamp": "2026-01-04T08:35:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "76fdc158-3f7b-4bd4-b2cd-fb9dc5bcf574",
+        "taskId": "9c826954-4abb-44dd-9202-44654af5d18c",
+        "taskTitle": "Verify on production",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:07:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      },
+      {
+        "id": "d20d14c8-046e-4d35-b8ea-2af84f681a1b",
+        "taskId": "45b7f220-ed25-400b-a63f-d7afa5e2f853",
+        "taskTitle": "Write integration tests",
+        "type": "completed",
+        "timestamp": "2026-01-04T11:12:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ],
+    "2026-01-30": [
+      {
+        "id": "9c5d22f0-5dfd-488f-96b6-445091d3ff08",
+        "taskId": "761ca865-35ca-4ada-9ec0-0fd13a523b88",
+        "taskTitle": "Deploy to staging",
+        "type": "completed",
+        "timestamp": "2026-01-04T10:36:00.000Z",
+        "previousState": "todo",
+        "newState": "completed"
+      }
+    ]
+  },
+  "settings": {
+    "theme": "dark",
+    "defaultStartTime": "now",
+    "dateFormat": "MMMM do, yyyy",
+    "timeFormat": "12h"
+  }
+}
