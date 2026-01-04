@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Box } from "ink";
-import { TaskItem } from "./TaskItem";
-import type { Task } from "../../types/task";
+import React, { useState } from 'react';
+import { Box } from 'ink';
+import { TaskItem } from './TaskItem';
+import type { Task } from '../../types/task';
 
 interface TaskListProps {
   tasks: Task[];
@@ -27,12 +27,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 
         return (
           <Box key={task.id} flexDirection="column">
-            <TaskItem
-              task={task}
-              depth={depth}
-              isSelected={isSelected}
-              isExpanded={isExpanded}
-            />
+            <TaskItem task={task} depth={depth} isSelected={isSelected} isExpanded={isExpanded} />
 
             {hasChildren && isExpanded && (
               <TaskList

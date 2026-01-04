@@ -1,20 +1,13 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
-import { useStorage } from "./StorageContext";
-import { useUndo } from "./UndoContext";
-import { taskMoveService } from "../services/taskMoveService";
-import { logger } from "../utils/logger";
-import type { Task, TaskTree } from "../types/task";
-import type { TimelineEvent } from "../types/timeline";
-import type { CalendarDate } from "../types/calendar";
-import type { UndoActionType } from "../types/undo";
-import { checkForUpdate, UpdateInfo } from "../utils/version";
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
+import { useStorage } from './StorageContext';
+import { useUndo } from './UndoContext';
+import { taskMoveService } from '../services/taskMoveService';
+import { logger } from '../utils/logger';
+import type { Task, TaskTree } from '../types/task';
+import type { TimelineEvent } from '../types/timeline';
+import type { CalendarDate } from '../types/calendar';
+import type { UndoActionType } from '../types/undo';
+import { checkForUpdate, UpdateInfo } from '../utils/version';
 
 interface AppContextType {
   selectedDate: CalendarDate;
@@ -23,8 +16,8 @@ interface AppContextType {
   setTasks: (tasks: TaskTree) => void;
   timeline: { [date: string]: TimelineEvent[] };
   setTimeline: (timeline: { [date: string]: TimelineEvent[] }) => void;
-  activePane: "calendar" | "tasks" | "timeline";
-  setActivePane: (pane: "calendar" | "tasks" | "timeline") => void;
+  activePane: 'calendar' | 'tasks' | 'timeline';
+  setActivePane: (pane: 'calendar' | 'tasks' | 'timeline') => void;
   showHelp: boolean;
   setShowHelp: (show: boolean) => void;
   isInputMode: boolean;
@@ -50,15 +43,17 @@ interface AppContextType {
   recurringEditConfig: {
     taskId: string;
     taskTitle: string;
-    actionType: "edit" | "delete" | "complete" | "state-change" | "add-subtask";
-    onConfirm: (action: "this" | "all" | "from-today") => void;
+    actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
+    onConfirm: (action: 'this' | 'all' | 'from-today') => void;
   } | null;
-  setRecurringEditConfig: (config: {
-    taskId: string;
-    taskTitle: string;
-    actionType: "edit" | "delete" | "complete" | "state-change" | "add-subtask";
-    onConfirm: (action: "this" | "all" | "from-today") => void;
-  } | null) => void;
+  setRecurringEditConfig: (
+    config: {
+      taskId: string;
+      taskTitle: string;
+      actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
+      onConfirm: (action: 'this' | 'all' | 'from-today') => void;
+    } | null,
+  ) => void;
   clearTimelineForDate: (dateStr: string) => void;
   isModalOpen: boolean;
   saveNow: () => Promise<void>;
@@ -87,12 +82,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     day: today.getDate(),
   });
   const [tasks, setTasks] = useState<TaskTree>({});
-  const [timeline, setTimeline] = useState<{ [date: string]: TimelineEvent[] }>(
-    {}
-  );
-  const [activePane, setActivePane] = useState<
-    "calendar" | "tasks" | "timeline"
-  >("tasks");
+  const [timeline, setTimeline] = useState<{ [date: string]: TimelineEvent[] }>({});
+  const [activePane, setActivePane] = useState<'calendar' | 'tasks' | 'timeline'>('tasks');
   const [showHelp, setShowHelp] = useState(false);
   // Use ref for isInputMode to avoid React state timing issues
   const isInputModeRef = useRef(false);
@@ -121,28 +112,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [recurringEditConfig, setRecurringEditConfig] = useState<{
     taskId: string;
     taskTitle: string;
-    actionType: "edit" | "delete" | "complete" | "state-change" | "add-subtask";
-    onConfirm: (action: "this" | "all" | "from-today") => void;
+    actionType: 'edit' | 'delete' | 'complete' | 'state-change' | 'add-subtask';
+    onConfirm: (action: 'this' | 'all' | 'from-today') => void;
   } | null>(null);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   // Function to clear timeline for a specific date
-  const clearTimelineForDate = useCallback((dateStr: string) => {
-    pushUndoAction("TIMELINE_CLEAR", tasks, timeline);
-    setTimeline((prev) => {
-      const newTimeline = { ...prev };
-      delete newTimeline[dateStr];
-      return newTimeline;
-    });
-  }, [pushUndoAction, tasks, timeline]);
+  const clearTimelineForDate = useCallback(
+    (dateStr: string) => {
+      pushUndoAction('TIMELINE_CLEAR', tasks, timeline);
+      setTimeline((prev) => {
+        const newTimeline = { ...prev };
+        delete newTimeline[dateStr];
+        return newTimeline;
+      });
+    },
+    [pushUndoAction, tasks, timeline],
+  );
 
   // Push current state to undo stack before a mutation
   const pushUndoableAction = useCallback(
     (actionType: UndoActionType) => {
       pushUndoAction(actionType, tasks, timeline);
     },
-    [pushUndoAction, tasks, timeline]
+    [pushUndoAction, tasks, timeline],
   );
 
   // Perform undo operation
@@ -168,7 +162,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }
       setShowUpdateDialog(false);
     },
-    [data, save]
+    [data, save],
   );
 
   // Track if initial data has been loaded to prevent save loop
@@ -185,16 +179,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Load data from storage (only once)
   useEffect(() => {
     if (data && !initialLoadDone.current) {
-      logger.log("Loading data from storage", {
+      logger.log('Loading data from storage', {
         settings: data.settings,
         taskDates: Object.keys(data.tasks),
-        timelineDates: Object.keys(data.timeline)
+        timelineDates: Object.keys(data.timeline),
       });
 
       // Check if auto-move is enabled and move tasks before setting initial state
       let tasksToSet = data.tasks;
       if (data.settings?.autoMoveUnfinishedTasks !== false) {
-        logger.log("Auto-move enabled, moving unfinished tasks");
+        logger.log('Auto-move enabled, moving unfinished tasks');
         tasksToSet = taskMoveService.autoMoveUnfinishedTasksToToday(data.tasks);
         // Save the updated tasks if any were moved
         if (tasksToSet !== data.tasks) {
@@ -204,7 +198,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           });
         }
       } else {
-        logger.log("Auto-move disabled, skipping");
+        logger.log('Auto-move disabled, skipping');
       }
 
       setTasks(tasksToSet);
@@ -233,9 +227,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         tasks,
         timeline,
       });
-      logger.log("Auto-saving data", {
+      logger.log('Auto-saving data', {
         taskCount: Object.keys(tasks).reduce((acc, date) => acc + tasks[date].length, 0),
-        timelineCount: Object.keys(timeline).reduce((acc, date) => acc + (timeline[date]?.length || 0), 0)
+        timelineCount: Object.keys(timeline).reduce(
+          (acc, date) => acc + (timeline[date]?.length || 0),
+          0,
+        ),
       });
     }
   }, [tasks, timeline]);
@@ -276,7 +273,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         recurringEditConfig,
         setRecurringEditConfig,
         clearTimelineForDate,
-        isModalOpen: showHelp || showThemeDialog || showOverview || showClearTimelineDialog || showUpdateDialog || showSettingsDialog || showRecurringTaskDialog || showRecurringEditDialog,
+        isModalOpen:
+          showHelp ||
+          showThemeDialog ||
+          showOverview ||
+          showClearTimelineDialog ||
+          showUpdateDialog ||
+          showSettingsDialog ||
+          showRecurringTaskDialog ||
+          showRecurringEditDialog,
         saveNow,
         pushUndoableAction,
         performUndo,
@@ -295,7 +300,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 export const useApp = (): AppContextType => {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error("useApp must be used within AppProvider");
+    throw new Error('useApp must be used within AppProvider');
   }
   return context;
 };

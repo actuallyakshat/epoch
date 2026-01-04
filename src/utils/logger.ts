@@ -1,12 +1,12 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 class Logger {
   private logFile: string;
   private stream: fs.WriteStream | null = null;
 
   constructor() {
-    this.logFile = path.join(process.cwd(), "debug.log");
+    this.logFile = path.join(process.cwd(), 'debug.log');
     this.initializeLog();
   }
 
@@ -15,10 +15,10 @@ class Logger {
     if (fs.existsSync(this.logFile)) {
       fs.unlinkSync(this.logFile);
     }
-    
+
     // Create write stream
-    this.stream = fs.createWriteStream(this.logFile, { flags: "a" });
-    this.log("Logger initialized");
+    this.stream = fs.createWriteStream(this.logFile, { flags: 'a' });
+    this.log('Logger initialized');
   }
 
   log(message: string, data?: any) {
@@ -33,8 +33,8 @@ class Logger {
   }
 
   cleanup() {
-    this.log("Cleaning up logger");
-    
+    this.log('Cleaning up logger');
+
     if (this.stream) {
       this.stream.end();
       this.stream = null;
@@ -51,16 +51,16 @@ class Logger {
 export const logger = new Logger();
 
 // Cleanup on process exit
-process.on("exit", () => {
+process.on('exit', () => {
   logger.cleanup();
 });
 
-process.on("SIGINT", () => {
+process.on('SIGINT', () => {
   logger.cleanup();
   process.exit(0);
 });
 
-process.on("SIGTERM", () => {
+process.on('SIGTERM', () => {
   logger.cleanup();
   process.exit(0);
 });

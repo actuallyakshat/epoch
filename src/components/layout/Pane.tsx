@@ -1,8 +1,8 @@
-import React from "react";
-import { Box } from "ink";
-import { Text } from "../common/ThemedText";
-import type { ReactNode } from "react";
-import { useTheme } from "../../contexts/ThemeContext";
+import React from 'react';
+import { Box } from 'ink';
+import { Text } from '../common/ThemedText';
+import type { ReactNode } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface PaneProps {
   children: ReactNode;
@@ -32,18 +32,14 @@ export const Pane: React.FC<PaneProps> = ({
       height={paneHeight}
       paddingRight={1}
       paddingX={2}
-      alignItems={center ? "center" : "flex-start"}
+      alignItems={center ? 'center' : 'flex-start'}
       overflow="hidden"
     >
       {title && (
         <Box marginBottom={1}>
           <Text
-            backgroundColor={
-              isFocused ? theme.colors.focusIndicator : undefined
-            }
-            color={
-              isFocused ? theme.colors.background : theme.colors.taskHeader
-            }
+            backgroundColor={isFocused ? theme.colors.focusIndicator : undefined}
+            color={isFocused ? theme.colors.background : theme.colors.taskHeader}
             bold
           >
             {isFocused ? ` ${title.toUpperCase()} ` : title}
@@ -55,7 +51,7 @@ export const Pane: React.FC<PaneProps> = ({
         flexGrow={1}
         width="100%"
         overflow="hidden"
-        alignItems={center ? "center" : "flex-start"}
+        alignItems={center ? 'center' : 'flex-start'}
       >
         {children}
       </Box>

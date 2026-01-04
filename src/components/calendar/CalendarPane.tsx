@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Box, Text, useInput } from "ink";
-import { addDays, addWeeks, subDays, subWeeks } from "date-fns";
-import { useTheme } from "../../contexts/ThemeContext";
-import { useApp } from "../../contexts/AppContext";
-import { Pane } from "../layout/Pane";
-import { MonthView } from "./MonthView";
-import { KeyboardHints } from "../common/KeyboardHints";
-import { calendarService } from "../../services/calendarService";
+import React, { useState, useEffect } from 'react';
+import { Box, Text, useInput } from 'ink';
+import { addDays, addWeeks, subDays, subWeeks } from 'date-fns';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useApp } from '../../contexts/AppContext';
+import { Pane } from '../layout/Pane';
+import { MonthView } from './MonthView';
+import { KeyboardHints } from '../common/KeyboardHints';
+import { calendarService } from '../../services/calendarService';
 
 export const CalendarPane: React.FC = () => {
   const { theme } = useTheme();
-  const {
-    selectedDate,
-    setSelectedDate,
-    tasks,
-    activePane,
-    isModalOpen,
-    isInputMode,
-  } = useApp();
+  const { selectedDate, setSelectedDate, tasks, activePane, isModalOpen, isInputMode } = useApp();
   const [currentMonth, setCurrentMonth] = useState({
     year: selectedDate.year,
     month: selectedDate.month,
@@ -25,10 +18,7 @@ export const CalendarPane: React.FC = () => {
 
   // Update currentMonth when selectedDate changes to different month
   useEffect(() => {
-    if (
-      selectedDate.month !== currentMonth.month ||
-      selectedDate.year !== currentMonth.year
-    ) {
+    if (selectedDate.month !== currentMonth.month || selectedDate.year !== currentMonth.year) {
       setCurrentMonth({ year: selectedDate.year, month: selectedDate.month });
     }
   }, [selectedDate.year, selectedDate.month]);
@@ -37,10 +27,10 @@ export const CalendarPane: React.FC = () => {
     currentMonth.year,
     currentMonth.month,
     selectedDate,
-    tasks
+    tasks,
   );
 
-  const isFocused = activePane === "calendar" && !isModalOpen;
+  const isFocused = activePane === 'calendar' && !isModalOpen;
 
   const navigateDate = (newDate: Date) => {
     setSelectedDate({
@@ -54,40 +44,33 @@ export const CalendarPane: React.FC = () => {
     (input: string, key) => {
       if (!isFocused) return;
 
-      const currentDate = new Date(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day
-      );
+      const currentDate = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
 
       // Navigate by day (h/l or left/right)
-      if (input === "h" || key.leftArrow) {
+      if (input === 'h' || key.leftArrow) {
         navigateDate(subDays(currentDate, 1));
         return;
       }
 
-      if (input === "l" || key.rightArrow) {
+      if (input === 'l' || key.rightArrow) {
         navigateDate(addDays(currentDate, 1));
         return;
       }
 
       // Navigate by week (j/k or down/up)
-      if (input === "j" || key.downArrow) {
+      if (input === 'j' || key.downArrow) {
         navigateDate(addWeeks(currentDate, 1));
         return;
       }
 
-      if (input === "k" || key.upArrow) {
+      if (input === 'k' || key.upArrow) {
         navigateDate(subWeeks(currentDate, 1));
         return;
       }
 
       // Navigate by month
-      if (input === "n") {
-        const next = calendarService.getNextMonth(
-          currentMonth.year,
-          currentMonth.month
-        );
+      if (input === 'n') {
+        const next = calendarService.getNextMonth(currentMonth.year, currentMonth.month);
         setCurrentMonth(next);
         // Move selected date to first day of new month
         setSelectedDate({
@@ -98,11 +81,8 @@ export const CalendarPane: React.FC = () => {
         return;
       }
 
-      if (input === "p") {
-        const prev = calendarService.getPreviousMonth(
-          currentMonth.year,
-          currentMonth.month
-        );
+      if (input === 'p') {
+        const prev = calendarService.getPreviousMonth(currentMonth.year, currentMonth.month);
         setCurrentMonth(prev);
         // Move selected date to first day of new month
         setSelectedDate({
@@ -114,7 +94,7 @@ export const CalendarPane: React.FC = () => {
       }
 
       // Go to today
-      if (input === "T") {
+      if (input === 'T') {
         const today = new Date();
         setSelectedDate({
           year: today.getFullYear(),
@@ -124,25 +104,21 @@ export const CalendarPane: React.FC = () => {
         return;
       }
     },
-    { isActive: isFocused && !isInputMode }
+    { isActive: isFocused && !isInputMode },
   );
 
   const monthName = calendarService.getMonthName(currentMonth.month);
 
   return (
-    <Pane
-      title={`${monthName} ${currentMonth.year}`}
-      isFocused={isFocused}
-      center
-    >
+    <Pane title={`${monthName} ${currentMonth.year}`} isFocused={isFocused} center>
       <Box flexDirection="column" alignItems="center">
         <MonthView calendarView={calendarView} />
         <KeyboardHints
           hints={[
-            { key: "h/l", description: "days" },
-            { key: "j/k", description: "weeks" },
-            { key: "n/p", description: "month" },
-            { key: "T", description: "today" },
+            { key: 'h/l', description: 'days' },
+            { key: 'j/k', description: 'weeks' },
+            { key: 'n/p', description: 'month' },
+            { key: 'T', description: 'today' },
           ]}
         />
       </Box>

@@ -10,7 +10,7 @@ export class TimelineService {
     eventType: TimelineEventType,
     timestamp: Date = new Date(),
     previousState?: TaskState,
-    newState?: TaskState
+    newState?: TaskState,
   ): TimelineEvent {
     return {
       id: uuid(),
@@ -29,7 +29,7 @@ export class TimelineService {
 
   addEvent(
     timeline: { [date: string]: TimelineEvent[] },
-    event: TimelineEvent
+    event: TimelineEvent,
   ): { [date: string]: TimelineEvent[] } {
     const dateStr = getDateString(event.timestamp);
 
@@ -42,12 +42,12 @@ export class TimelineService {
   // Remove all events for a specific task (used when deleting a task)
   removeEventsByTaskId(
     timeline: { [date: string]: TimelineEvent[] },
-    taskId: string
+    taskId: string,
   ): { [date: string]: TimelineEvent[] } {
     const result: { [date: string]: TimelineEvent[] } = {};
 
     for (const [date, events] of Object.entries(timeline)) {
-      const filtered = events.filter(e => e.taskId !== taskId);
+      const filtered = events.filter((e) => e.taskId !== taskId);
       if (filtered.length > 0) {
         result[date] = filtered;
       }
@@ -60,7 +60,7 @@ export class TimelineService {
   removeLastEventByType(
     timeline: { [date: string]: TimelineEvent[] },
     taskId: string,
-    eventType: TimelineEventType
+    eventType: TimelineEventType,
   ): { [date: string]: TimelineEvent[] } {
     const result: { [date: string]: TimelineEvent[] } = {};
     let removed = false;
@@ -72,7 +72,8 @@ export class TimelineService {
       const events = timeline[date];
       if (!removed) {
         // Find the last matching event in this date's events
-        const lastIndex = events.map((e, i) => ({ e, i }))
+        const lastIndex = events
+          .map((e, i) => ({ e, i }))
           .filter(({ e }) => e.taskId === taskId && e.type === eventType)
           .pop()?.i;
 
@@ -100,9 +101,7 @@ export class TimelineService {
       hour12: true,
     });
 
-    const stateInfo = event.newState
-      ? ` (${event.previousState} -> ${event.newState})`
-      : '';
+    const stateInfo = event.newState ? ` (${event.previousState} -> ${event.newState})` : '';
 
     return `${timeStr} - ${event.type.charAt(0).toUpperCase() + event.type.slice(1)}: ${event.taskTitle}${stateInfo}`;
   }

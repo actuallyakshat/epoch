@@ -62,11 +62,7 @@ export class StorageService {
 
       // Convert Date objects to ISO strings for JSON serialization
       const serialized = this.serializeDates(data);
-      await fs.writeFile(
-        this.filePath,
-        JSON.stringify(serialized, null, 2),
-        'utf-8'
-      );
+      await fs.writeFile(this.filePath, JSON.stringify(serialized, null, 2), 'utf-8');
     } catch (error) {
       console.error('Failed to save storage:', error);
     }
@@ -89,15 +85,13 @@ export class StorageService {
 
   private hydrateDates(data: any): StorageSchema {
     if (data.tasks) {
-      Object.keys(data.tasks).forEach(date => {
-        data.tasks[date] = data.tasks[date].map((task: any) =>
-          this.hydrateTask(task)
-        );
+      Object.keys(data.tasks).forEach((date) => {
+        data.tasks[date] = data.tasks[date].map((task: any) => this.hydrateTask(task));
       });
     }
 
     if (data.timeline) {
-      Object.keys(data.timeline).forEach(date => {
+      Object.keys(data.timeline).forEach((date) => {
         data.timeline[date] = data.timeline[date].map((event: any) => ({
           ...event,
           timestamp: new Date(event.timestamp),
@@ -117,10 +111,12 @@ export class StorageService {
       updatedAt: new Date(task.updatedAt),
       startTime: task.startTime ? new Date(task.startTime) : undefined,
       endTime: task.endTime ? new Date(task.endTime) : undefined,
-      recurrence: task.recurrence ? {
-        ...task.recurrence,
-        endDate: task.recurrence.endDate ? new Date(task.recurrence.endDate) : undefined,
-      } : undefined,
+      recurrence: task.recurrence
+        ? {
+            ...task.recurrence,
+            endDate: task.recurrence.endDate ? new Date(task.recurrence.endDate) : undefined,
+          }
+        : undefined,
       children: task.children ? task.children.map((child: any) => this.hydrateTask(child)) : [],
     };
   }
@@ -128,17 +124,23 @@ export class StorageService {
   private serializeDates(data: StorageSchema): any {
     return {
       ...data,
-      tasks: Object.keys(data.tasks).reduce((acc, date) => {
-        acc[date] = data.tasks[date].map(task => this.serializeTask(task));
-        return acc;
-      }, {} as Record<string, any>),
-      timeline: Object.keys(data.timeline).reduce((acc, date) => {
-        acc[date] = data.timeline[date].map(event => ({
-          ...event,
-          timestamp: event.timestamp.toISOString(),
-        }));
-        return acc;
-      }, {} as Record<string, any>),
+      tasks: Object.keys(data.tasks).reduce(
+        (acc, date) => {
+          acc[date] = data.tasks[date].map((task) => this.serializeTask(task));
+          return acc;
+        },
+        {} as Record<string, any>,
+      ),
+      timeline: Object.keys(data.timeline).reduce(
+        (acc, date) => {
+          acc[date] = data.timeline[date].map((event) => ({
+            ...event,
+            timestamp: event.timestamp.toISOString(),
+          }));
+          return acc;
+        },
+        {} as Record<string, any>,
+      ),
     };
   }
 
@@ -149,10 +151,12 @@ export class StorageService {
       updatedAt: task.updatedAt.toISOString(),
       startTime: task.startTime ? task.startTime.toISOString() : undefined,
       endTime: task.endTime ? task.endTime.toISOString() : undefined,
-      recurrence: task.recurrence ? {
-        ...task.recurrence,
-        endDate: task.recurrence.endDate ? task.recurrence.endDate.toISOString() : undefined,
-      } : undefined,
+      recurrence: task.recurrence
+        ? {
+            ...task.recurrence,
+            endDate: task.recurrence.endDate ? task.recurrence.endDate.toISOString() : undefined,
+          }
+        : undefined,
       children: task.children ? task.children.map((child: any) => this.serializeTask(child)) : [],
     };
   }

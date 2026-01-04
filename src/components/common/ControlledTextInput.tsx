@@ -1,5 +1,5 @@
-import React, { useRef, useReducer, useEffect } from "react";
-import { Text, useInput } from "ink";
+import React, { useRef, useReducer, useEffect } from 'react';
+import { Text, useInput } from 'ink';
 
 type Props = {
   value: string;
@@ -22,7 +22,7 @@ export const ControlledTextInput: React.FC<Props> = ({
   placeholder,
   focus = true,
   placeholderColor,
-  cursorColor = "white",
+  cursorColor = 'white',
   color,
   maxLength,
 }) => {
@@ -57,16 +57,16 @@ export const ControlledTextInput: React.FC<Props> = ({
   // Helper to find word start (for Ctrl+W, Alt+B)
   const findWordStart = (text: string, pos: number): number => {
     let i = pos - 1;
-    while (i >= 0 && text[i] === " ") i--;
-    while (i >= 0 && text[i] !== " ") i--;
+    while (i >= 0 && text[i] === ' ') i--;
+    while (i >= 0 && text[i] !== ' ') i--;
     return i + 1;
   };
 
   // Helper to find word end (for Alt+F)
   const findWordEnd = (text: string, pos: number): number => {
     let i = pos;
-    while (i < text.length && text[i] === " ") i++;
-    while (i < text.length && text[i] !== " ") i++;
+    while (i < text.length && text[i] === ' ') i++;
+    while (i < text.length && text[i] !== ' ') i++;
     return i;
   };
 
@@ -86,7 +86,7 @@ export const ControlledTextInput: React.FC<Props> = ({
         return;
       }
 
-      if (input === "\r" || input === "\n") return;
+      if (input === '\r' || input === '\n') return;
 
       let nextValue = currentValue;
       let nextCursor = cursor;
@@ -120,8 +120,7 @@ export const ControlledTextInput: React.FC<Props> = ({
       // === CURSOR MOVEMENT ===
       else if (key.leftArrow && !key.ctrl) {
         nextCursor = Math.max(0, cursor - 1);
-      }
-      else if (key.rightArrow && !key.ctrl) {
+      } else if (key.rightArrow && !key.ctrl) {
         nextCursor = Math.min(currentValue.length, cursor + 1);
       }
       // Ctrl+Left: move back one word
@@ -135,34 +134,30 @@ export const ControlledTextInput: React.FC<Props> = ({
         nextCursor = wordEnd;
       }
       // Alt+B: move back one word (readline standard)
-      else if (key.meta && input === "b") {
+      else if (key.meta && input === 'b') {
         const wordStart = findWordStart(currentValue, cursor);
         nextCursor = wordStart;
       }
       // Alt+F: move forward one word (readline standard)
-      else if (key.meta && input === "f") {
+      else if (key.meta && input === 'f') {
         const wordEnd = findWordEnd(currentValue, cursor);
         nextCursor = wordEnd;
       }
       // === CTRL COMBINATIONS ===
-      else if (key.ctrl && input === "a") {
+      else if (key.ctrl && input === 'a') {
         // Move to start
         nextCursor = 0;
-      }
-      else if (key.ctrl && input === "e") {
+      } else if (key.ctrl && input === 'e') {
         // Move to end
         nextCursor = currentValue.length;
-      }
-      else if (key.ctrl && input === "u") {
+      } else if (key.ctrl && input === 'u') {
         // Delete to start of line
         nextValue = currentValue.slice(cursor);
         nextCursor = 0;
-      }
-      else if (key.ctrl && input === "k") {
+      } else if (key.ctrl && input === 'k') {
         // Delete to end of line
         nextValue = currentValue.slice(0, cursor);
-      }
-      else if (key.ctrl && input === "w") {
+      } else if (key.ctrl && input === 'w') {
         // Delete word (backup if backspace check didn't catch it)
         const wordStart = findWordStart(currentValue, cursor);
         nextValue = currentValue.slice(0, wordStart) + currentValue.slice(cursor);
@@ -170,9 +165,10 @@ export const ControlledTextInput: React.FC<Props> = ({
       }
       // === CHARACTER INPUT ===
       else if (!key.ctrl && !key.meta && input.length > 0) {
-        const filtered = input.replace(/[\x00-\x1F\x7F]/g, "");
+        const filtered = input.replace(/[\x00-\x1F\x7F]/g, '');
         if (filtered) {
-          const possibleValue = currentValue.slice(0, cursor) + filtered + currentValue.slice(cursor);
+          const possibleValue =
+            currentValue.slice(0, cursor) + filtered + currentValue.slice(cursor);
           if (!maxLength || possibleValue.length <= maxLength) {
             nextValue = possibleValue;
             nextCursor = cursor + filtered.length;
@@ -200,7 +196,7 @@ export const ControlledTextInput: React.FC<Props> = ({
         forceRender();
       }
     },
-    { isActive: focus }
+    { isActive: focus },
   );
 
   // Read from refs for rendering
@@ -210,7 +206,7 @@ export const ControlledTextInput: React.FC<Props> = ({
 
   // Split text around cursor
   const beforeCursor = displayValue.slice(0, cursor);
-  const atCursor = displayValue[cursor] || " ";
+  const atCursor = displayValue[cursor] || ' ';
   const afterCursor = displayValue.slice(cursor + 1);
 
   return (

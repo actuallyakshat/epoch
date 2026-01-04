@@ -18,7 +18,7 @@ export class TaskService {
       throw new Error(validation.error);
     }
 
-    logger.log("Creating new task", { title, date, state });
+    logger.log('Creating new task', { title, date, state });
 
     const now = new Date();
     return {
@@ -33,17 +33,15 @@ export class TaskService {
   }
 
   updateTask(tasks: TaskTree, taskId: string, updates: Partial<Task>): TaskTree {
-    logger.log("Updating task", { taskId, updates });
+    logger.log('Updating task', { taskId, updates });
 
-    const dateStr = Object.keys(tasks).find(date =>
-      findTaskById(tasks[date], taskId)
-    );
+    const dateStr = Object.keys(tasks).find((date) => findTaskById(tasks[date], taskId));
 
     if (!dateStr) {
       throw new Error('Task not found');
     }
 
-    if (updates.title) {
+    if (updates.title !== undefined) {
       const validation = validateTaskTitle(updates.title);
       if (!validation.valid) {
         throw new Error(validation.error);
@@ -71,14 +69,14 @@ export class TaskService {
   }
 
   deleteTask(tasks: TaskTree, taskId: string): TaskTree {
-    logger.log("Deleting task", { taskId });
+    logger.log('Deleting task', { taskId });
 
-    const dateStr = Object.keys(tasks).find(date =>
-      findTaskById(tasks[date], taskId)
-    );
+    const dateStr = Object.keys(tasks).find((date) => findTaskById(tasks[date], taskId));
 
     if (!dateStr) {
-      logger.log("Task not found for deletion, it might be an ephemeral recurring instance", { taskId });
+      logger.log('Task not found for deletion, it might be an ephemeral recurring instance', {
+        taskId,
+      });
       return tasks;
     }
 
@@ -91,7 +89,7 @@ export class TaskService {
   addSubtask(tasks: TaskTree, parentId: string, title: string): TaskTree {
     const parentTask = Object.values(tasks)
       .flat()
-      .find(t => findTaskById([t], parentId));
+      .find((t) => findTaskById([t], parentId));
 
     if (!parentTask) {
       throw new Error('Parent task not found');
@@ -99,9 +97,7 @@ export class TaskService {
 
     const newSubtask = this.createTask(title, parentTask.date);
 
-    const dateStr = Object.keys(tasks).find(date =>
-      findTaskById(tasks[date], parentId)
-    );
+    const dateStr = Object.keys(tasks).find((date) => findTaskById(tasks[date], parentId));
 
     if (!dateStr) {
       throw new Error('Parent task not found');
@@ -117,13 +113,11 @@ export class TaskService {
   }
 
   changeTaskState(tasks: TaskTree, taskId: string, newState: TaskState): TaskTree {
-    logger.log("Changing task state", { taskId, newState });
+    logger.log('Changing task state', { taskId, newState });
 
     return this.updateTask(tasks, taskId, {
       state: newState,
-      endTime: ['completed', 'delegated', 'delayed'].includes(newState)
-        ? new Date()
-        : undefined,
+      endTime: ['completed', 'delegated', 'delayed'].includes(newState) ? new Date() : undefined,
     });
   }
 
@@ -149,10 +143,10 @@ export class TaskService {
   }
 
   excludeRecurringInstance(tasks: TaskTree, parentTaskId: string, dateStr: string): TaskTree {
-    logger.log("Excluding recurring instance", { parentTaskId, dateStr });
+    logger.log('Excluding recurring instance', { parentTaskId, dateStr });
 
-    const parentDateStr = Object.keys(tasks).find(date =>
-      tasks[date].some(t => t.id === parentTaskId)
+    const parentDateStr = Object.keys(tasks).find((date) =>
+      tasks[date].some((t) => t.id === parentTaskId),
     );
 
     if (!parentDateStr) {
@@ -161,7 +155,7 @@ export class TaskService {
 
     return {
       ...tasks,
-      [parentDateStr]: tasks[parentDateStr].map(task => {
+      [parentDateStr]: tasks[parentDateStr].map((task) => {
         if (task.id === parentTaskId) {
           const recurrence = task.recurrence;
           if (!recurrence) return task;
@@ -172,14 +166,14 @@ export class TaskService {
               ...task,
               recurrence: {
                 ...recurrence,
-                excludedDates: [...excludedDates, dateStr]
+                excludedDates: [...excludedDates, dateStr],
               },
-              updatedAt: new Date()
+              updatedAt: new Date(),
             };
           }
         }
         return task;
-      })
+      }),
     };
   }
 }

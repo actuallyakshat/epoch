@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged to format files
+pnpm lint-staged
+
+# Try to run Sonar, but don't block commit if it fails
+echo "Attempting to run SonarQube scanner..."
+if pnpm sonar; then
+  echo "SonarQube scan completed successfully"
+else
+  echo "Warning: SonarQube scan failed (server may not be running)"
+  echo "To run SonarQube locally: docker run -d -p 9000:9000 sonarqube"
+  echo "Commit will proceed despite SonarQube failure"
+fi

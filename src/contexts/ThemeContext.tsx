@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { getTheme, getThemeNames } from "../themes";
-import type { Theme } from "../types/theme";
-import { useStorage } from "./StorageContext";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getTheme, getThemeNames } from '../themes';
+import type { Theme } from '../types/theme';
+import { useStorage } from './StorageContext';
 
 interface ThemeContextType {
   theme: Theme;
@@ -19,7 +19,7 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   children,
-  initialTheme = "dark",
+  initialTheme = 'dark',
 }) => {
   const { data, save } = useStorage();
   const [themeName, setThemeName] = useState(initialTheme);
@@ -66,7 +66,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
+    throw new Error('useTheme must be used within ThemeProvider');
   }
   return context;
 };

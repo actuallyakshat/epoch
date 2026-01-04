@@ -1,7 +1,7 @@
-import React from "react";
-import { Box, Text } from "ink";
-import { useTheme } from "../../contexts/ThemeContext";
-import type { Task } from "../../types/task";
+import React from 'react';
+import { Box, Text } from 'ink';
+import { useTheme } from '../../contexts/ThemeContext';
+import type { Task } from '../../types/task';
 
 interface TaskItemProps {
   task: Task;
@@ -10,12 +10,7 @@ interface TaskItemProps {
   isExpanded: boolean;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({
-  task,
-  depth,
-  isSelected,
-  isExpanded,
-}) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ task, depth, isSelected, isExpanded }) => {
   const { theme } = useTheme();
 
   const stateColors: Record<string, string | undefined> = {
@@ -26,28 +21,23 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   };
 
   const checkbox =
-    task.state === "completed"
-      ? "☑"
-      : task.state === "delegated"
-      ? "↦"
-      : task.state === "delayed"
-      ? "⏸"
-      : "☐";
+    task.state === 'completed'
+      ? '☑'
+      : task.state === 'delegated'
+        ? '↦'
+        : task.state === 'delayed'
+          ? '⏸'
+          : '☐';
 
-  const expandIcon =
-    task.children.length > 0 ? (isExpanded ? "▼ " : "▶ ") : "  ";
-  const indent = "  ".repeat(depth);
-  const selector = isSelected ? ">" : " ";
+  const expandIcon = task.children.length > 0 ? (isExpanded ? '▼ ' : '▶ ') : '  ';
+  const indent = '  '.repeat(depth);
+  const selector = isSelected ? '>' : ' ';
   const textColor = stateColors[task.state] || theme.colors.foreground;
-  const strikethrough = task.state === "completed";
+  const strikethrough = task.state === 'completed';
 
   return (
     <Box>
-      <Text
-        color={
-          isSelected ? theme.colors.focusIndicator : theme.colors.foreground
-        }
-      >
+      <Text color={isSelected ? theme.colors.focusIndicator : theme.colors.foreground}>
         {selector}
       </Text>
       <Text> </Text>
@@ -55,28 +45,16 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <Text> </Text>
       <Text>{expandIcon}</Text>
       <Text>{indent}</Text>
-      <Text
-        color={textColor}
-        strikethrough={strikethrough}
-        dimColor={task.state === "delayed"}
-      >
+      <Text color={textColor} strikethrough={strikethrough} dimColor={task.state === 'delayed'}>
         {task.title}
       </Text>
       {task.recurrence && (
-        <Text
-          color={
-            isSelected
-              ? theme.colors.focusIndicator
-              : theme.colors.timelineEventStarted
-          }
-        >
-          {" "}
+        <Text color={isSelected ? theme.colors.focusIndicator : theme.colors.timelineEventStarted}>
+          {' '}
           ↺
         </Text>
       )}
-      {task.startTime && !task.endTime && (
-        <Text color={theme.colors.timelineEventStarted}> ▶</Text>
-      )}
+      {task.startTime && !task.endTime && <Text color={theme.colors.timelineEventStarted}> ▶</Text>}
     </Box>
   );
 };

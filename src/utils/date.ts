@@ -1,4 +1,11 @@
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  startOfWeek,
+  endOfWeek,
+} from 'date-fns';
 
 export const formatDate = (date: Date, formatStr: string = 'MMM d, yyyy'): string => {
   return format(date, formatStr);

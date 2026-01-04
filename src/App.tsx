@@ -1,28 +1,28 @@
-import React from "react";
-import { Box, Text } from "ink";
-import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
-import { StorageProvider } from "./contexts/StorageContext";
-import { AppProvider, useApp } from "./contexts/AppContext";
-import { UndoProvider } from "./contexts/UndoContext";
-import { useKeyboardNav } from "./hooks/useKeyboardNav";
-import { useTerminalSize } from "./hooks/useTerminalSize";
-import { ThreeColumnLayout } from "./components/layout/ThreeColumnLayout";
-import { CalendarPane } from "./components/calendar/CalendarPane";
-import { TasksPane } from "./components/tasks/TasksPane";
-import { TimelinePane } from "./components/timeline/TimelinePane";
-import { HelpDialog } from "./components/common/HelpDialog";
-import { ThemeDialog } from "./components/common/ThemeDialog";
-import { SettingsDialog } from "./components/common/SettingsDialog";
-import { RecurringTaskDialog } from "./components/common/RecurringTaskDialog";
-import { RecurringEditDialog } from "./components/common/RecurringEditDialog";
-import type { RecurringEditAction } from "./components/common/RecurringEditDialog";
-import { ClearTimelineDialog } from "./components/common/ClearTimelineDialog";
-import { UpdateDialog } from "./components/common/UpdateDialog";
-import { OverviewScreen } from "./components/overview/OverviewScreen";
-import { FullscreenBackground } from "./components/common/FullscreenBackground";
-import { taskService } from "./services/taskService";
-import type { RecurrencePattern } from "./types/task";
-import { logger } from "./utils/logger";
+import React from 'react';
+import { Box, Text } from 'ink';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { StorageProvider } from './contexts/StorageContext';
+import { AppProvider, useApp } from './contexts/AppContext';
+import { UndoProvider } from './contexts/UndoContext';
+import { useKeyboardNav } from './hooks/useKeyboardNav';
+import { useTerminalSize } from './hooks/useTerminalSize';
+import { ThreeColumnLayout } from './components/layout/ThreeColumnLayout';
+import { CalendarPane } from './components/calendar/CalendarPane';
+import { TasksPane } from './components/tasks/TasksPane';
+import { TimelinePane } from './components/timeline/TimelinePane';
+import { HelpDialog } from './components/common/HelpDialog';
+import { ThemeDialog } from './components/common/ThemeDialog';
+import { SettingsDialog } from './components/common/SettingsDialog';
+import { RecurringTaskDialog } from './components/common/RecurringTaskDialog';
+import { RecurringEditDialog } from './components/common/RecurringEditDialog';
+import type { RecurringEditAction } from './components/common/RecurringEditDialog';
+import { ClearTimelineDialog } from './components/common/ClearTimelineDialog';
+import { UpdateDialog } from './components/common/UpdateDialog';
+import { OverviewScreen } from './components/overview/OverviewScreen';
+import { FullscreenBackground } from './components/common/FullscreenBackground';
+import { taskService } from './services/taskService';
+import type { RecurrencePattern } from './types/task';
+import { logger } from './utils/logger';
 
 const AppContent: React.FC = () => {
   const {
@@ -87,7 +87,7 @@ const AppContent: React.FC = () => {
   if (showRecurringTaskDialog && recurringTaskId) {
     const handleConfirm = (pattern: RecurrencePattern) => {
       try {
-        pushUndoableAction("TASK_UPDATE");
+        pushUndoableAction('TASK_UPDATE');
         const updated = taskService.updateTask(tasks, recurringTaskId, {
           recurrence: pattern,
         });
@@ -95,7 +95,7 @@ const AppContent: React.FC = () => {
         setShowRecurringTaskDialog(false);
         setRecurringTaskId(null);
       } catch (err) {
-        console.error("Error setting task recurrence:", err);
+        console.error('Error setting task recurrence:', err);
       }
     };
 
@@ -109,25 +109,28 @@ const AppContent: React.FC = () => {
 
   if (showRecurringEditDialog && recurringEditConfig) {
     const handleConfirm = (action: RecurringEditAction) => {
-      logger.log("[App] RecurringEditDialog handleConfirm called", { action, actionType: recurringEditConfig.actionType });
-      
-      if (action === "cancel") {
-        logger.log("[App] User cancelled, closing dialog");
+      logger.log('[App] RecurringEditDialog handleConfirm called', {
+        action,
+        actionType: recurringEditConfig.actionType,
+      });
+
+      if (action === 'cancel') {
+        logger.log('[App] User cancelled, closing dialog');
         setShowRecurringEditDialog(false);
         setRecurringEditConfig(null);
         return;
       }
 
       // Call the onConfirm callback passed from TasksPane FIRST
-      if (action === "this" || action === "all" || action === "from-today") {
-        logger.log("[App] Calling onConfirm callback from TasksPane", { action });
+      if (action === 'this' || action === 'all' || action === 'from-today') {
+        logger.log('[App] Calling onConfirm callback from TasksPane', { action });
         recurringEditConfig.onConfirm(action);
       }
-      
+
       // Close dialog after a microtask to ensure TasksPane state updates are processed
-      logger.log("[App] Scheduling dialog close");
+      logger.log('[App] Scheduling dialog close');
       setTimeout(() => {
-        logger.log("[App] Closing dialog now");
+        logger.log('[App] Closing dialog now');
         setShowRecurringEditDialog(false);
         setRecurringEditConfig(null);
       }, 0);
@@ -143,8 +146,14 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <FullscreenBackground backgroundColor={theme.colors.background || "black"}>
-      <Box flexDirection="column" width={width} height={height} padding={1} backgroundColor={theme.colors.background}>
+    <FullscreenBackground backgroundColor={theme.colors.background || 'black'}>
+      <Box
+        flexDirection="column"
+        width={width}
+        height={height}
+        padding={1}
+        backgroundColor={theme.colors.background}
+      >
         {showOverview ? (
           <OverviewScreen />
         ) : (
@@ -159,8 +168,8 @@ const AppContent: React.FC = () => {
         {exitConfirmation && (
           <Box width="100%" justifyContent="center" paddingY={1}>
             <Text backgroundColor="red" color="white" bold>
-              {" "}
-              Press Ctrl+C again to exit Epoch{" "}
+              {' '}
+              Press Ctrl+C again to exit Epoch{' '}
             </Text>
           </Box>
         )}

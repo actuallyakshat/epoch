@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { storageService } from '../services/storage';
 import type { StorageSchema } from '../types/storage';
 
@@ -23,9 +16,7 @@ interface StorageProviderProps {
   children: React.ReactNode;
 }
 
-export const StorageProvider: React.FC<StorageProviderProps> = ({
-  children,
-}) => {
+export const StorageProvider: React.FC<StorageProviderProps> = ({ children }) => {
   const [data, setData] = useState<StorageSchema | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -92,7 +83,7 @@ export const StorageProvider: React.FC<StorageProviderProps> = ({
       }
       if (latestDataRef.current) {
         // Use sync write for unmount to ensure data is saved
-        storageService.save(latestDataRef.current).catch(err => {
+        storageService.save(latestDataRef.current).catch((err) => {
           console.error('Failed to save on unmount:', err);
         });
       }

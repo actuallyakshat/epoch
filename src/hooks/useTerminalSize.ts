@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useStdout } from "ink";
+import { useState, useEffect } from 'react';
+import { useStdout } from 'ink';
 
 interface TerminalSize {
   width: number;
@@ -34,11 +34,11 @@ export const useTerminalSize = (): TerminalSize => {
       });
     };
 
-    stdout.on("resize", handleResize);
+    stdout.on('resize', handleResize);
 
     // Cleanup listener on unmount
     return () => {
-      stdout.off("resize", handleResize);
+      stdout.off('resize', handleResize);
     };
   }, [stdout]);
 

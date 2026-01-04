@@ -1,11 +1,10 @@
-
 import type { Theme } from '../types/theme';
 
 export const terminalTheme: Theme = {
   name: 'terminal',
   colors: {
     // defaults rely on terminal settings
-    
+
     border: 'gray',
 
     calendarBorder: 'gray',

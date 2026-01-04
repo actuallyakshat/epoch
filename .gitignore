@@ -4,3 +4,7 @@ dist/
 *.log
 .env
 .env.local
+
+# SonarQube exports
+sonar-issues.json
+sonar-issues.md

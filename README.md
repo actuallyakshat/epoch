@@ -17,6 +17,7 @@ Epoch is a modern, terminal-based task logger and time tracker built with TypeSc
 ## Installation & Running
 
 ### Prerequisites
+
 - Node.js (v16+ recommended)
 - pnpm
 
@@ -39,18 +40,21 @@ pnpm start
 Epoch is designed to be used entirely without a mouse.
 
 ### Global Navigation
+
 - `1` / `2` / `3`: Switch directly to Calendar / Tasks / Timeline panes
 - `Tab` / `Shift+Tab`: Cycle through panes
 - `?`: Toggle help dialog
 - `q`: Quit application
 
 ### Calendar Pane
+
 - `j` / `k` (or `↓` / `↑`): Navigate weeks
 - `h` / `l` (or `←` / `→`): Navigate days
 - `n` / `p`: Next / Previous month
 - `Enter`: Select date
 
 ### Tasks Pane
+
 - `a`: Add new task
 - `e`: Edit task title
 - `d`: Delete task
@@ -63,6 +67,7 @@ Epoch is designed to be used entirely without a mouse.
 - `Enter`: Expand/Collapse subtasks
 
 ### Timeline Pane
+
 - `j` / `k`: Scroll through activity history
 - `t`: Toggle theme (Dark/Light)
 
@@ -82,7 +87,51 @@ Your data is stored locally in a human-readable JSON file. This allows for easy 
 - **Date Handling**: date-fns
 - **Persistence**: File System (JSON)
 
+## Development & Code Quality
+
+### Testing
+
+```bash
+pnpm test          # Run tests
+pnpm test:coverage # Run tests with coverage report
+```
+
+### Code Formatting
+
+Code is automatically formatted with Prettier on every commit.
+
+```bash
+pnpm format        # Format all files
+pnpm format:check  # Check formatting without modifying files
+```
+
+### Local SonarQube Analysis
+
+This project uses SonarQube for local code quality analysis (runs in pre-commit hook).
+
+**To run SonarQube locally:**
+
+```bash
+# Start SonarQube server (Docker)
+docker run -d -p 9000:9000 --name sonarqube sonarqube
+
+# Initialize server at http://localhost:9000 (admin/admin)
+# Create a new project and generate a token
+
+# Add token to environment
+export SONAR_TOKEN=your_token_here
+
+# Run analysis
+pnpm sonar
+```
+
+**Pre-commit Hook:**
+
+- Runs `lint-staged` to format staged files with Prettier
+- Attempts to run SonarQube scanner (non-blocking if server unavailable)
+
+Configuration: See `sonar-project.properties`
+
 ## Author
 
 Created by [Akshat Dubey](mailto:akshatdubey0808@gmail.com).
-
