@@ -13,6 +13,7 @@ Epoch is a modern, terminal-based task logger and time tracker built with TypeSc
 - **Task States**: Track tasks through 'todo', 'completed', 'delegated', and 'delayed' states.
 - **Extensible Themes**: Comes with built-in dark and light themes (plus 20+ community themes like Catppuccin, Nord, Dracula).
 - **Local Persistence**: Data is saved locally in JSON format for easy backup, portability, and privacy.
+- **Cross-Machine Sync**: Export and import your data across machines using temporary cloud storage with secure 8-character codes.
 
 ## Installation & Running
 
@@ -78,6 +79,87 @@ Your data is stored locally in a human-readable JSON file. This allows for easy 
 - **macOS**: `~/Library/Application Support/epoch/data.json`
 - **Linux**: `~/.local/share/epoch/data.json` (or `$XDG_DATA_HOME`)
 - **Windows**: `%APPDATA%\epoch\data.json`
+
+## Cross-Machine Data Sharing
+
+Epoch now supports exporting and importing your data across machines using a temporary cloud-based storage solution. This feature is perfect for syncing your tasks between your work laptop and home desktop, or sharing a snapshot with a colleague.
+
+### How It Works
+
+The sharing functionality uses a dedicated server (see `server/` directory) that:
+
+- **Temporarily stores** your data in Redis (Upstash)
+- **Generates a secure 8-character code** for each export
+- **Expires data after 5 minutes** (TTL: 300 seconds)
+- **Hashes codes with bcrypt** for security
+- **Rate limits requests** (100 requests per 15 minutes)
+
+### Usage
+
+#### Exporting Data
+
+```bash
+epoch export
+```
+
+This will:
+
+1. Upload your current data to the server
+2. Generate a unique 8-character code
+3. Display the code and expiration time
+
+Example output:
+
+```
+Data exported successfully!
+---------------------------
+Secret Key: aB3dE7fG
+Expires: 1/4/2026, 7:45:30 PM
+---------------------------
+
+Run 'epoch import' on another machine and enter this key to sync your data.
+```
+
+#### Importing Data
+
+```bash
+epoch import
+```
+
+This will:
+
+1. Prompt you to enter the 8-character code
+2. Fetch the data from the server
+3. Ask whether to **replace** or **merge** with existing data
+   - **Replace (r)**: Overwrites all local data
+   - **Merge (m)**: Combines remote data with local, preserving both
+
+Example workflow:
+
+```
+$ epoch import
+Enter your secret key: aB3dE7fG
+
+Data found! Do you want to (r)eplace existing data or (m)erge with it? [r/m]: m
+Data successfully merged.
+```
+
+### Server Details
+
+The export/import server is hosted at `https://epoch-server.actuallyakshat.in` and provides:
+
+- **Health check endpoint**: `GET /api/health`
+- **Export endpoint**: `POST /api/data/export`
+- **Import endpoint**: `POST /api/data/import`
+
+For development or self-hosting, see the `server/` directory for complete setup instructions including:
+
+- Express.js + TypeScript server
+- Upstash Redis integration
+- Docker deployment configuration
+- Swagger API documentation
+
+**Note**: Data is stored temporarily (5 minutes) for security and privacy. This is not a backup solution—it's designed for quick transfers between machines.
 
 ## Tech Stack
 
